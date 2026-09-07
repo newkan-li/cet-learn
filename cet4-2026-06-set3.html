@@ -101,7 +101,7 @@ canvas#sCanvas{width:100%;height:150px;border:1.5px dashed #b9c6d2;border-radius
 
 .pmbox{position:relative;margin:4px 0}
 .pmbox .passage{margin:0;padding-right:6px}
-.pmow{position:absolute;inset:0;width:100%;height:100%;display:block;background:transparent;touch-action:none;cursor:crosshair;pointer-events:auto}
+.pmow{position:absolute;inset:0;width:100%;height:100%;display:block;background:transparent;touch-action:none;cursor:crosshair;pointer-events:none}body.pmink canvas.pmow{pointer-events:auto}
 .pmfoot{display:flex;align-items:center;gap:8px;margin:2px 0 6px}
 .pmlbl{font-size:12px;color:#5b6b7b;flex:0 0 auto}
 #lineBtn.navbtn.on,#lineBtn.navbtn.eraser-on{background:#c0392b;color:#fff;border-color:#c0392b}
@@ -640,7 +640,7 @@ function sPos(ev){var c=document.getElementById('sCanvas');var r=c.getBoundingCl
 var ERASER=false;
 function strokeCtx(ctx){if(!ctx)return;if(ERASER){ctx.globalCompositeOperation='destination-out';ctx.lineWidth=26;ctx.strokeStyle='rgba(0,0,0,1)';}else{ctx.globalCompositeOperation='source-over';ctx.lineWidth=4;ctx.strokeStyle='#22303f';}ctx.lineCap='round';ctx.lineJoin='round';}
 function resetCtx(ctx){if(ctx){ctx.globalCompositeOperation='source-over';}}
-var _ge=0;function vEraser(){var _n=Date.now();if(_n-_ge<250)return;_ge=_n;ERASER=!ERASER;var b=document.getElementById('eraserBtn');if(b){b.textContent=ERASER?'🧽 橡皮：开(擦除)':'🧽 橡皮：关';if(b.classList)b.classList.toggle('eraser-on',ERASER);}var ch=document.getElementById('vchip');if(ch)ch.style.display='none';try{if(window.getSelection&&window.getSelection().removeAllRanges)window.getSelection().removeAllRanges();}catch(e){}return ERASER;}
+var _ge=0;function vEraser(){var _n=Date.now();if(_n-_ge<250)return;_ge=_n;ERASER=!ERASER;var b=document.getElementById('eraserBtn');if(b){b.textContent=ERASER?'🧽 橡皮：开(擦除)':'🧽 橡皮：关';if(b.classList)b.classList.toggle('eraser-on',ERASER);}var ch=document.getElementById('vchip');if(ch)ch.style.display='none';try{if(window.getSelection&&window.getSelection().removeAllRanges)window.getSelection().removeAllRanges();}catch(e){}pmSync();return ERASER;}
 
 var _eraserLast=0;
 function vEraserTap(){var n=Date.now();if(n-_eraserLast<320)return;_eraserLast=n;vEraser();}
@@ -806,11 +806,11 @@ function vExportPDF(){
 
 /* ===== A-P 段落原文直接标注（透明覆盖 + 下划线模式） ===== */
 var STRAIGHT=false;
-function vLine(){STRAIGHT=!STRAIGHT;var b=document.getElementById('lineBtn');if(b){b.textContent=STRAIGHT?'➖ 横线：开':'➖ 横线：关';if(b.classList)b.classList.toggle('eraser-on',STRAIGHT);}return STRAIGHT;}
+function vLine(){STRAIGHT=!STRAIGHT;var b=document.getElementById('lineBtn');if(b){b.textContent=STRAIGHT?'➖ 横线：开':'➖ 横线：关';if(b.classList)b.classList.toggle('eraser-on',STRAIGHT);}pmSync();return STRAIGHT;}
 function wbSaveOv(k,c){try{var url=c.toDataURL('image/png');localStorage.setItem('wbcanvas:'+k,url);}catch(e){}}
 function bindPM(c){
  var k=c.getAttribute('data-key');if(!k)return;
- var st=[],drawing=false,snap=null,ax=0,ay=0;
+ var st=[],drawing=false,snap=null,ax=0,ay=0,_dx=0,_dy=0,_dt=0;
  function setI(){try{var r=c.getBoundingClientRect();var w=Math.max(40,r.width);c.width=1000;c.height=Math.max(20,Math.round(r.height*(1000/w)));}catch(e){c.width=1000;c.height=300;}}
  setI();
  function pos(ev){var r=c.getBoundingClientRect();var p=ev.touches?ev.touches[0]:ev;return{x:(p.clientX-r.left)*(c.width/r.width),y:(p.clientY-r.top)*(c.height/r.height)};}
@@ -818,7 +818,7 @@ function bindPM(c){
  function canDraw(){return ERASER||STRAIGHT;}
  c.addEventListener('pointerdown',function(ev){
   if(!canDraw()){ev.preventDefault();return;}
-  drawing=true;
+  drawing=true;_dx=ev.clientX;_dy=ev.clientY;_dt=Date.now();
   var ctx=c.getContext('2d');
   if(STRAIGHT&&!ERASER){try{snap=ctx.getImageData(0,0,c.width,c.height);}catch(e){snap=null;}var p=pos(ev);ax=p.x;ay=p.y;st=[[ax,ay]];}
   else{if(st.length&&st[st.length-1]!==null)st.push(null);var q=pos(ev);st.push([q.x,q.y]);}
@@ -840,11 +840,46 @@ function bindPM(c){
   ctx.beginPath();if(last&&last.length===2)ctx.moveTo(last[0],last[1]);else ctx.moveTo(p.x,p.y);
   ctx.lineTo(p.x,p.y);ctx.stroke();ev.preventDefault();
  });
- function end(){if(drawing){drawing=false;var ctx=c.getContext('2d');resetCtx(ctx);wbSaveOv(k,c);}}
+ function end(ev){if(drawing){drawing=false;if(ev&&STRAIGHT&&!ERASER){var _mx=ev.clientX,_my=ev.clientY,_dt2=Date.now()-_dt,_ddx=_mx-_dx,_ddy=_my-_dy;if(_ddx*_ddx+_ddy*_ddy<64&&_dt2<600){pmWordAt(_mx,_my);return;}}var ctx=c.getContext('2d');resetCtx(ctx);wbSaveOv(k,c);}}
  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
 }
 function wbRestorePM(c){var k=c.getAttribute('data-key');if(!k)return;try{var s=localStorage.getItem('wbcanvas:'+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}}
 window.addEventListener('load',function(){document.querySelectorAll('canvas.pmow[data-key]').forEach(function(c){bindPM(c);wbRestorePM(c);});});
+/* ---- PM word pick (iPad Apple Pencil / tap) ---- */
+var _pmchipHide=0;
+function pmSync(){var on=ERASER||STRAIGHT;document.body.classList.toggle('pmink',on);}
+function pmHideChip(){var c=document.getElementById('vchip');if(c)c.style.display='none';}
+function pmShowLater(x,y,w){
+ var chip=document.getElementById('vchip');if(!chip)return;
+ setTimeout(function(){vSel=w;chip.textContent='＋ 加入生词本';
+  var top=window.scrollY+y+10,left=window.scrollX+x-90;
+  try{var r=document.caretRangeFromPoint(x,y);if(r&&r.startContainer){var rc=r.getBoundingClientRect();top=window.scrollY+rc.bottom+6;left=window.scrollX+rc.left;}}catch(e){}
+  left=Math.max(4,Math.min(left,window.scrollX+window.innerWidth-170));
+  chip.style.top=top+'px';chip.style.left=left+'px';chip.style.display='block';
+  if(_pmchipHide)clearTimeout(_pmchipHide);
+  _pmchipHide=setTimeout(pmHideChip,7000);
+ },90);
+}
+function pmWordAt(x,y){
+ var r=null;try{r=document.caretRangeFromPoint(x,y);}catch(e){r=null;}
+ var w='';
+ if(r&&r.startContainer&&r.startContainer.nodeType===3){
+  var node=r.startContainer,txt=node.nodeValue||'',off=Math.min(r.startOffset,txt.length);
+  var isWc=function(ch){return /[A-Za-z0-9'\u2019\-]/.test(ch);};
+  var p=off;
+  if(p>0&&isWc(txt.charAt(p-1)))p=p-1;
+  else if(p<txt.length&&isWc(txt.charAt(p)))p=p;
+  else return;
+  var q=p+1;
+  while(p>0&&isWc(txt.charAt(p-1)))p--;
+  while(q<txt.length&&isWc(txt.charAt(q)))q++;
+  w=txt.slice(p,q).trim();
+ }
+ w=w.replace(/^[^A-Za-z0-9'\u2019\-]+/,'').replace(/[^A-Za-z0-9'\u2019\-]+$/,'');
+ if(!/[A-Za-z]/.test(w))return;
+ pmShowLater(x,y,w);
+}
+window.addEventListener('load',function(){pmSync();});
 
 /* ============ 选择题作答 + 错误统计 ============ */
 var MCK='cet4mc', MCSELK='cet4mcsel';
