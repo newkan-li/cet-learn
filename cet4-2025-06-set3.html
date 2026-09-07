@@ -681,13 +681,13 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden)vBad
 
 /* ---------- 写作/翻译手写练习板 (Apple Pencil) ---------- */
 function wbSave(k,c){
- try{var tmp=document.createElement('canvas');var dw=600;tmp.width=dw;tmp.height=Math.max(1,Math.round(c.height*dw/c.width));var tc=tmp.getContext('2d');tc.fillStyle='#fffdf7';tc.fillRect(0,0,tmp.width,tmp.height);tc.drawImage(c,0,0,tmp.width,tmp.height);localStorage.setItem('wbcanvas:'+k,tmp.toDataURL('image/png'));}catch(e){}
+ try{var tmp=document.createElement('canvas');var dw=600;tmp.width=dw;tmp.height=Math.max(1,Math.round(c.height*dw/c.width));var tc=tmp.getContext('2d');tc.fillStyle='#fffdf7';tc.fillRect(0,0,tmp.width,tmp.height);tc.drawImage(c,0,0,tmp.width,tmp.height);localStorage.setItem(WBK+k,tmp.toDataURL('image/png'));}catch(e){}
 }
-function wbErase(k,c){try{var ctx=c.getContext('2d');if(ctx)ctx.clearRect(0,0,c.width,c.height);localStorage.removeItem('wbcanvas:'+k);}catch(e){}}
+function wbErase(k,c){try{var ctx=c.getContext('2d');if(ctx)ctx.clearRect(0,0,c.width,c.height);localStorage.removeItem(WBK+k);}catch(e){}}
 function wbRestoreAll(){
  document.querySelectorAll('.wb').forEach(function(wb){
   var k=wb.getAttribute('data-key');var c=wb.querySelector('canvas.wc');if(!k||!c)return;
-  try{var s=localStorage.getItem('wbcanvas:'+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}
+  try{var s=localStorage.getItem(WBK+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}
  });
 }
 function wbInitBoard(wb){
@@ -715,7 +715,7 @@ window.addEventListener('load',function(){
 });
 
 /* ---- 手写作品 导出 / 导入 / 单区下载 ---- */
-function wbCollect(){var out={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wbcanvas:')===0){out[k]=localStorage.getItem(k);}}}catch(e){}return out;}
+function wbCollect(){var out={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf(WBK)===0){out[k]=localStorage.getItem(k);}}}catch(e){}return out;}
 function wbExportAll(){
  var d=wbCollect();var keys=Object.keys(d);if(!keys.length){alert('暂无手写作品（先在翻译/作文书写区写几笔）。');return;}
 var obj={_type:'cet4-handwriting',created:new Date().toISOString(),boards:d,mc:mcLoad()};
@@ -726,12 +726,12 @@ var obj={_type:'cet4-handwriting',created:new Date().toISOString(),boards:d,mc:m
 function wbImportFile(ev){
  var f=ev.target.files&&ev.target.files[0];if(!f)return;
  var rd=new FileReader();
- rd.onload=function(){try{var o=JSON.parse(rd.result);var d=(o&&o._type==='cet4-handwriting')?o.boards:o;var n=0;for(var k in d){if(k&&d.hasOwnProperty(k)&&k.indexOf('wbcanvas:')===0&&typeof d[k]==='string'){try{localStorage.setItem(k,d[k]);n++;}catch(e){}}}if(!n&&typeof d==='object'){for(var k2 in d){if(d.hasOwnProperty(k2)&&typeof d[k2]==='string'){try{localStorage.setItem('wbcanvas:'+k2,d[k2]);n++;}catch(e){}}}}if(o&&o.mc){mcSave(o.mc);}alert('导入成功：'+n+' 块手写作品；选择题统计已随备份恢复。');wbRestoreAll();}catch(e){alert('文件格式不正确。');}};
+ rd.onload=function(){try{var o=JSON.parse(rd.result);var d=(o&&o._type==='cet4-handwriting')?o.boards:o;var n=0;function normKey(r){var s=String(r||'');if(s.indexOf('wbcanvas:')===0)s=s.slice(9);var p=s.split(':');if(p.length>=2&&/^[a-z]\d{3}$/.test(p[0]))s=p.slice(1).join(':');return s;}for(var k in d){if(d&&d.hasOwnProperty(k)&&typeof d[k]==='string'&&k.indexOf('wbcanvas:')===0){var tgt=(k.indexOf(WBK)===0)?k:WBK+normKey(k);try{if(!localStorage.getItem(tgt)){localStorage.setItem(tgt,d[k]);n++;}}catch(e){}}}if(o&&o.mc){mcSave(o.mc);}alert('导入成功：'+n+' 块手写作品；选择题统计已随备份恢复。');wbRestoreAll();}catch(e){alert('文件格式不正确。');}};
  rd.readAsText(f);ev.target.value='';
 }
 function wbDownloadBoard(wb){
  var k=wb.getAttribute('data-key')||'';var c=wb.querySelector('canvas.wc');if(!k||!c)return;
- var s=null;try{s=localStorage.getItem('wbcanvas:'+k);}catch(e){}
+ var s=null;try{s=localStorage.getItem(WBK+k);}catch(e){}
  if(!s){try{var tmp=document.createElement('canvas');var dw=1200;tmp.width=dw;tmp.height=Math.max(1,Math.round(c.height*dw/c.width));var tc=tmp.getContext('2d');tc.fillStyle='#fffdf7';tc.fillRect(0,0,tmp.width,tmp.height);tc.drawImage(c,0,0,tmp.width,tmp.height);s=tmp.toDataURL('image/png');}catch(e){s=null;}}
  if(!s){alert('此书写区为空。');return;}
  var a=document.createElement('a');a.href=s;a.download=(k||'board')+'.png';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},400);
@@ -747,13 +747,14 @@ function bindWBLine(c){
  function end(){if(drawing){drawing=false;resetCtx(c.getContext('2d'));wbSave(k,c);}}
  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
 }
-function wbRestoreLine(c){var k=c.getAttribute('data-key');if(!k)return;try{var s=localStorage.getItem('wbcanvas:'+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}}
+function wbRestoreLine(c){var k=c.getAttribute('data-key');if(!k)return;try{var s=localStorage.getItem(WBK+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}}
 function wbSheetClear(scope){if(!scope)return;var arr=scope.querySelectorAll('canvas[data-key]');arr.forEach(function(c){wbErase(c.getAttribute('data-key'),c);});}
 window.addEventListener('load',function(){document.querySelectorAll('.wbsheet canvas[data-key]').forEach(function(c){bindWBLine(c);wbRestoreLine(c);});
  document.querySelectorAll('canvas.inlwc[data-key],canvas.pmshort[data-key],canvas.grfill[data-key]').forEach(function(c){bindWBLine(c);wbRestoreLine(c);});});
 
 /* ============ 一键导出：练习+手写 → PDF (print window) ============ */
 var ANSDATA={"title": "2025年6月英语四级真题（第3套）", "appwords": [["hemispherectomy", "大脑半球切除术"], ["surgical procedure", "外科手术"], ["intact brains", "完好的大脑"], ["compensate for", "弥补"], ["critical organ", "关键器官"], ["medical literature", "医学文献"], ["responsible for sight", "负责视觉"], ["retained", "保留"], ["visual tasks", "视觉任务"], ["remaining half", "剩余的一半"], ["strengthened", "增强的"], ["take over", "接管"], ["process smells", "处理气味"], ["adapt", "适应"], ["phantom traffic jams", "幽灵堵车"], ["emergent property", "涌现特性"], ["crawl to a halt", "缓慢挪动至停滞"], ["slow down slightly", "轻微减速"], ["spread backward", "向后扩散"], ["like a wave", "如波浪般"], ["damper", "抑制"], ["bilateral control", "双边控制"], ["adaptive cruise control", "自适应巡航"], ["autonomous cruise control", "自动驾驶巡航"], ["throughput", "通过量"], ["tailgating", "紧跟车尾"], ["rear-facing sensors", "后向传感器"], ["forward-facing sensors", "前向传感器"], ["schools of fish", "鱼群"], ["densely packed", "密集的"], ["simulation", "模拟"], ["physical beauty", "外在美"], ["soulful", "触及灵魂的"], ["polish an image", "打磨形象"], ["intimacy", "亲密"], ["fulfillment", "成就感；满足"], ["skin deep", "浮于表层"], ["starlets", "小明星"], ["resentment", "怨恨"], ["bitter court battles", "难堪的官司"], ["a curse as a blessing", "亦祸亦福"], ["cultivate inner qualities", "培养内在品质"], ["authentic", "真实的"], ["magnetic attraction", "磁石般的吸引"], ["superficial", "表面的"], ["compatible souls", "契合的灵魂"], ["appreciate us as we are", "欣赏原本的我们"], ["plant-based meats", "植物基肉类"], ["meatless meat", "无肉之“肉”"], ["imitation meats", "仿制肉"], ["vegetarians", "素食者"], ["alternative protein", "替代蛋白"], ["skyrocket", "飙升"], ["rubbery", "有嚼劲橡皮感的"], ["cholesterol-free", "零胆固醇"], ["sodium", "钠"], ["highly processed", "高度加工"], ["red meat", "红肉"], ["blood sugar", "血糖"], ["ditch meat", "戒肉"], ["whole grains", "全谷物"], ["sustainable", "可持续的"]], "appkey": "a063", "cloze": [{"no": 26, "letter": "G", "word": "particularly"}, {"no": 27, "letter": "F", "word": "organ"}, {"no": 28, "letter": "H", "word": "remaining"}, {"no": 29, "letter": "C", "word": "indicates"}, {"no": 30, "letter": "E", "word": "literature"}, {"no": 31, "letter": "A", "word": "adapt"}, {"no": 32, "letter": "I", "word": "responsible"}, {"no": 33, "letter": "K", "word": "still"}, {"no": 34, "letter": "O", "word": "visual"}, {"no": 35, "letter": "J", "word": "retained"}], "match": [{"no": 36, "letter": "C"}, {"no": 37, "letter": "H"}, {"no": 38, "letter": "E"}, {"no": 39, "letter": "N"}, {"no": 40, "letter": "F"}, {"no": 41, "letter": "B"}, {"no": 42, "letter": "M"}, {"no": 43, "letter": "G"}, {"no": 44, "letter": "D"}, {"no": 45, "letter": "L"}], "reading": [{"no": "46", "ans": "B"}, {"no": "47", "ans": "C"}, {"no": "48", "ans": "D"}, {"no": "49", "ans": "A"}, {"no": "50", "ans": "C"}, {"no": "51", "ans": "C"}, {"no": "52", "ans": "A"}, {"no": "53", "ans": "B"}, {"no": "54", "ans": "D"}, {"no": "55", "ans": "A"}], "trans": [{"zh": "近年来，中国东北地区正在大力开发冰雪资源。", "en": "In recent years, the northeastern region of China has been vigorously developing its ice and snow resources."}, {"zh": "例如，哈尔滨利用丰富的冰雪资源打造了极具地方特色的“冰雪大世界”，让游客在欣赏冰雪之美的同时也能体验当地独特的民俗文化。", "en": "For example, Harbin has made use of its abundant ice and snow resources to build the “Ice and Snow World”, a place full of local characteristics, where tourists can appreciate the beauty of ice and snow while experiencing the local unique folk culture."}, {"zh": "如今，曾令人畏惧的冰天雪地正吸引着四面八方的游客，成为深受欢迎的旅游胜地。", "en": "Today, the ice-and-snow world that was once intimidating is attracting tourists from far and wide and has become a popular tourist destination."}, {"zh": "冰雪旅游业正为当地的经济发展做出越来越大的贡献。", "en": "The ice-and-snow tourism industry is making an ever-increasing contribution to the local economic development."}], "essay": ["Dear sir or madam,", "In my view, AI technology can greatly help our learning if it is used properly.", "First and foremost, AI tools such as ChatGPT can explain difficult concepts clearly and provide plenty of practice materials, which saves us much time and energy.", "In addition, AI offers instant feedback on our writing and speaking, so we can find and correct our mistakes quickly and improve step by step.", "However, we should never rely on AI to finish homework or write essays for us, because that weakens our ability to think independently and even becomes a kind of cheating.", "In conclusion, I believe the appropriate use of AI means treating it as an assistant rather than a substitute, so that we can study in a smarter but still honest way.", "Yours sincerely,", "Li Ming"], "vocab": [["hemispherectomy", "大脑半球切除术"], ["surgical procedure", "外科手术"], ["intact brains", "完好的大脑"], ["compensate for", "弥补"], ["critical organ", "关键器官"], ["medical literature", "医学文献"], ["responsible for sight", "负责视觉"], ["retained", "保留"], ["visual tasks", "视觉任务"], ["remaining half", "剩余的一半"], ["strengthened", "增强的"], ["take over", "接管"], ["process smells", "处理气味"], ["adapt", "适应"], ["phantom traffic jams", "幽灵堵车"], ["emergent property", "涌现特性"], ["crawl to a halt", "缓慢挪动至停滞"], ["slow down slightly", "轻微减速"], ["spread backward", "向后扩散"], ["like a wave", "如波浪般"], ["damper", "抑制"], ["bilateral control", "双边控制"], ["adaptive cruise control", "自适应巡航"], ["autonomous cruise control", "自动驾驶巡航"], ["throughput", "通过量"], ["tailgating", "紧跟车尾"], ["rear-facing sensors", "后向传感器"], ["forward-facing sensors", "前向传感器"], ["schools of fish", "鱼群"], ["densely packed", "密集的"], ["simulation", "模拟"], ["physical beauty", "外在美"], ["soulful", "触及灵魂的"], ["polish an image", "打磨形象"], ["intimacy", "亲密"], ["fulfillment", "成就感；满足"], ["skin deep", "浮于表层"], ["starlets", "小明星"], ["resentment", "怨恨"], ["bitter court battles", "难堪的官司"], ["a curse as a blessing", "亦祸亦福"], ["cultivate inner qualities", "培养内在品质"], ["authentic", "真实的"], ["magnetic attraction", "磁石般的吸引"], ["superficial", "表面的"], ["compatible souls", "契合的灵魂"], ["appreciate us as we are", "欣赏原本的我们"], ["plant-based meats", "植物基肉类"], ["meatless meat", "无肉之“肉”"], ["imitation meats", "仿制肉"], ["vegetarians", "素食者"], ["alternative protein", "替代蛋白"], ["skyrocket", "飙升"], ["rubbery", "有嚼劲橡皮感的"], ["cholesterol-free", "零胆固醇"], ["sodium", "钠"], ["highly processed", "高度加工"], ["red meat", "红肉"], ["blood sugar", "血糖"], ["ditch meat", "戒肉"], ["whole grains", "全谷物"], ["sustainable", "可持续的"]]};var SETTITLE=(ANSDATA&&ANSDATA.title)||'2026年6月英语四级真题（第2套）';
+var _APK0=(ANSDATA&&ANSDATA.appkey)||'x';VB_KEY='cet4vbook:'+_APK0;
 function pdCloneToHTML(id, removeAnswerText){
  var el=document.getElementById(id);if(!el)return '';
  var c=el.cloneNode(true);
@@ -763,7 +764,7 @@ function pdCloneToHTML(id, removeAnswerText){
  if(removeAnswerText){var ma=c.querySelectorAll('.model-essay');ma.forEach(function(n){if(n&&n.parentNode)n.parentNode.removeChild(n);});}
  c.querySelectorAll('canvas').forEach(function(cv){
   var pn=cv.parentNode;if(!pn)return;
-  var k=cv.getAttribute('data-key')||'';var s=null;try{s=localStorage.getItem('wbcanvas:'+k);}catch(e){}
+  var k=cv.getAttribute('data-key')||'';var s=null;try{s=localStorage.getItem(WBK+k);}catch(e){}
   if(s){var im=document.createElement('img');im.src=s;im.style.maxWidth='100%';pn.replaceChild(im,cv);return;}
   var ph=document.createElement('span');ph.style.cssText='display:block;min-height:88px;border:1px dashed #999;background:#fff;';
   var cls=String(cv.className||'');
@@ -811,7 +812,7 @@ function vExportPDF(){
 /* ===== A-P 段落原文直接标注（透明覆盖 + 下划线模式） ===== */
 var STRAIGHT=false;
 function vLine(){STRAIGHT=!STRAIGHT;var b=document.getElementById('lineBtn');if(b){b.textContent=STRAIGHT?'➖ 横线：开':'➖ 横线：关';if(b.classList)b.classList.toggle('eraser-on',STRAIGHT);}pmSync();return STRAIGHT;}
-function wbSaveOv(k,c){try{var url=c.toDataURL('image/png');localStorage.setItem('wbcanvas:'+k,url);}catch(e){}}
+function wbSaveOv(k,c){try{var url=c.toDataURL('image/png');localStorage.setItem(WBK+k,url);}catch(e){}}
 function bindPM(c){
  var k=c.getAttribute('data-key');if(!k)return;
  var st=[],drawing=false,snap=null,ax=0,ay=0,_dx=0,_dy=0,_dt=0;
@@ -847,7 +848,7 @@ function bindPM(c){
  function end(ev){if(drawing){drawing=false;if(ev&&STRAIGHT&&!ERASER){var _mx=ev.clientX,_my=ev.clientY,_dt2=Date.now()-_dt,_ddx=_mx-_dx,_ddy=_my-_dy;if(_ddx*_ddx+_ddy*_ddy<64&&_dt2<600){pmWordAt(_mx,_my);return;}}var ctx=c.getContext('2d');resetCtx(ctx);wbSaveOv(k,c);}}
  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
 }
-function wbRestorePM(c){var k=c.getAttribute('data-key');if(!k)return;try{var s=localStorage.getItem('wbcanvas:'+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}}
+function wbRestorePM(c){var k=c.getAttribute('data-key');if(!k)return;try{var s=localStorage.getItem(WBK+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}}
 window.addEventListener('load',function(){document.querySelectorAll('canvas.pmow[data-key]').forEach(function(c){bindPM(c);wbRestorePM(c);});});
 /* ---- PM word pick (iPad Apple Pencil / tap) ---- */
 var _pmchipHide=0;
@@ -886,7 +887,26 @@ function pmWordAt(x,y){
 window.addEventListener('load',function(){pmSync();});
 
 /* ============ 选择题作答 + 错误统计 ============ */
-var MCK='cet4mc', MCSELK='cet4mcsel';
+var _APK=(ANSDATA&&ANSDATA.appkey)||'x';
+var MCK='cet4mc:'+_APK, MCSELK='cet4mcsel:'+_APK;
+var WBK='wbcanvas:'+_APK+':';
+function migrateLegacy(){
+ try{
+  if(localStorage.getItem('nsfix-global'))return;
+  var copied=0,i,k,v,nk;
+  for(i=localStorage.length-1;i>=0;i--){k=localStorage.key(i);if(!k)continue;
+   if(k.indexOf('wbcanvas:')===0&&k.indexOf(WBK)!==0){
+    v=localStorage.getItem(k);nk=WBK+k.slice(('wbcanvas:').length);
+    if(v&&!localStorage.getItem(nk)){try{localStorage.setItem(nk,v);copied++;}catch(e){}}
+   }
+  }
+  ['cet4mc','cet4mcsel'].forEach(function(b){try{v=localStorage.getItem(b);nk=b+':'+_APK;if(v&&!localStorage.getItem(nk)){localStorage.setItem(nk,v);copied++;}}catch(e){}});
+  try{v=localStorage.getItem('cet4vbook2026s2');if(v&&!localStorage.getItem(VB_KEY)){localStorage.setItem(VB_KEY,v);copied++;}}catch(e){}
+  try{localStorage.setItem('nsfix-global','1');}catch(e){}
+  if(copied){setTimeout(function(){try{alert('已把本设备旧版数据归位到本套：'+copied+' 项（作答/手写/生词本）。旧数据曾跨套共享、已被覆盖者无法复原；此后每套各自独立。');}catch(e){}},600);}
+ }catch(e){}
+}
+window.addEventListener('load',function(){setTimeout(migrateLegacy,400);});
 function mcLoad(){try{var o=localStorage.getItem(MCK);return o?JSON.parse(o):{};}catch(e){return {};}}
 function mcSave(o){try{localStorage.setItem(MCK,JSON.stringify(o||{}));}catch(e){}}
 function mcSelLoad(){try{var o=localStorage.getItem(MCSELK);return o?JSON.parse(o):{};}catch(e){return {};}}

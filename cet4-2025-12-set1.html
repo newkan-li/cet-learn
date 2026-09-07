@@ -683,13 +683,13 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden)vBad
 
 /* ---------- 写作/翻译手写练习板 (Apple Pencil) ---------- */
 function wbSave(k,c){
- try{var tmp=document.createElement('canvas');var dw=600;tmp.width=dw;tmp.height=Math.max(1,Math.round(c.height*dw/c.width));var tc=tmp.getContext('2d');tc.fillStyle='#fffdf7';tc.fillRect(0,0,tmp.width,tmp.height);tc.drawImage(c,0,0,tmp.width,tmp.height);localStorage.setItem('wbcanvas:'+k,tmp.toDataURL('image/png'));}catch(e){}
+ try{var tmp=document.createElement('canvas');var dw=600;tmp.width=dw;tmp.height=Math.max(1,Math.round(c.height*dw/c.width));var tc=tmp.getContext('2d');tc.fillStyle='#fffdf7';tc.fillRect(0,0,tmp.width,tmp.height);tc.drawImage(c,0,0,tmp.width,tmp.height);localStorage.setItem(WBK+k,tmp.toDataURL('image/png'));}catch(e){}
 }
-function wbErase(k,c){try{var ctx=c.getContext('2d');if(ctx)ctx.clearRect(0,0,c.width,c.height);localStorage.removeItem('wbcanvas:'+k);}catch(e){}}
+function wbErase(k,c){try{var ctx=c.getContext('2d');if(ctx)ctx.clearRect(0,0,c.width,c.height);localStorage.removeItem(WBK+k);}catch(e){}}
 function wbRestoreAll(){
  document.querySelectorAll('.wb').forEach(function(wb){
   var k=wb.getAttribute('data-key');var c=wb.querySelector('canvas.wc');if(!k||!c)return;
-  try{var s=localStorage.getItem('wbcanvas:'+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}
+  try{var s=localStorage.getItem(WBK+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}
  });
 }
 function wbInitBoard(wb){
@@ -717,7 +717,7 @@ window.addEventListener('load',function(){
 });
 
 /* ---- 手写作品 导出 / 导入 / 单区下载 ---- */
-function wbCollect(){var out={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wbcanvas:')===0){out[k]=localStorage.getItem(k);}}}catch(e){}return out;}
+function wbCollect(){var out={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf(WBK)===0){out[k]=localStorage.getItem(k);}}}catch(e){}return out;}
 function wbExportAll(){
  var d=wbCollect();var keys=Object.keys(d);if(!keys.length){alert('暂无手写作品（先在翻译/作文书写区写几笔）。');return;}
 var obj={_type:'cet4-handwriting',created:new Date().toISOString(),boards:d,mc:mcLoad()};
@@ -728,12 +728,12 @@ var obj={_type:'cet4-handwriting',created:new Date().toISOString(),boards:d,mc:m
 function wbImportFile(ev){
  var f=ev.target.files&&ev.target.files[0];if(!f)return;
  var rd=new FileReader();
- rd.onload=function(){try{var o=JSON.parse(rd.result);var d=(o&&o._type==='cet4-handwriting')?o.boards:o;var n=0;for(var k in d){if(k&&d.hasOwnProperty(k)&&k.indexOf('wbcanvas:')===0&&typeof d[k]==='string'){try{localStorage.setItem(k,d[k]);n++;}catch(e){}}}if(!n&&typeof d==='object'){for(var k2 in d){if(d.hasOwnProperty(k2)&&typeof d[k2]==='string'){try{localStorage.setItem('wbcanvas:'+k2,d[k2]);n++;}catch(e){}}}}if(o&&o.mc){mcSave(o.mc);}alert('导入成功：'+n+' 块手写作品；选择题统计已随备份恢复。');wbRestoreAll();}catch(e){alert('文件格式不正确。');}};
+ rd.onload=function(){try{var o=JSON.parse(rd.result);var d=(o&&o._type==='cet4-handwriting')?o.boards:o;var n=0;function normKey(r){var s=String(r||'');if(s.indexOf('wbcanvas:')===0)s=s.slice(9);var p=s.split(':');if(p.length>=2&&/^[a-z]\d{3}$/.test(p[0]))s=p.slice(1).join(':');return s;}for(var k in d){if(d&&d.hasOwnProperty(k)&&typeof d[k]==='string'&&k.indexOf('wbcanvas:')===0){var tgt=(k.indexOf(WBK)===0)?k:WBK+normKey(k);try{if(!localStorage.getItem(tgt)){localStorage.setItem(tgt,d[k]);n++;}}catch(e){}}}if(o&&o.mc){mcSave(o.mc);}alert('导入成功：'+n+' 块手写作品；选择题统计已随备份恢复。');wbRestoreAll();}catch(e){alert('文件格式不正确。');}};
  rd.readAsText(f);ev.target.value='';
 }
 function wbDownloadBoard(wb){
  var k=wb.getAttribute('data-key')||'';var c=wb.querySelector('canvas.wc');if(!k||!c)return;
- var s=null;try{s=localStorage.getItem('wbcanvas:'+k);}catch(e){}
+ var s=null;try{s=localStorage.getItem(WBK+k);}catch(e){}
  if(!s){try{var tmp=document.createElement('canvas');var dw=1200;tmp.width=dw;tmp.height=Math.max(1,Math.round(c.height*dw/c.width));var tc=tmp.getContext('2d');tc.fillStyle='#fffdf7';tc.fillRect(0,0,tmp.width,tmp.height);tc.drawImage(c,0,0,tmp.width,tmp.height);s=tmp.toDataURL('image/png');}catch(e){s=null;}}
  if(!s){alert('此书写区为空。');return;}
  var a=document.createElement('a');a.href=s;a.download=(k||'board')+'.png';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},400);
@@ -749,13 +749,14 @@ function bindWBLine(c){
  function end(){if(drawing){drawing=false;resetCtx(c.getContext('2d'));wbSave(k,c);}}
  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
 }
-function wbRestoreLine(c){var k=c.getAttribute('data-key');if(!k)return;try{var s=localStorage.getItem('wbcanvas:'+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}}
+function wbRestoreLine(c){var k=c.getAttribute('data-key');if(!k)return;try{var s=localStorage.getItem(WBK+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}}
 function wbSheetClear(scope){if(!scope)return;var arr=scope.querySelectorAll('canvas[data-key]');arr.forEach(function(c){wbErase(c.getAttribute('data-key'),c);});}
 window.addEventListener('load',function(){document.querySelectorAll('.wbsheet canvas[data-key]').forEach(function(c){bindWBLine(c);wbRestoreLine(c);});
  document.querySelectorAll('canvas.inlwc[data-key],canvas.pmshort[data-key],canvas.grfill[data-key]').forEach(function(c){bindWBLine(c);wbRestoreLine(c);});});
 
 /* ============ 一键导出：练习+手写 → PDF (print window) ============ */
 var ANSDATA={"title": "2025年12月英语四级真题（第1套）", "appwords": [["choice", "选择"], ["selection", "挑选；选项"], ["maximize", "使最大化"], ["regretful", "后悔的"], ["satisfied", "满意的"], ["perspective", "视角；观点"], ["guidelines", "指导原则"], ["option", "选项"], ["narrow", "缩小；变窄"], ["confident", "自信的"], ["matter", "要紧；重要"], ["ultimately", "最终"], ["overwhelm", "使不知所措；压倒"], ["decision", "决定；决策"], ["bike lanes", "自行车道"], ["parking spots", "停车位"], ["merchants", "商户"], ["sales figures", "销售数据"], ["pedestrian-friendly", "便于行人的"], ["greenhouse emissions", "温室气体排放"], ["infrastructure", "基础设施"], ["cyclists", "骑行者"], ["pedestrians", "行人"], ["dense areas", "人口密集区"], ["hang around", "逗留；闲逛"], ["horror stories", "糟糕的事例"], ["blind spot", "盲区"], ["commute", "通勤"], ["curbside seating", "路缘户外座位"], ["permanent", "永久的"], ["living organisms", "生物体"], ["day-night cycle", "昼夜周期"], ["rhythm", "节律；节奏"], ["food intake", "食物摄入"], ["fat storage", "脂肪储存"], ["drug targets", "药物靶点"], ["modify", "改变；修饰"], ["effectiveness", "有效性"], ["side effects", "副作用"], ["prescribe", "开处方"], ["oversight", "疏忽；疏漏"], ["compliance", "依从性"], ["cholesterol", "胆固醇"], ["enzyme", "酶"], ["sedative", "镇静剂"], ["administer", "给药；执行"], ["retirement", "退休"], ["hairdresser", "理发师"], ["scenarios", "情形；局面"], ["real wages", "实际工资"], ["pension", "养老金"], ["private sector", "私营部门"], ["manufacturing", "制造业"], ["labor-intensive", "劳动密集型的"], ["educational attainment", "受教育程度"], ["bachelor's degree", "学士学位"], ["isolation", "孤独；隔绝"], ["professional occupations", "专业职业"], ["manual work", "体力劳动"], ["look forward to", "盼望"]], "appkey": "a121", "cloze": [{"no": 26, "letter": "C", "word": "chance"}, {"no": 27, "letter": "N", "word": "selection"}, {"no": 28, "letter": "D", "word": "confused"}, {"no": 29, "letter": "H", "word": "invest"}, {"no": 30, "letter": "J", "word": "presented"}, {"no": 31, "letter": "E", "word": "crucial"}, {"no": 32, "letter": "I", "word": "matter"}, {"no": 33, "letter": "O", "word": "ultimately"}, {"no": 34, "letter": "G", "word": "enter"}, {"no": 35, "letter": "K", "word": "range"}], "match": [{"no": 36, "letter": "E"}, {"no": 37, "letter": "K"}, {"no": 38, "letter": "C"}, {"no": 39, "letter": "O"}, {"no": 40, "letter": "G"}, {"no": 41, "letter": "D"}, {"no": 42, "letter": "L"}, {"no": 43, "letter": "J"}, {"no": 44, "letter": "A"}, {"no": 45, "letter": "H"}], "reading": [{"no": "46", "ans": "A"}, {"no": "47", "ans": "C"}, {"no": "48", "ans": "A"}, {"no": "49", "ans": "B"}, {"no": "50", "ans": "A"}, {"no": "51", "ans": "A"}, {"no": "52", "ans": "C"}, {"no": "53", "ans": "D"}, {"no": "54", "ans": "B"}, {"no": "55", "ans": "D"}], "trans": [{"zh": "近年来，中国政府高度重视民营经济的发展，出台了一系列政策支持民营企业。", "en": "In recent years, the Chinese government has attached great importance to the development of the private economy and issued a series of policies to support private enterprises."}, {"zh": "截至2025年3月底，全国民营企业数量超过5700万家，占企业总量的92.3%。", "en": "As of the end of March 2025, the number of private enterprises nationwide exceeded 57 million, accounting for 92.3% of all enterprises."}, {"zh": "民营企业不仅数量稳步增长，质量和结构也在不断提升。", "en": "Private enterprises have not only grown steadily in number but also kept improving in quality and structure."}, {"zh": "民营企业的研发投入不断增加，在新一代信息技术、人工智能等领域发展迅速。", "en": "Their R&D investment has kept rising, and they have developed rapidly in fields such as new-generation information technology and artificial intelligence."}, {"zh": "民营企业核心竞争力的增强为中国经济的高质量发展提供了有力支撑。", "en": "The growing core competitiveness of private enterprises has provided strong support for the high-quality development of China’s economy."}], "essay": ["Dear student union,", "I would like to make several suggestions on how the student union can better enrich our campus life.", "First and foremost, the union could organize more regular cultural and arts events, such as concerts, exhibitions and film nights, so that students can relax and make new friends.", "In addition, it would be helpful to set up more interest-based clubs and societies, which give every student a chance to develop hobbies and teamwork skills.", "What’s more, the union could launch fitness and mental-health weeks, offering sports activities and counseling talks to support students’ wellbeing.", "I sincerely hope these suggestions will be considered, so that our campus life will become more colorful and meaningful for everyone.", "Yours sincerely,", "Li Ming"], "vocab": [["choice", "选择"], ["selection", "挑选；选项"], ["maximize", "使最大化"], ["regretful", "后悔的"], ["satisfied", "满意的"], ["perspective", "视角；观点"], ["guidelines", "指导原则"], ["option", "选项"], ["narrow", "缩小；变窄"], ["confident", "自信的"], ["matter", "要紧；重要"], ["ultimately", "最终"], ["overwhelm", "使不知所措；压倒"], ["decision", "决定；决策"], ["bike lanes", "自行车道"], ["parking spots", "停车位"], ["merchants", "商户"], ["sales figures", "销售数据"], ["pedestrian-friendly", "便于行人的"], ["greenhouse emissions", "温室气体排放"], ["infrastructure", "基础设施"], ["cyclists", "骑行者"], ["pedestrians", "行人"], ["dense areas", "人口密集区"], ["hang around", "逗留；闲逛"], ["horror stories", "糟糕的事例"], ["blind spot", "盲区"], ["commute", "通勤"], ["curbside seating", "路缘户外座位"], ["permanent", "永久的"], ["living organisms", "生物体"], ["day-night cycle", "昼夜周期"], ["rhythm", "节律；节奏"], ["food intake", "食物摄入"], ["fat storage", "脂肪储存"], ["drug targets", "药物靶点"], ["modify", "改变；修饰"], ["effectiveness", "有效性"], ["side effects", "副作用"], ["prescribe", "开处方"], ["oversight", "疏忽；疏漏"], ["compliance", "依从性"], ["cholesterol", "胆固醇"], ["enzyme", "酶"], ["sedative", "镇静剂"], ["administer", "给药；执行"], ["retirement", "退休"], ["hairdresser", "理发师"], ["scenarios", "情形；局面"], ["real wages", "实际工资"], ["pension", "养老金"], ["private sector", "私营部门"], ["manufacturing", "制造业"], ["labor-intensive", "劳动密集型的"], ["educational attainment", "受教育程度"], ["bachelor's degree", "学士学位"], ["isolation", "孤独；隔绝"], ["professional occupations", "专业职业"], ["manual work", "体力劳动"], ["look forward to", "盼望"]]};var SETTITLE=(ANSDATA&&ANSDATA.title)||'2026年6月英语四级真题（第2套）';
+var _APK0=(ANSDATA&&ANSDATA.appkey)||'x';VB_KEY='cet4vbook:'+_APK0;
 function pdCloneToHTML(id, removeAnswerText){
  var el=document.getElementById(id);if(!el)return '';
  var c=el.cloneNode(true);
@@ -765,7 +766,7 @@ function pdCloneToHTML(id, removeAnswerText){
  if(removeAnswerText){var ma=c.querySelectorAll('.model-essay');ma.forEach(function(n){if(n&&n.parentNode)n.parentNode.removeChild(n);});}
  c.querySelectorAll('canvas').forEach(function(cv){
   var pn=cv.parentNode;if(!pn)return;
-  var k=cv.getAttribute('data-key')||'';var s=null;try{s=localStorage.getItem('wbcanvas:'+k);}catch(e){}
+  var k=cv.getAttribute('data-key')||'';var s=null;try{s=localStorage.getItem(WBK+k);}catch(e){}
   if(s){var im=document.createElement('img');im.src=s;im.style.maxWidth='100%';pn.replaceChild(im,cv);return;}
   var ph=document.createElement('span');ph.style.cssText='display:block;min-height:88px;border:1px dashed #999;background:#fff;';
   var cls=String(cv.className||'');
@@ -813,7 +814,7 @@ function vExportPDF(){
 /* ===== A-P 段落原文直接标注（透明覆盖 + 下划线模式） ===== */
 var STRAIGHT=false;
 function vLine(){STRAIGHT=!STRAIGHT;var b=document.getElementById('lineBtn');if(b){b.textContent=STRAIGHT?'➖ 横线：开':'➖ 横线：关';if(b.classList)b.classList.toggle('eraser-on',STRAIGHT);}pmSync();return STRAIGHT;}
-function wbSaveOv(k,c){try{var url=c.toDataURL('image/png');localStorage.setItem('wbcanvas:'+k,url);}catch(e){}}
+function wbSaveOv(k,c){try{var url=c.toDataURL('image/png');localStorage.setItem(WBK+k,url);}catch(e){}}
 function bindPM(c){
  var k=c.getAttribute('data-key');if(!k)return;
  var st=[],drawing=false,snap=null,ax=0,ay=0,_dx=0,_dy=0,_dt=0;
@@ -849,7 +850,7 @@ function bindPM(c){
  function end(ev){if(drawing){drawing=false;if(ev&&STRAIGHT&&!ERASER){var _mx=ev.clientX,_my=ev.clientY,_dt2=Date.now()-_dt,_ddx=_mx-_dx,_ddy=_my-_dy;if(_ddx*_ddx+_ddy*_ddy<64&&_dt2<600){pmWordAt(_mx,_my);return;}}var ctx=c.getContext('2d');resetCtx(ctx);wbSaveOv(k,c);}}
  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
 }
-function wbRestorePM(c){var k=c.getAttribute('data-key');if(!k)return;try{var s=localStorage.getItem('wbcanvas:'+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}}
+function wbRestorePM(c){var k=c.getAttribute('data-key');if(!k)return;try{var s=localStorage.getItem(WBK+k);if(s){var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx)ctx.drawImage(im,0,0,c.width,c.height);};im.src=s;}}catch(e){}}
 window.addEventListener('load',function(){document.querySelectorAll('canvas.pmow[data-key]').forEach(function(c){bindPM(c);wbRestorePM(c);});});
 /* ---- PM word pick (iPad Apple Pencil / tap) ---- */
 var _pmchipHide=0;
@@ -888,7 +889,26 @@ function pmWordAt(x,y){
 window.addEventListener('load',function(){pmSync();});
 
 /* ============ 选择题作答 + 错误统计 ============ */
-var MCK='cet4mc', MCSELK='cet4mcsel';
+var _APK=(ANSDATA&&ANSDATA.appkey)||'x';
+var MCK='cet4mc:'+_APK, MCSELK='cet4mcsel:'+_APK;
+var WBK='wbcanvas:'+_APK+':';
+function migrateLegacy(){
+ try{
+  if(localStorage.getItem('nsfix-global'))return;
+  var copied=0,i,k,v,nk;
+  for(i=localStorage.length-1;i>=0;i--){k=localStorage.key(i);if(!k)continue;
+   if(k.indexOf('wbcanvas:')===0&&k.indexOf(WBK)!==0){
+    v=localStorage.getItem(k);nk=WBK+k.slice(('wbcanvas:').length);
+    if(v&&!localStorage.getItem(nk)){try{localStorage.setItem(nk,v);copied++;}catch(e){}}
+   }
+  }
+  ['cet4mc','cet4mcsel'].forEach(function(b){try{v=localStorage.getItem(b);nk=b+':'+_APK;if(v&&!localStorage.getItem(nk)){localStorage.setItem(nk,v);copied++;}}catch(e){}});
+  try{v=localStorage.getItem('cet4vbook2026s2');if(v&&!localStorage.getItem(VB_KEY)){localStorage.setItem(VB_KEY,v);copied++;}}catch(e){}
+  try{localStorage.setItem('nsfix-global','1');}catch(e){}
+  if(copied){setTimeout(function(){try{alert('已把本设备旧版数据归位到本套：'+copied+' 项（作答/手写/生词本）。旧数据曾跨套共享、已被覆盖者无法复原；此后每套各自独立。');}catch(e){}},600);}
+ }catch(e){}
+}
+window.addEventListener('load',function(){setTimeout(migrateLegacy,400);});
 function mcLoad(){try{var o=localStorage.getItem(MCK);return o?JSON.parse(o):{};}catch(e){return {};}}
 function mcSave(o){try{localStorage.setItem(MCK,JSON.stringify(o||{}));}catch(e){}}
 function mcSelLoad(){try{var o=localStorage.getItem(MCSELK);return o?JSON.parse(o):{};}catch(e){return {};}}
