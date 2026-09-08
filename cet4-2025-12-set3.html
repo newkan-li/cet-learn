@@ -361,7 +361,7 @@ function vFullExport(){try{
  var ts=(obj.created||'').slice(0,19).replace(/[-T:]/g,'');
  _bkFile('cet4-'+ap+'-backup-'+ts+'.json',JSON.stringify(obj,null,1));
 }catch(e){alert('备份失败：'+e.message);}}
-function _bkNorm(raw){var s=String(raw||'');if(s.indexOf('wbcanvas:')===0)s=s.slice(9);var p=s.split(':');if(p.length>=2&&/^[a-z]\d{3}$/.test(p[0]))s=p.slice(1).join(':');return s;}
+function _bkNorm(raw){var s=String(raw||'');if(s.indexOf('wbcanvas:')===0)s=s.slice(9);var p=s.split(':');if(p.length>=2&&/^(?:[a-z]\d{3}|ap\d)$/.test(p[0]))s=p.slice(1).join(':');return s;}
 function vFullImport(ev){
  var f=ev.target.files&&ev.target.files[0];if(!f)return;
  var rd=new FileReader();
@@ -816,7 +816,7 @@ var obj={_type:'cet4-handwriting',created:new Date().toISOString(),boards:d,mc:m
 function wbImportFile(ev){
  var f=ev.target.files&&ev.target.files[0];if(!f)return;
  var rd=new FileReader();
- rd.onload=function(){try{var o=JSON.parse(rd.result);var d=(o&&o._type==='cet4-handwriting')?o.boards:o;var n=0;function normKey(r){var s=String(r||'');if(s.indexOf('wbcanvas:')===0)s=s.slice(9);var p=s.split(':');if(p.length>=2&&/^[a-z]\d{3}$/.test(p[0]))s=p.slice(1).join(':');return s;}for(var k in d){if(d&&d.hasOwnProperty(k)&&typeof d[k]==='string'&&k.indexOf('wbcanvas:')===0){var tgt=(k.indexOf(WBK)===0)?k:WBK+normKey(k);try{if(!localStorage.getItem(tgt)){localStorage.setItem(tgt,d[k]);n++;}}catch(e){}}}if(o&&o.mc){mcSave(o.mc);}alert('导入成功：'+n+' 块手写作品；选择题统计已随备份恢复。');wbRestoreAll();}catch(e){alert('文件格式不正确。');}};
+ rd.onload=function(){try{var o=JSON.parse(rd.result);var d=(o&&o._type==='cet4-handwriting')?o.boards:o;var n=0;function normKey(r){var s=String(r||'');if(s.indexOf('wbcanvas:')===0)s=s.slice(9);var p=s.split(':');if(p.length>=2&&/^(?:[a-z]\d{3}|ap\d)$/.test(p[0]))s=p.slice(1).join(':');return s;}for(var k in d){if(d&&d.hasOwnProperty(k)&&typeof d[k]==='string'&&k.indexOf('wbcanvas:')===0){var tgt=(k.indexOf(WBK)===0)?k:WBK+normKey(k);try{if(!localStorage.getItem(tgt)){localStorage.setItem(tgt,d[k]);n++;}}catch(e){}}}if(o&&o.mc){mcSave(o.mc);}alert('导入成功：'+n+' 块手写作品；选择题统计已随备份恢复。');wbRestoreAll();}catch(e){alert('文件格式不正确。');}};
  rd.readAsText(f);ev.target.value='';
 }
 function wbDownloadBoard(wb){

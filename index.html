@@ -24,7 +24,7 @@
   .card a.go{align-self:flex-start;margin-top:6px;text-decoration:none;color:#fff;background:var(--accent);padding:7px 16px;border-radius:22px;font-size:14px}
   .card a.go:active{opacity:.85}
   footer{color:var(--sub);font-size:12.5px;text-align:center;margin-top:36px}
-</style>
+#overview table th,#overview table td{text-align:left;padding:6px 10px;border-bottom:1px solid #eef1f7;vertical-align:top}#overview table th{font-size:12.5px;color:#5a6172}#overview table tbody tr:last-child td{border-bottom:none}#overview a{text-decoration:none;font-weight:600}</style>
 </head>
 <body>
 <div class="wrap">
@@ -43,18 +43,30 @@
 
   <div class="cards" id="list"></div>
 
+  <div style="background:#fff;border:1px solid #e3e6ee;border-radius:14px;padding:16px 20px;margin:22px 0 6px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <h2 style="font-size:19px;margin:0">📊 我的学习总览（本设备浏览器）</h2>
+      <button onclick="renderOverview()" style="background:#fff;color:#2b6ef2;border:1px solid #2b6ef2;border-radius:16px;padding:4px 12px;font-size:12.5px;cursor:pointer">↻ 刷新</button>
+    </div>
+    <div id="overview" style="font-size:13.5px">统计读取中…</div>
+    <p style="color:#8a93a6;font-size:12px;margin:10px 0 0">说明：需经本域名（github.io/cet-learn）访问才能读取各套作答/错题/生词记录（浏览器本地，仅你的这台设备可见）；若从本地文件直接双击打开，则因浏览器隔离看不到统计。错题本、正确率在每套页内「交卷判分」后自动记录，完整备份可随文件迁移。</p>
+  </div>
+
   <footer>编者参考答案 · 仅供个人学习使用 · 逐题精讲由 AI 辅助整理</footer>
 </div>
 
 <script>
 var SETS=[
- {f:"cet4-2026-06-set2.html",y:"2026 年 6 月",n:"第 2 套",p1:"冒名顶替现象",p2:"音乐是共通语言"},
- {f:"cet4-2026-06-set3.html",y:"2026 年 6 月",n:"第 3 套",p1:"厌恶感与道德",p2:"陌生人“以为彼此认识”效应"},
- {f:"cet4-2025-12-set1.html",y:"2025 年 12 月",n:"第 1 套",p1:"用药时间与人体节律",p2:"退休推迟：想工作还是需要钱"},
- {f:"cet4-2025-12-set2.html",y:"2025 年 12 月",n:"第 2 套",p1:"青少年健康饮食干预",p2:"婴儿会做梦吗"},
- {f:"cet4-2025-12-set3.html",y:"2025 年 12 月",n:"第 3 套",p1:"纯素餐厅获米其林三星",p2:"基因检测的准确性"},
- {f:"cet4-2025-06-set1.html",y:"2025 年 6 月",n:"第 1 套",p1:"熊猫“太舒服”反不利",p2:"Grit 毅力比天赋重要"},
- {f:"cet4-2025-06-set3.html",y:"2025 年 6 月",n:"第 3 套",p1:"外在美 vs 内在美",p2:"植物基人造肉"}
+ {f:"cet4-2026-06-set2.html",apk:"ap2",y:"2026 年 6 月",n:"第 2 套",p1:"冒名顶替现象",p2:"音乐是共通语言"},
+ {f:"cet4-2026-06-set3.html",apk:"ap3",y:"2026 年 6 月",n:"第 3 套",p1:"厌恶感与道德",p2:"陌生人“以为彼此认识”效应"},
+ {f:"cet4-2025-12-set1.html",apk:"a121",y:"2025 年 12 月",n:"第 1 套",p1:"用药时间与人体节律",p2:"退休推迟：想工作还是需要钱"},
+ {f:"cet4-2025-12-set2.html",apk:"a122",y:"2025 年 12 月",n:"第 2 套",p1:"青少年健康饮食干预",p2:"婴儿会做梦吗"},
+ {f:"cet4-2025-12-set3.html",apk:"a123",y:"2025 年 12 月",n:"第 3 套",p1:"纯素餐厅获米其林三星",p2:"基因检测的准确性"},
+ {f:"cet4-2025-06-set1.html",apk:"a061",y:"2025 年 6 月",n:"第 1 套",p1:"熊猫“太舒服”反不利",p2:"Grit 毅力比天赋重要"},
+ {f:"cet4-2025-06-set3.html",apk:"a063",y:"2025 年 6 月",n:"第 3 套",p1:"外在美 vs 内在美",p2:"植物基人造肉"},
+ {f:"cet4-2024-12-set2.html",apk:"a242",y:"2024 年 12 月",n:"第 2 套",p1:"人与自然疏离与“种植权”",p2:"美国工程界女性"},
+ {f:"cet4-2024-12-set1.html",apk:"a241",y:"2024 年 12 月",n:"第 1 套",p1:"金融素养与财商教育",p2:"巧克力会灭绝？基因编辑救可可"},
+ {f:"cet4-2023-12-set1.html",apk:"a231",y:"2023 年 12 月",n:"第 1 套",p1:"别再炫耀“我很忙”",p2:"女性机票为何更便宜"}
 ];
 var L=document.getElementById("list");
 SETS.forEach(function(s){
@@ -68,6 +80,43 @@ SETS.forEach(function(s){
   var a=document.createElement("a");a.className="go";a.href=s.f;a.target="_blank";a.textContent="打开本套精讲 →";c.appendChild(a);
   L.appendChild(c);
 });
+
+function soGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function soJson(k){var v=soGet(k);if(!v)return null;try{return JSON.parse(v);}catch(e){return null;}}
+function escH(s){return String(s==null?'':s).replace(/[&<>"]/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];});}
+function renderOverview(){
+ var el=document.getElementById('overview');if(!el)return;
+ var rows='',totW=0,totOK=0,totMiss=0,any=false;
+ var cause={};
+ SETS.forEach(function(s){
+  var ap=s.apk||'',seen=soGet('seen:'+ap)||'';
+  var wb=soJson('wrong:'+ap);var wc=wb?wb.length:0;
+  if(wb){wb.forEach(function(e){if(e&&e.cause){cause[e.cause]=(cause[e.cause]||0)+1;}});}
+  var st=soJson('cet4mc:'+ap)||{},ok=0,miss=0;
+  Object.keys(st).forEach(function(q){ok+=(st[q].ok||0);miss+=(st[q].miss||0);});
+  var vb=soJson('cet4vbook:'+ap);var vn=Array.isArray(vb)?vb.length:0;
+  var rate=(ok+miss)?Math.round(ok*100/(ok+miss))+'%':'—';
+  var seenTxt='—';if(seen){var d=new Date(seen);seenTxt=d.toLocaleDateString('zh-CN')+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+  if(wc||ok||miss||vn||seen)any=true;
+  totW+=wc;totOK+=ok;totMiss+=miss;
+  rows+='<tr><td>'+escH(s.y+' '+s.n)+'</td>'
+   +'<td>'+(wc?('<a href="'+s.f+'" target="_blank" style="color:#2b6ef2;text-decoration:none">'+wc+' 题</a>'):'0 题')+'</td>'
+   +'<td>'+rate+'</td><td>'+vn+'</td><td>'+escH(seenTxt)+'</td></tr>';
+ });
+ if(!any){
+  el.innerHTML='<p class="hint">本设备还没有学习记录。先去任意一套：限时作答 → 交卷判分（生词可点“导入本篇速查60词”）。记录只存在这台设备的浏览器里。</p>';
+  return;
+ }
+ var totRate=(totOK+totMiss)?Math.round(totOK*100/(totOK+totMiss))+'%':'—';
+ var causes='';var names={'a词':'a·词汇','b定位':'b·定位','c替换':'c·同义替换','d干扰':'d·干扰项','o其他':'o·其他'};
+ var cks=Object.keys(cause);if(cks.length){causes='<p style="margin:8px 0 0"><b>错因分布：</b>'+cks.map(function(c){return (names[c]||c)+' '+cause[c];}).join('　')+'</p>';}
+ el.innerHTML='<table style="border-collapse:collapse;width:100%;margin-top:6px">'
+  +'<thead><tr><th style="text-align:left">套别</th><th style="text-align:left">错题数</th><th style="text-align:left">答题正确率</th><th style="text-align:left">生词本词数</th><th style="text-align:left">最近学习</th></tr></thead>'
+  +'<tbody>'+rows+'<tr style="font-weight:700;border-top:2px solid #d6e2ff"><td>合计</td><td>'+totW+' 题</td><td>'+totRate+'</td><td>—</td><td>—</td></tr></tbody></table>'
+  +causes
+  +'<p style="color:#8a93a6;font-size:12px;margin:8px 0 0">点错题数可跳到该套页内「📕 错题本」复习重做。</p>';
+}
+renderOverview();
 </script>
 </body>
 </html>
