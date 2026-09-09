@@ -741,8 +741,8 @@ var _ge=0;function vEraser(){var _n=Date.now();if(_n-_ge<250)return;_ge=_n;ERASE
 var _eraserLast=0;
 var FINGER_DRAW=false;
 function pnOK(ev){return !!(ev&&ev.pointerType&&(ev.pointerType==='pen'||ev.pointerType==='mouse'||(FINGER_DRAW&&ev.pointerType==='touch')));}
-function pnW(ev){var p=0.5;try{if(ev&&typeof ev.pressure==='number'&&ev.pressure>0&&ev.pressure<=1)p=ev.pressure;}catch(e){}return Math.max(1.6,Math.min(8,1.1+4.6*p));}
-function inkSeg(ctx,x0,y0,x1,y1,w){if(!ctx)return;try{ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();ctx.beginPath();ctx.arc(x1,y1,w/2,0,6.2832);ctx.fill();}catch(e){}}
+function pnW(ev){var p=0.5;try{if(ev&&typeof ev.pressure==='number'&&ev.pressure>0&&ev.pressure<=1)p=ev.pressure;}catch(e){}var base=(typeof INK!=='undefined'&&INK.w)?INK.w:3;if(typeof INK!=='undefined'&&INK.hl)base=base*2.6;return Math.max(1.4,Math.min(14,base*(0.5+1.15*p)));}
+function inkSeg(ctx,x0,y0,x1,y1,w){if(!ctx)return;try{if(typeof INK!=='undefined'){ctx.globalCompositeOperation='source-over';ctx.strokeStyle=INK.hl?INK.hlC:INK.color;ctx.fillStyle=ctx.strokeStyle;ctx.globalAlpha=INK.hl?0.55:1;}ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();ctx.beginPath();ctx.arc(x1,y1,w/2,0,6.2832);ctx.fill();}catch(e){}}
 function pnHold(c,on){try{c.style.touchAction=on?'none':'';}catch(e){}}
 function vFinger(){FINGER_DRAW=!FINGER_DRAW;var b=document.getElementById('fingerBtn');if(b){b.textContent=FINGER_DRAW?'✍️ 手指书写：开':'✍️ 手指书写：关';if(b.classList)b.classList.toggle('eraser-on',FINGER_DRAW);}return FINGER_DRAW;}
 function vEraserTap(){var n=Date.now();if(n-_eraserLast<320)return;_eraserLast=n;vEraser();}
@@ -1123,4 +1123,45 @@ function apInit(){
 }
 
 window.addEventListener("load",function(){apInit();});
+</script><script>(function(){
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){}}
+var INK={color:'#20242c',w:3.5,hl:false,hlC:'#ffd54f'};
+try{var p=ls('inkprefs');if(p){var o=JSON.parse(p);if(o){if(o.color)INK.color=o.color;if(typeof o.w==='number')INK.w=o.w;if(typeof o.hl==='boolean')INK.hl=o.hl;if(o.hlC)INK.hlC=o.hlC;}}}catch(e){}
+window.INK=INK;
+function inkSave(){ls('inkprefs',JSON.stringify(INK));}
+function snapCap(c){try{var cw=c.width||600,ch=c.height||200,dw=480,hh=Math.max(40,Math.round(ch*dw/cw));var t=document.createElement('canvas');t.width=dw;t.height=hh;var x=t.getContext('2d');x.fillStyle='#fffdf7';x.fillRect(0,0,dw,hh);x.drawImage(c,0,0,dw,hh);return t.toDataURL('image/jpeg',0.72);}catch(e){return null;}}
+function isInk(el){if(!el||el.tagName!=='CANVAS')return false;var cn=String(el.className||'');return cn.indexOf('wbline')>-1||cn.indexOf('grfill')>-1||cn.indexOf('pmshort')>-1||cn.indexOf('inlwc')>-1||!!(el.closest&&el.closest('.wb'));}
+function commit(c){var k=c.getAttribute('data-key');if(!k)return;try{var url=c.toDataURL('image/jpeg',0.8);localStorage.setItem(WBK+k,url);}catch(e){}}
+window.addEventListener('pointerdown',function(ev){var t=ev.target;if(!isInk(t))return;if(!(ev.pointerType==='pen'||ev.pointerType==='mouse'||(window.FINGER_DRAW&&ev.pointerType==='touch')))return;window._inkCanvas=t;t._ustk=t._ustk||[];t._rstk=[];var cap=snapCap(t);if(cap){t._ustk.push(cap);if(t._ustk.length>40)t._ustk.shift();}},true);
+function doUndo(dir){var c=window._inkCanvas;if(!c)return;var from=c[dir?'_rstk':'_ustk']||[],to=c[dir?'_ustk':'_rstk']||[];if(!from.length)return;var img=from.pop();var cur=snapCap(c);if(cur){to.push(cur);}var im=new Image();im.onload=function(){var ctx=c.getContext('2d');if(ctx){ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(im,0,0,c.width,c.height);}commit(c);};im.src=img;}
+function setInk(part){for(var k in part){if(part.hasOwnProperty(k))INK[k]=part[k];}inkSave();paintBar();}
+function paintBar(){
+ var d=window._inkDots,o=window._inkWdots,h=window._inkHl,u=window._inkUndo,r=window._inkRedo;
+ if(d)d.innerHTML='';if(o)o.innerHTML='';
+ if(!d||!o||!h)return;
+ var COLORS=['#20242c','#1f5c8b','#c0392b','#1b7f3b'];
+ for(var i=0;i<COLORS.length;i++){var c=COLORS[i];var b=document.createElement('button');b.type='button';b.title='笔色 '+c;b.style.cssText='width:22px;height:22px;border-radius:50%;border:2px solid '+(INK.color===c?'#000':'#ccd3dd')+';background:'+c+';cursor:pointer;margin:0 3px;vertical-align:middle';b.onclick=function(cc){return function(){setInk({color:cc,hl:false});};}(c);d.appendChild(b);}
+ var WD=[2,3.5,6];
+ for(var j=0;j<WD.length;j++){var w=WD[j];var bb=document.createElement('button');bb.type='button';bb.title='粗细 '+w;var sz=Math.max(3,Math.round(w*2.2));bb.style.cssText='width:26px;height:26px;border-radius:6px;border:'+(INK.w===w?'2px solid #c0392b':'1px solid #ccd3dd')+';background:#fff;cursor:pointer;margin:0 3px;vertical-align:middle';bb.innerHTML='<span style="display:block;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:#20242c"></span>';bb.onclick=function(ww){return function(){setInk({w:ww});};}(w);o.appendChild(bb);}
+ h.style.background=(INK.hl?INK.hlC:'#8a93a6');h.style.color='#fff';h.style.border='1px solid '+(INK.hl?'#b48a1f':'#ccd3dd');
+ h.textContent=INK.hl?'荧光：开':'荧光：关';
+ if(u)u.disabled=!window._inkCanvas;if(r)r.disabled=!window._inkCanvas;
+}
+function build(){
+ var bar=document.createElement('div');bar.id='inkbar';
+ bar.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:9998;background:rgba(255,255,255,.96);border:1px solid #d4dae4;border-radius:22px;box-shadow:0 2px 10px rgba(20,30,60,.18);padding:6px 12px;display:flex;align-items:center;gap:4px;max-width:96vw;overflow:auto';
+ var l1=document.createElement('span');l1.textContent='笔：';l1.style.cssText='font-size:12px;color:#5a6172;white-space:nowrap';bar.appendChild(l1);
+ var dots=document.createElement('span');dots.id='inkdots';bar.appendChild(dots);
+ var wdot=document.createElement('span');wdot.id='inkwdots';bar.appendChild(wdot);
+ var hl=document.createElement('button');hl.type='button';hl.id='inkhl';hl.style.cssText='margin:0 6px;border-radius:14px;padding:2px 9px;font-size:12px;cursor:pointer';hl.onclick=function(){setInk({hl:!INK.hl});};bar.appendChild(hl);
+ var und=document.createElement('button');und.type='button';und.id='inkundo';und.textContent='↶撤销';und.style.cssText='margin-left:6px;border:1px solid #ccd3dd;border-radius:14px;padding:2px 10px;font-size:12px;cursor:pointer;background:#fff';und.onclick=function(){doUndo(0);};bar.appendChild(und);
+ var red=document.createElement('button');red.type='button';red.id='inkredo';red.textContent='↷重做';red.style.cssText='margin:0 6px 0 2px;border:1px solid #ccd3dd;border-radius:14px;padding:2px 10px;font-size:12px;cursor:pointer;background:#fff';red.onclick=function(){doUndo(1);};bar.appendChild(red);
+ var tip=document.createElement('span');tip.textContent='✍ 先写再撤销';tip.style.cssText='font-size:11px;color:#8a93a6;white-space:nowrap';bar.appendChild(tip);
+ var st=document.createElement('style');st.textContent='@media print{#inkbar{display:none!important}}';document.head.appendChild(st);
+ document.body.appendChild(bar);
+ window._inkDots=dots;window._inkWdots=wdot;window._inkHl=hl;window._inkUndo=und;window._inkRedo=red;
+ paintBar();
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',build);}else{build();}
+})();
 </script></body></html>
