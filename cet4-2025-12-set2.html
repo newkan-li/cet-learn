@@ -57,7 +57,7 @@ input#vocabSearch{width:100%;max-width:420px;padding:8px 12px;border:1px solid v
 .sgray{color:#5b6b7b;font-size:12px;margin-top:8px}
 .wb{margin:10px 0;border:1px solid #dde6ee;border-radius:10px;padding:8px 12px;background:#fff}
 .wb .wprompt{font-size:14px;color:#22303f;margin:4px 0}
-canvas.wc{width:100%;height:120px;border:1.5px dashed #b9c6d2;border-radius:8px;background:#fffdf7;display:block}
+canvas.wc{width:100%;height:150px;border:1.5px dashed #b9c6d2;border-radius:8px;background:#fffdf7;display:block}
 canvas.wc.sm{height:88px}
 canvas.wc.smr{height:64px}
 canvas.wc.tall{height:320px}
@@ -67,7 +67,7 @@ canvas.wc.tall{height:320px}
 .wbsheet{margin:8px 0 2px;border:1px solid #e3ebf2;border-radius:10px;padding:8px 10px;background:#fff}
 .wline{display:flex;align-items:center;gap:8px;margin:2px 0}
 .wlnum{flex:0 0 auto;font-size:13px;color:#44505c;min-width:0}
-.wbline{flex:1;height:44px;min-width:0;border:1px dashed #c3d2e0;border-radius:5px;background:#fffdf7;display:block}
+.wbline{flex:1;height:62px;min-width:0;border:1px dashed #c3d2e0;border-radius:5px;background:#fffdf7;display:block}
 .wbtool{margin:4px 0}
 #studyPanel{position:fixed;inset:0;background:rgba(20,32,46,.55);z-index:1200;display:none;align-items:center;justify-content:center}
 #studyPanel.on{display:flex}
@@ -88,7 +88,7 @@ canvas#sCanvas{width:100%;height:150px;border:1.5px dashed #b9c6d2;border-radius
 .soverlay th{background:#234f7a;color:#fff}
 @media print{aside,#vbtns,#vchip,.vdrawer,#studyPanel,.soverlay,input,button{display:none!important}body{color:#000}.layout{display:block}main{max-width:none;padding:0}details.sol{display:block!important;border:none;padding:2px 0}details.sol summary{list-style:none}h2,h3{break-after:avoid}}
 
-.inlwc{display:inline-block;width:64px;height:34px;vertical-align:middle;margin:0 3px;border:1px dashed #b9c6d2;border-radius:5px;background:#fffdf7;cursor:crosshair}
+.inlwc{display:inline-block;width:76px;height:44px;vertical-align:middle;margin:0 3px;border:1px dashed #b9c6d2;border-radius:5px;background:#fffdf7;cursor:crosshair}
 
 #eraserBtn.eraser-on{background:#c0392b;color:#fff;border-color:#c0392b;font-weight:700}
 
@@ -97,7 +97,7 @@ canvas#sCanvas{width:100%;height:150px;border:1.5px dashed #b9c6d2;border-radius
 .navbtn:hover{background:#e7eef6}
 #eraserBtn.navbtn.eraser-on,#eraserBtn.eraser-on{background:#c0392b;color:#fff;border-color:#c0392b}
 
-.pmshort{display:inline-block;width:96px;height:34px;vertical-align:middle;margin-left:8px;border:1px dashed #b9c6d2;border-radius:5px;background:#fffdf7;cursor:crosshair}
+.pmshort{display:inline-block;width:108px;height:46px;vertical-align:middle;margin-left:8px;border:1px dashed #b9c6d2;border-radius:5px;background:#fffdf7;cursor:crosshair}
 
 .pmbox{position:relative;margin:4px 0}
 .pmbox .passage{margin:0;padding-right:6px}
@@ -106,7 +106,7 @@ canvas#sCanvas{width:100%;height:150px;border:1.5px dashed #b9c6d2;border-radius
 .pmlbl{font-size:12px;color:#5b6b7b;flex:0 0 auto}
 #lineBtn.navbtn.on,#lineBtn.navbtn.eraser-on{background:#c0392b;color:#fff;border-color:#c0392b}
 
-.grfill{display:inline-block;width:120px;height:36px;vertical-align:middle;margin:0 6px;border:1px dashed #b9c6d2;border-radius:5px;background:#fffdf7;cursor:crosshair}
+.grfill{display:inline-block;width:132px;height:46px;vertical-align:middle;margin:0 6px;border:1px dashed #b9c6d2;border-radius:5px;background:#fffdf7;cursor:crosshair}
 
 .ghint{color:#1f5c8b;font-weight:600;margin-left:6px}
 .sencn{color:#888;font-size:12px;margin:2px 0 6px}
@@ -824,7 +824,7 @@ function wbInitBoard(wb){
  c._wbst=st;
  function pos(ev){var r=c.getBoundingClientRect();var p=ev.touches?ev.touches[0]:ev;return{x:(p.clientX-r.left)*(c.width/r.width),y:(p.clientY-r.top)*(c.height/r.height)};}
  c.addEventListener('pointerdown',function(ev){if(!pnOK(ev))return;drawing=true;pnHold(c,true);if(st.length&&st[st.length-1]!==null)st.push(null);var p=pos(ev);st.push([p.x,p.y]);try{if(c.setPointerCapture)c.setPointerCapture(ev.pointerId);}catch(e){}ev.preventDefault();});
- c.addEventListener('pointermove',function(ev){if(!drawing)return;var ctx=c.getContext('2d');if(!ctx)return;var evs=[ev];try{if(ev.getCoalescedEvents&&ev.getCoalescedEvents().length)evs=ev.getCoalescedEvents();}catch(e){}var erase=(typeof ERASER!=='undefined')&&ERASER;var w=erase?22:pnW(ev);var last=st.length?st[st.length-1]:null;for(var i=0;i<evs.length;i++){var p=pos(evs[i]);if(erase){try{ctx.globalCompositeOperation='destination-out';ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=w;ctx.strokeStyle='rgba(0,0,0,1)';ctx.globalAlpha=1;if(last&&last.length===2){ctx.beginPath();ctx.moveTo(last[0],last[1]);ctx.lineTo(p.x,p.y);ctx.stroke();}ctx.beginPath();ctx.arc(p.x,p.y,w/2,0,6.2832);ctx.fill();}catch(e){}}else{if(last&&last.length===2)inkSeg(ctx,last[0],last[1],p.x,p.y,w);else inkSeg(ctx,p.x,p.y,p.x,p.y,w);}last=p;st.push([p.x,p.y]);}ev.preventDefault();});
+ c.addEventListener('pointermove',function(ev){if(!drawing)return;var ctx=c.getContext('2d');if(!ctx)return;var evs=[ev];try{if(ev.getCoalescedEvents&&ev.getCoalescedEvents().length)evs=ev.getCoalescedEvents();}catch(e){}var erase=(typeof ERASER!=='undefined')&&ERASER;var _dh=0;try{_dh=c.getBoundingClientRect().height;}catch(e){_dh=120;}var _sc=(erase||_dh>=90)?1:Math.max(0.6,_dh/90);var w=erase?Math.min(22,Math.max(8,_dh*0.9)):pnW(ev)*_sc;var last=st.length?st[st.length-1]:null;for(var i=0;i<evs.length;i++){var p=pos(evs[i]);if(erase){try{ctx.globalCompositeOperation='destination-out';ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=w;ctx.strokeStyle='rgba(0,0,0,1)';ctx.globalAlpha=1;if(last&&last.length===2){ctx.beginPath();ctx.moveTo(last[0],last[1]);ctx.lineTo(p.x,p.y);ctx.stroke();}ctx.beginPath();ctx.arc(p.x,p.y,w/2,0,6.2832);ctx.fill();}catch(e){}}else{if(last&&last.length===2)inkSeg(ctx,last[0],last[1],p.x,p.y,w);else inkSeg(ctx,p.x,p.y,p.x,p.y,w);}last=p;st.push([p.x,p.y]);}ev.preventDefault();});
  function end(ev){if(!drawing)return;drawing=false;pnHold(c,false);var c2=c;resetCtx(c2&&c2.getContext('2d'));wbSave(k,c);}
  c.addEventListener('pointerup',end);
  c.addEventListener('pointercancel',end);
@@ -870,7 +870,7 @@ function bindWBLine(c){
  var k=c.getAttribute('data-key');if(!k)return;var st=[],drawing=false;
  c._st=st;
  c.addEventListener('pointerdown',function(ev){if(!pnOK(ev))return;drawing=true;pnHold(c,true);if(st.length&&st[st.length-1]!==null)st.push(null);var p=wbLpos(ev,c);st.push([p.x,p.y]);try{if(c.setPointerCapture)c.setPointerCapture(ev.pointerId);}catch(e){}ev.preventDefault();});
- c.addEventListener('pointermove',function(ev){if(!drawing)return;var ctx=c.getContext('2d');if(!ctx)return;var evs=[ev];try{if(ev.getCoalescedEvents&&ev.getCoalescedEvents().length)evs=ev.getCoalescedEvents();}catch(e){}var erase=(typeof ERASER!=='undefined')&&ERASER;var w=erase?22:pnW(ev);var last=st.length?st[st.length-1]:null;for(var i=0;i<evs.length;i++){var p=wbLpos(evs[i],c);if(erase){try{ctx.globalCompositeOperation='destination-out';ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=w;ctx.strokeStyle='rgba(0,0,0,1)';ctx.globalAlpha=1;if(last&&last.length===2){ctx.beginPath();ctx.moveTo(last[0],last[1]);ctx.lineTo(p.x,p.y);ctx.stroke();}ctx.beginPath();ctx.arc(p.x,p.y,w/2,0,6.2832);ctx.fill();}catch(e){}}else{if(last&&last.length===2)inkSeg(ctx,last[0],last[1],p.x,p.y,w);else inkSeg(ctx,p.x,p.y,p.x,p.y,w);}last=p;st.push([p.x,p.y]);}ev.preventDefault();});
+ c.addEventListener('pointermove',function(ev){if(!drawing)return;var ctx=c.getContext('2d');if(!ctx)return;var evs=[ev];try{if(ev.getCoalescedEvents&&ev.getCoalescedEvents().length)evs=ev.getCoalescedEvents();}catch(e){}var erase=(typeof ERASER!=='undefined')&&ERASER;var _dh=0;try{_dh=c.getBoundingClientRect().height;}catch(e){_dh=120;}var _sc=(erase||_dh>=90)?1:Math.max(0.6,_dh/90);var w=erase?Math.min(22,Math.max(8,_dh*0.9)):pnW(ev)*_sc;var last=st.length?st[st.length-1]:null;for(var i=0;i<evs.length;i++){var p=wbLpos(evs[i],c);if(erase){try{ctx.globalCompositeOperation='destination-out';ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=w;ctx.strokeStyle='rgba(0,0,0,1)';ctx.globalAlpha=1;if(last&&last.length===2){ctx.beginPath();ctx.moveTo(last[0],last[1]);ctx.lineTo(p.x,p.y);ctx.stroke();}ctx.beginPath();ctx.arc(p.x,p.y,w/2,0,6.2832);ctx.fill();}catch(e){}}else{if(last&&last.length===2)inkSeg(ctx,last[0],last[1],p.x,p.y,w);else inkSeg(ctx,p.x,p.y,p.x,p.y,w);}last=p;st.push([p.x,p.y]);}ev.preventDefault();});
  function end(){if(drawing){drawing=false;pnHold(c,false);resetCtx(c.getContext('2d'));wbSave(k,c);}}
  c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
 }
@@ -1178,43 +1178,31 @@ function build(){
 }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',build);}else{build();}
 })();
-</script><script>/* Zoom-in-place：书写区就地放大/收起 + 🔍 只读大图（无全屏弹层） */
+</script><script>/* Zoom per-area：每个书写区自带 ⤢(就地放大写) / 🔍(只读大图)，无全局开关 */
 (function(){
 if(window.__zpiDone)return;window.__zpiDone=true;
-var ZZ_ON=false, VIEW_ON=false, expEl=null, expState=null;
+var expEl=null,expState=null;
 
-function hasCl(el,c){return el.classList&&el.classList.contains(c);}
-function zzKind(t){if(!t||t.tagName!=='CANVAS')return '';if(t.id==='sCanvas')return '';if(!t.getAttribute('data-key'))return '';
- if(hasCl(t,'pmow'))return '';
- if(hasCl(t,'wc')||hasCl(t,'wbline'))return 'expand';
- if(hasCl(t,'inlwc')||hasCl(t,'grfill')||hasCl(t,'pmshort'))return 'view';
- return '';}
-function penOKev(ev){return ev&&ev.pointerType&&(ev.pointerType==='pen'||ev.pointerType==='mouse'||(window.FINGER_DRAW&&ev.pointerType==='touch'));}
+function hasCl(el,c){return el&&el.classList&&el.classList.contains(c);}
 function zzLabel(k){k=String(k||'');if(/^tr/.test(k))return '翻译·第'+k.slice(2)+'句';if(/^wp/.test(k))return '作文默写 '+k;if(/^in/.test(k))return '词性标注 空'+k.slice(2);if(/^gg/.test(k))return '语法填空 '+k;if(/^an/.test(k))return '作答区 '+k;if(/^pm/.test(k))return '段落作答 '+k;if(/^vc/.test(k))return '生词行 '+k;return k;}
 function bar(show){var b=document.getElementById('zpbar');if(b)b.style.display=show?'flex':'none';}
-function gv(k){var v=document.getElementById(k);return v;}
 
-function fixupBar(){
- var t=gv('zpTitle');if(t)t.textContent=expEl?('⤢ 放大：'+zzLabel(expEl.getAttribute('data-key'))):'';
- var b=gv('zpOk');if(b)b.textContent='✓ 收起保存';
-}
 function expand(el){
  if(expEl){try{finishKeep();}catch(e){collapse(true);}}
  var rect=el.getBoundingClientRect();
- var oh=getComputedStyle(el).height;             // e.g. '44px'
+ var oh=getComputedStyle(el).height;
  var origW=el.width, origH=el.height;
  var origSnap=null;try{origSnap=el.toDataURL('image/png');}catch(e){}
- var isRow=hasCl(el,'wbline');
  var vh=window.innerHeight||800;
- var Hd=Math.round(vh*0.52); if(Hd<180)Hd=180;
- if(isRow)Hd=Math.max(120,Hd);
+ var Hd=Math.round(vh*0.5); if(Hd<160)Hd=160;
  var BW=1500;
- var BH=Math.max(200,Math.round(1500*(Hd/Math.max(40,rect.width))));
- expEl=el;expState={oh:oh,ow:origW,ohp:origH,row:isRow,snap:origSnap,Hd:Hd,BW:BW,BH:BH};
+ var BH=Math.max(220,Math.round(1500*(Hd/Math.max(40,rect.width))));
+ expEl=el;expState={oh:oh,ow:origW,ohp:origH,snap:origSnap};
  el.style.height=Hd+'px';
  el.width=BW;el.height=BH;
  var x=el.getContext('2d');if(x){x.fillStyle='#fffdf7';x.fillRect(0,0,BW,BH);if(origSnap){var im=new Image();im.onload=function(){try{var x2=el.getContext('2d');x2.drawImage(im,0,0,BW,BH);}catch(e){}};im.src=origSnap;}}
- fixupBar();bar(true);
+ var t=document.getElementById('zpTitle');if(t)t.textContent='⤢ 放大：'+zzLabel(el.getAttribute('data-key'));
+ bar(true);
 }
 function collapse(keepContent){
  if(!expEl)return;
@@ -1230,18 +1218,46 @@ function collapse(keepContent){
 function finishKeep(){collapse(true);}
 function doClear(){if(!expEl)return;var x=expEl.getContext('2d');if(x){x.fillStyle='#fffdf7';x.fillRect(0,0,expEl.width,expEl.height);}}
 function doUndo(){if(expEl){try{window._inkCanvas=expEl;if(typeof inkUndo==='function')inkUndo();}catch(e){}}}
-function doErase(){if(typeof vEraser==='function')vEraser();}
 function preview(t){
- var v=gv('zzview');if(!v)return;
+ var v=document.getElementById('zzview');if(!v)return;
  var im=document.getElementById('zzvimg');if(!im)return;
  try{im.src=t.toDataURL('image/png');}catch(e){return;}
- var l=gv('zzvtitle');if(l)l.textContent='🔍 只读大图 · '+zzLabel(t.getAttribute('data-key'));
+ var l=document.getElementById('zzvtitle');if(l)l.textContent='🔍 只读大图 · '+zzLabel(t.getAttribute('data-key'));
  v.style.display='flex';
 }
-function viewHide(){var v=gv('zzview');if(v)v.style.display='none';}
+function viewHide(){var v=document.getElementById('zzview');if(v)v.style.display='none';}
 
+function on(g,fn){var e=document.getElementById(g);if(e)e.addEventListener('click',fn);}
+function chipBtn(txt,title,fn){
+ var b=document.createElement('button');b.type='button';b.textContent=txt;b.title=title;
+ b.style.cssText='border:1px solid #b9c6d2;background:#fff;color:#2b4a78;border-radius:9px;padding:0 6px;font-size:11px;line-height:18px;cursor:pointer;vertical-align:middle;margin:0 0 0 4px;white-space:nowrap';
+ b.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();fn();});
+ return b;
+}
+function mountChips(){
+ var seen={};
+ function keyOf(el){return el.getAttribute('data-key')||'';}
+ // big boards: .wb canvas.wc -> append ⤢ into its wbtool (or after)
+ document.querySelectorAll('.wb canvas.wc[data-key]').forEach(function(c){
+  if(seen['wc'+keyOf(c)])return;seen['wc'+keyOf(c)]=1;
+  var wb=c.closest?c.closest('.wb'):null;var tool=wb?wb.querySelector('.wbtool'):null;
+  var b=chipBtn('⤢ 放大', '就地放大书写', function(){expand(c);});
+  if(tool)tool.appendChild(b);else{c.parentNode&&c.parentNode.insertBefore(b,c.nextSibling);}
+ });
+ // vocab rows
+ document.querySelectorAll('.wline canvas.wbline[data-key]').forEach(function(c){
+  if(seen['wl'+keyOf(c)])return;seen['wl'+keyOf(c)]=1;
+  var b=chipBtn('⤢', '就地放大本行书写', function(){expand(c);});
+  var parent=c.parentNode;if(parent)parent.appendChild(b);
+ });
+ // inline pads: view only
+ document.querySelectorAll('canvas.inlwc[data-key],canvas.grfill[data-key],canvas.pmshort[data-key]').forEach(function(c){
+  if(seen['vi'+keyOf(c)+c.className])return;seen['vi'+keyOf(c)+c.className]=1;
+  var b=chipBtn('🔍', '只读大图查看', function(){preview(c);});
+  if(c.parentNode)c.parentNode.insertBefore(b,c.nextSibling);
+ });
+}
 function buildUI(){
- // toolbar
  var tb=document.createElement('div');tb.id='zpbar';
  tb.style.cssText='display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:9997;background:#fff;border:1px solid #d4dae4;border-radius:20px;box-shadow:0 2px 12px rgba(20,30,60,.2);padding:4px 10px;gap:6px;align-items:center;flex-wrap:wrap;max-width:96vw';
  tb.innerHTML='<span id="zpTitle" style="font-size:12px;color:#2b4a78;font-weight:700;white-space:nowrap"></span>'
@@ -1249,17 +1265,13 @@ function buildUI(){
   +'<button id="zpX" type="button" style="border:1px solid #b6bfcb;background:#fff;border-radius:14px;padding:3px 10px;font-size:12px">✕ 取消</button>'
   +'<button id="zpClr" type="button" style="border:1px solid #ccd3dd;background:#fff;border-radius:14px;padding:3px 10px;font-size:12px">清空</button>'
   +'<button id="zpUndo" type="button" style="border:1px solid #ccd3dd;background:#fff;border-radius:14px;padding:3px 10px;font-size:12px">↶撤销</button>'
-  +'<button id="zpErase" type="button" style="border:1px solid #ccd3dd;background:#fff;border-radius:14px;padding:3px 10px;font-size:12px">🧽橡皮</button>'
   +'<button id="zpView" type="button" style="border:1px solid #1b7f3b;color:#1b7f3b;background:#fff;border-radius:14px;padding:3px 10px;font-size:12px">🔍看大图</button>';
  document.body.appendChild(tb);
- function on(g,fn){var e=document.getElementById(g);if(e)e.addEventListener('click',fn);}
  on('zpOk',function(){finishKeep();});
  on('zpX',function(){collapse(false);});
  on('zpClr',doClear);
  on('zpUndo',doUndo);
- on('zpErase',doErase);
  on('zpView',function(){if(expEl)preview(expEl);});
- // read-only viewer
  var vw=document.createElement('div');vw.id='zzview';
  vw.style.cssText='position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;background:rgba(15,22,35,.6);padding:20px';
  vw.innerHTML='<div style="background:#fff;border-radius:14px;padding:10px 14px;max-width:96vw;text-align:center">'
@@ -1271,42 +1283,7 @@ function buildUI(){
  vw.addEventListener('click',function(e){if(e.target===vw)viewHide();});
  var st=document.createElement('style');st.textContent='@media print{#zpbar,#zzview{display:none!important}}';document.head.appendChild(st);
 }
-document.addEventListener('pointerdown',function(ev){
- var t=ev.target;
- if(!t||t.tagName!=='CANVAS')return;
- var kind=zzKind(t);if(!kind)return;
- if(!penOKev(ev))return;
- if(VIEW_ON){
-   ev.preventDefault();ev.stopImmediatePropagation();preview(t);return;
- }
- if(!ZZ_ON)return;
- if(kind==='expand'){
-   if(t===expEl)return;            // allow drawing in expanded area
-   ev.preventDefault();ev.stopImmediatePropagation();expand(t);
- } else {
-   // 行内小框在放大模式不就地扩：允许正常写；如需大图请用 🔍 只看
- }
-},true);
-
-function syncBtns(){
- var b=gv('zoomBtn');if(b){b.textContent=ZZ_ON?'⤢ 放大书写：开':'⤢ 放大书写：关';if(b.classList)b.classList.toggle('eraser-on',ZZ_ON);}
- var v=gv('viewBtn');if(v){v.textContent=VIEW_ON?'🔍 只看：开':'🔍 只看：关';if(v.classList)v.classList.toggle('eraser-on',VIEW_ON);}
-}
-function vZoom(){ZZ_ON=!ZZ_ON;if(ZZ_ON)VIEW_ON=false;syncBtns();}
-function vView(){VIEW_ON=!VIEW_ON;if(VIEW_ON)ZZ_ON=false;if(expEl)collapse(false);syncBtns();}
-function addNav(id,txt,fn){
- if(document.getElementById(id))return;
- var anchor=document.getElementById('fingerBtn')||document.getElementById('zoomBtn');
- var scope=document.body;
- var nb=document.createElement('button');nb.type='button';nb.id=id;nb.className='navbtn';nb.textContent=txt;
- if(anchor&&anchor.parentNode){anchor.parentNode.insertBefore(nb,anchor.nextSibling);}else{document.querySelector('aside')&&document.querySelector('aside').appendChild(nb);}
- nb.addEventListener('click',fn);
-}
-function init(){
- addNav('zoomBtn','⤢ 放大书写：关',vZoom);
- addNav('viewBtn','🔍 只看：关',vView);
- buildUI();
-}
+function init(){buildUI();mountChips();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script></body></html>
