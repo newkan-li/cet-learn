@@ -1203,12 +1203,23 @@ function expand(el){
 function collapse(keepContent){
  if(!expEl)return;
  var st=expState;
- var cur=null;try{cur=expEl.toDataURL('image/png');}catch(e){}
- var use=keepContent?cur:st.snap;
- expEl.width=st.ow;expEl.height=st.ohp;
- var x=expEl.getContext('2d');if(x){x.fillStyle='#fffdf7';x.fillRect(0,0,st.ow,st.ohp);if(use){var im=new Image();im.onload=function(){try{var x2=expEl.getContext('2d');x2.drawImage(im,0,0,st.ow,st.ohp);}catch(e){}};im.src=use;}}
- try{expEl.style.height=st.oh;}catch(e){}
- if(keepContent){var k=expEl.getAttribute('data-key');try{if(typeof wbSave==='function')wbSave(k,expEl);else if(typeof wbSaveOv==='function')wbSaveOv(k,expEl);}catch(e){}}
+ if(keepContent){
+   // 同步缩放回原尺寸后立即保存（避免异步导致保存为空/笔迹消失）
+   var tmp=document.createElement('canvas');tmp.width=st.ow;tmp.height=st.ohp;
+   var tc=tmp.getContext('2d');tc.fillStyle='#fffdf7';tc.fillRect(0,0,st.ow,st.ohp);
+   try{tc.drawImage(expEl,0,0,st.ow,st.ohp);}catch(e){}
+   expEl.width=st.ow;expEl.height=st.ohp;
+   var x=expEl.getContext('2d');x.fillStyle='#fffdf7';x.fillRect(0,0,st.ow,st.ohp);x.drawImage(tmp,0,0);
+   try{expEl.style.height=st.oh;}catch(e){}
+   var k=expEl.getAttribute('data-key');
+   try{if(typeof wbSave==='function')wbSave(k,expEl);else if(typeof wbSaveOv==='function')wbSaveOv(k,expEl);}catch(e){}
+ } else {
+   // 取消：恢复放大前的画面（原图异步画回即可，无需保存）
+   var cur=st.snap;
+   expEl.width=st.ow;expEl.height=st.ohp;
+   var x=expEl.getContext('2d');if(x){x.fillStyle='#fffdf7';x.fillRect(0,0,st.ow,st.ohp);if(cur){var im=new Image();im.onload=function(){try{var x2=expEl.getContext('2d');x2.drawImage(im,0,0,st.ow,st.ohp);}catch(e){}};im.src=cur;}}
+   try{expEl.style.height=st.oh;}catch(e){}
+ }
  expEl=null;expState=null;bar(false);
 }
 function finishKeep(){collapse(true);}
