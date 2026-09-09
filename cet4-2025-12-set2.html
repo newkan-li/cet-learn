@@ -1178,4 +1178,90 @@ function build(){
 }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',build);}else{build();}
 })();
+</script><script>/* Zoom Pad：全屏放大书写层（点书写区→放大写→回写小框/只读预览） */
+(function(){
+if(window.__zzDone)return;window.__zzDone=true;
+var ZZ_ON=false;
+function zzT(t){if(!t||t.tagName!=='CANVAS')return false;if(t.id==='sCanvas')return false;
+ var c=t.classList;if(c.contains('pmow'))return false;
+ if(!t.getAttribute('data-key'))return false;
+ return c.contains('wc')||c.contains('wbline')||c.contains('grfill')||c.contains('inlwc')||c.contains('pmshort');}
+function zzLabel(k){k=String(k||'');if(/^tr/.test(k))return '翻译·第'+k.slice(2)+'句';if(/^wp/.test(k))return '作文默写 '+k;if(/^in/.test(k))return '词性标注 空'+k.slice(2);if(/^gg/.test(k))return '语法填空 '+k;if(/^an/.test(k))return '作答区 '+k;if(/^pm/.test(k))return '段落作答 '+k;if(/^vc/.test(k))return '生词行 '+k;return k;}
+var ovc=null,ovctx=null,oStack=[],oRedo=[],origEl=null,ovMode='write',ovDrawing=false,ovLast=null;
+
+function ovSnap(){try{return ovc.toDataURL('image/jpeg',0.72);}catch(e){return null;}}
+function ovPush(){var s=ovSnap();if(s){oStack.push(s);if(oStack.length>40)oStack.shift();oRedo=[];}}
+function ovPaintImg(url){var im=new Image();im.onload=function(){var x=ovc.getContext('2d');if(x){x.clearRect(0,0,ovc.width,ovc.height);x.drawImage(im,0,0,ovc.width,ovc.height);}};im.src=url;}
+function ovClear(){if(!ovc)return;ovPush();var x=ovc.getContext('2d');if(x){x.fillStyle='#fffdf7';x.fillRect(0,0,ovc.width,ovc.height);}}
+function ovUndo(){if(!ovc||!oStack.length)return;var cur=ovSnap();if(cur)oRedo.push(cur);var img=oStack.pop();ovPaintImg(img);}
+function zzOpen(el){
+ if(!ovc)zzBuild();
+ origEl=el;
+ var t=document.getElementById('zzTitle');if(t)t.textContent='⤢ 放大书写 · '+zzLabel(el.getAttribute('data-key'));
+ ovc.width=1400;ovc.height=900;
+ ovClear();
+ var x=ovc.getContext('2d');
+ try{x.drawImage(el,0,0,ovc.width,ovc.height);}catch(e){}
+ oStack=[];oRedo=[];
+ ovMode='write';zzModeUI();
+ document.body.style.overflow='hidden';
+ var z=document.getElementById('zzbox');if(z)z.style.display='flex';
+ window._inkCanvas=null;
+}
+function zzClose(){var z=document.getElementById('zzbox');if(z)z.style.display='none';document.body.style.overflow='';origEl=null;oStack=[];oRedo=[];}
+function zzFinish(){
+ if(!origEl||!ovc)return;
+ try{var x=origEl.getContext('2d');if(x){x.clearRect(0,0,origEl.width,origEl.height);x.fillStyle='#fffdf7';x.fillRect(0,0,origEl.width,origEl.height);x.drawImage(ovc,0,0,origEl.width,origEl.height);}}catch(e){}
+ var k=origEl.getAttribute('data-key');
+ try{if(typeof wbSave==='function')wbSave(k,origEl);else if(typeof wbSaveOv==='function')wbSaveOv(k,origEl);}catch(e){}
+ zzClose();
+}
+function zzModeUI(){var b=document.getElementById('zzMode');if(!b)return;var l=document.getElementById('zzLock');if(ovMode==='write'){b.textContent='✍️ 写';if(l)l.textContent='可写';}else{b.textContent='👀 看';if(l)l.textContent='只读';}}
+
+function zzBuild(){
+ var z=document.createElement('div');z.id='zzbox';
+ z.style.cssText='position:fixed;inset:0;z-index:9990;display:none;align-items:center;justify-content:center;background:rgba(15,22,35,.55);backdrop-filter:blur(2px)';
+ z.innerHTML='<div style="width:min(96vw,960px);max-height:94vh;background:#fff;border-radius:16px;display:flex;flex-direction:column;overflow:hidden">'
+  +'<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f2f6fc;border-bottom:1px solid #d9e2ee;flex-wrap:wrap">'
+  +'<span id="zzTitle" style="font-weight:700;font-size:14px;color:#2b4a78"></span>'
+  +'<span id="zzLock" style="font-size:12px;color:#1b7f3b"></span>'
+  +'<span style="flex:1"></span>'
+  +'<button id="zzMode" type="button" style="border:1px solid #2b6ef2;color:#2b6ef2;background:#fff;border-radius:14px;padding:3px 10px;font-size:12px">✍️ 写</button>'
+  +'<button id="zzClear" type="button" style="border:1px solid #ccd3dd;background:#fff;border-radius:14px;padding:3px 10px;font-size:12px">清空</button>'
+  +'<button id="zzUndo" type="button" style="border:1px solid #ccd3dd;background:#fff;border-radius:14px;padding:3px 10px;font-size:12px">↶撤销</button>'
+  +'<button id="zzErase" type="button" style="border:1px solid #ccd3dd;background:#fff;border-radius:14px;padding:3px 10px;font-size:12px">🧽橡皮</button>'
+  +'<button id="zzCancel" type="button" style="border:1px solid #b6bfcb;background:#fff;border-radius:14px;padding:3px 12px;font-size:12px">✕ 取消</button>'
+  +'<button id="zzOk" type="button" style="background:#2b6ef2;color:#fff;border:none;border-radius:14px;padding:3px 14px;font-size:12px">✓ 完成回写</button>'
+  +'</div>'
+  +'<div style="flex:1;overflow:auto;padding:12px;background:#f7f9fc">'
+  +'<canvas id="zzc" style="width:100%;display:block;background:#fffdf7;border:1px dashed #b9c6d2;border-radius:8px"></canvas>'
+  +'</div>'
+  +'<p style="margin:0;padding:6px 12px;font-size:11px;color:#5a6172">写于放大区；“完成回写”后缩回小框（可再点弹层切 👀 看只读大图）。🧽橡皮与主工具栏同步。</p>'
+  +'</div>';
+ document.body.appendChild(z);
+ ovc=document.getElementById('zzc');ovctx=ovc.getContext('2d');
+ var st=document.createElement('style');st.textContent='@media print{#zzbox{display:none!important}}';document.head.appendChild(st);
+ z.addEventListener('pointerdown',function(e){if(e.target===z){zzClose();}},true);
+ document.getElementById('zzMode').addEventListener('click',function(){ovMode=(ovMode==='write')?'view':'write';zzModeUI();});
+ document.getElementById('zzClear').addEventListener('click',function(){if(ovMode==='view')return;ovClear();});
+ document.getElementById('zzUndo').addEventListener('click',ovUndo);
+ var er=document.getElementById('zzErase');if(er)er.addEventListener('click',function(){if(typeof vEraser==='function')vEraser();});
+ document.getElementById('zzCancel').addEventListener('click',zzClose);
+ document.getElementById('zzOk').addEventListener('click',zzFinish);
+ ovc.addEventListener('pointerdown',function(ev){if(ovMode!=='write')return;if(!pnOK(ev))return;ovPush();ovDrawing=true;ovLast=null;try{ovc.style.touchAction='none';}catch(e){}ev.preventDefault();});
+ ovc.addEventListener('pointermove',function(ev){if(ovMode!=='write'||!ovDrawing)return;var r=ovc.getBoundingClientRect();var evs=[ev];try{if(ev.getCoalescedEvents&&ev.getCoalescedEvents().length)evs=ev.getCoalescedEvents();}catch(e){}var erase=(typeof ERASER!=='undefined')&&ERASER;var w=erase?22:pnW(ev);for(var i=0;i<evs.length;i++){var p=evs[i];var x=(p.clientX-r.left)*(ovc.width/r.width);var y=(p.clientY-r.top)*(ovc.height/r.height);if(erase){try{ovctx.globalCompositeOperation='destination-out';ovctx.lineCap='round';ovctx.lineJoin='round';ovctx.lineWidth=w;ovctx.strokeStyle='rgba(0,0,0,1)';ovctx.globalAlpha=1;if(ovLast){ovctx.beginPath();ovctx.moveTo(ovLast[0],ovLast[1]);ovctx.lineTo(x,y);ovctx.stroke();}ovctx.beginPath();ovctx.arc(x,y,w/2,0,6.2832);ovctx.fill();}catch(e){}}else if(typeof inkSeg==='function'){if(ovLast)inkSeg(ovctx,ovLast[0],ovLast[1],x,y,w);else inkSeg(ovctx,x,y,x,y,w);}ovLast=[x,y];}ev.preventDefault();});
+ function ovEnd(){if(ovDrawing){ovDrawing=false;ovLast=null;try{ovc.style.touchAction='';}catch(e){}}}
+ ovc.addEventListener('pointerup',ovEnd);ovc.addEventListener('pointercancel',ovEnd);
+}
+document.addEventListener('pointerdown',function(ev){
+ var t=ev.target;
+ if(!ZZ_ON||!zzT(t))return;
+ if(!(ev.pointerType==='pen'||ev.pointerType==='mouse'||(window.FINGER_DRAW&&ev.pointerType==='touch')))return;
+ ev.preventDefault();ev.stopImmediatePropagation();
+ zzOpen(t);
+},true);
+function vZoom(){ZZ_ON=!ZZ_ON;var b=document.getElementById('zoomBtn');if(b){b.textContent=ZZ_ON?'⤢ 放大书写：开':'⤢ 放大书写：关';if(b.classList)b.classList.toggle('eraser-on',ZZ_ON);}return ZZ_ON;}
+function zzInit(){var b=document.getElementById('zoomBtn');if(!b){var l=document.getElementById('fingerBtn');if(l&&l.parentNode){var nb=document.createElement('button');nb.type='button';nb.id='zoomBtn';nb.className='navbtn';nb.textContent='⤢ 放大书写：关';nb.addEventListener('click',vZoom);l.parentNode.insertBefore(nb,l.nextSibling);}}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',zzInit);else zzInit();
+})();
 </script></body></html>
