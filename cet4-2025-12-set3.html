@@ -753,6 +753,21 @@ document.addEventListener('mouseup',function(ev){
  if(ev.target.closest('#vdrawer')||ev.target.closest('#vchip')||ev.target.closest('#vbtns'))return;
  setTimeout(function(){var sel=window.getSelection();if(!sel||sel.isCollapsed){chip.style.display='none';return;}var t=sel.toString().replace(/\s+/g,' ').trim();var toks=t?t.split(/\s+/).length:0;if(!t||t.length>320||toks>80){chip.style.display='none';return;}vSel=t;chip.textContent=toks>1?'＋ 加为短语/句子并联网翻译':'＋ 加入生词本';try{var r=sel.getRangeAt(0).getBoundingClientRect();chip.style.top=(window.scrollY+r.bottom+6)+'px';chip.style.left=(window.scrollX+r.left)+'px';chip.style.display='block';}catch(e){chip.style.display='none';}},10);
 });
+addEventListener('selectionchange',function(){
+ var chip=document.getElementById('vchip');if(!chip)return;
+ var ae=document.activeElement;if(ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA')){chip.style.display='none';return;}
+ var sel=window.getSelection();
+ if(!sel||sel.isCollapsed||!sel.toString().trim()){
+  var keep=false;try{keep=window._pmKeep&&(Date.now()-window._pmKeep<260);}catch(e){}
+  if(!keep)chip.style.display='none';
+  return;
+ }
+ var t=sel.toString().replace(/\s+/g,' ').trim();var toks=t?t.split(/\s+/).length:0;
+ if(!t||t.length>320||toks>80){chip.style.display='none';return;}
+ vSel=t;chip.textContent=toks>1?'＋ 加为短语/句子并联网翻译':'＋ 加入生词本';
+ try{var r=sel.getRangeAt(0).getBoundingClientRect();chip.style.top=(window.scrollY+r.bottom+6)+'px';chip.style.left=(Math.max(4,window.scrollX+r.left))+'px';chip.style.display='block';}catch(e){chip.style.display='none';}
+},{passive:true});
+
 document.addEventListener('scroll',function(){var c=document.getElementById('vchip');if(c)c.style.display='none';},{passive:true});
 document.addEventListener('keydown',function(ev){var pan=document.getElementById('studyPanel');if(!pan||!pan.classList||!pan.classList.contains('on'))return;var t=ev.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'))return;if(ev.key==='ArrowRight'){ev.preventDefault();sNext();}else if(ev.key==='ArrowLeft'){ev.preventDefault();sPrev();}});
 document.addEventListener('pointerdown',sDown);
@@ -951,7 +966,7 @@ window.addEventListener('load',function(){document.querySelectorAll('canvas.pmow
 var _pmchipHide=0;
 function pmSync(){var on=ERASER||STRAIGHT;document.body.classList.toggle('pmink',on);}
 function pmHideChip(){var c=document.getElementById('vchip');if(c)c.style.display='none';}
-function pmShowLater(x,y,w){
+function pmShowLater(x,y,w){ try{window._pmKeep=Date.now();}catch(e){}
  var chip=document.getElementById('vchip');if(!chip)return;
  setTimeout(function(){vSel=w;chip.textContent='＋ 加入生词本';
   var top=window.scrollY+y+10,left=window.scrollX+x-90;
