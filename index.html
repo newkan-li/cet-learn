@@ -78,6 +78,7 @@ SETS.forEach(function(s){
   var t=document.createElement("p");t.className="topics";
   t.innerHTML="Passage One："+"<span>"+s.p1+"</span>　|　Passage Two："+"<span>"+s.p2+"</span>";c.appendChild(t);
   var a=document.createElement("a");a.className="go";a.href=s.f;a.target="_blank";a.textContent="打开本套精讲 →";c.appendChild(a);
+  var pp=document.createElement("a");pp.href="print/"+s.f.replace(".html","-handout.pdf");pp.target="_blank";pp.textContent="🖨 纸面手写页(PDF)";pp.style.cssText="align-self:flex-start;margin-top:4px;text-decoration:none;color:#2b6ef2;border:1px solid #2b6ef2;background:#fff;padding:6px 14px;border-radius:22px;font-size:13px";c.appendChild(pp);
   L.appendChild(c);
 });
 
