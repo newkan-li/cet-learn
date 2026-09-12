@@ -1,0 +1,7 @@
+# editor / ctags / OS / python
+tags
+.vim-bookmarks
+*.swp
+.DS_Store
+__pycache__/
+*.pyc
