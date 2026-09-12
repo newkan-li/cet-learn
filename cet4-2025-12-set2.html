@@ -1340,8 +1340,7 @@ function apply(t){
  var b=document.getElementById('themeBtn');if(b)b.textContent='🎨 '+({light:'浅色',dark:'暗色',sepia:'护眼',contrast:'高对比'}[t]||'主题');
 }
 function cur(){try{var t=localStorage.getItem(KEY);if(t&&['light','dark','sepia','contrast'].indexOf(t)>=0)return t;}catch(e){}
- try{if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)return 'dark';}catch(e){}
- return 'light';}
+ return 'sepia';}
 function build(){
  var st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st);
  var btn=document.createElement('button');btn.id='themeBtn';btn.type='button';
