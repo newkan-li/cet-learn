@@ -1531,4 +1531,148 @@ function build(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else build();
 })();
-</script></body></html>
+</script><script id="czModeScript">
+/* 选词填空：模式切换（手写 / 选词 / 两者）+ 全屏手写（CET4 #q-cloze）。
+   手写=蓝色小框；选词=绿色“选词”标签行。 全屏手写支持单空与整卷（26-35），笔迹本地保存。 */
+(function(){
+if(window.__czModeDone)return;window.__czModeDone=true;
+function $(s,r){return (r||document).querySelector(s);}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+function ready(fn){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fn);else fn();}
+var MKEY='czmode';
+function getWBK(){if(typeof window.WBK==='string')return window.WBK;var ap=(window.ANSDATA&&ANSDATA.appkey)||'set';return 'wbcanvas:'+ap+':';}
+function wbSaveOv(k,c){try{if(typeof window.wbSaveOv==='function'){window.wbSaveOv(k,c);return;}localStorage.setItem(getWBK()+k,c.toDataURL('image/png'));}catch(e){}}
+function wbRestore(k,c){try{var s=localStorage.getItem(getWBK()+k);if(!s)return;var im=new Image();im.onload=function(){var x=c.getContext('2d');if(x)x.drawImage(im,0,0,c.width,c.height);};im.src=s;}catch(e){}}
+
+function injectCSS(){
+ if($('#czModeCSS'))return;
+ var css=[
+  '.czbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0;padding:8px 10px;border:1px dashed #b9c6d2;border-radius:10px;background:rgba(43,110,242,.06)}',
+  '.czbar .lbl{font-size:12.5px;font-weight:700;color:var(--blue,#1f5c8b)}',
+  '.czbtn{border:1px solid #b9c6d2;background:#fff;color:#234f7a;border-radius:14px;padding:3px 12px;font-size:12.5px;cursor:pointer}',
+  '.czbtn.on{background:#2b6ef2;color:#fff;border-color:#2b6ef2}',
+  '.czhint{font-size:12px;color:var(--sub,#5b6b7b)}',
+  '#q-cloze.czhand .mcq{display:none!important}',
+  '#q-cloze.czchoose canvas.inlwc{display:none!important}',
+  '#q-cloze.czchoose .czfull{display:none!important}',
+  'canvas.inlwc{background:#eef4ff}',
+  '#q-cloze.czhand canvas.inlwc{background:#dfeaff;box-shadow:0 0 0 2px rgba(43,110,242,.55) inset}',
+  '.czfull{border:1px solid #9fb6d6;background:#fff;color:#234f7a;border-radius:8px;padding:0 5px;font-size:11px;line-height:18px;cursor:pointer;margin:0 0 0 3px;vertical-align:middle}',
+  '.cztag{display:inline-block;font-size:11px;border-radius:8px;padding:0 6px;margin-right:4px;vertical-align:middle}',
+  '.cztag.h{background:#e8f0fe;color:#1f5c8b;border:1px solid #b9cbe8}',
+  '.cztag.c{background:#e8f6ec;color:#1b7f3b;border:1px solid #b9ddc4}',
+  '#czOverlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(15,22,35,.6);padding:14px}',
+  '#czOverlay .pad{background:#fff;border-radius:14px;padding:10px 12px;max-width:97vw;max-height:96vh;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.32)}',
+  '#czOverlay .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;font-weight:700;color:#234f7a;font-size:14px}',
+  '#czOverlay canvas{display:block;background:#fffdf7;border:1px dashed #b9c6d2;border-radius:8px;touch-action:none;cursor:crosshair;margin:6px 0}',
+  '#czOverlay .rowlab{font-size:13px;color:#234f7a;font-weight:700;margin-top:8px}',
+  '#czOverlay .btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:8px}',
+  '#czOverlay .btns button{border:1px solid #b9c6d2;background:#fff;border-radius:14px;padding:4px 14px;font-size:13px;cursor:pointer}',
+  '#czOverlay .btns .save{background:#2b6ef2;color:#fff;border-color:#2b6ef2}',
+  'html.theme-dark .czbar{background:rgba(43,110,242,.12);border-color:#2c3442}',
+  'html.theme-dark .czbtn{background:#1a212b;color:#dbe3ee;border-color:#2c3442}',
+  'html.theme-dark .czbtn.on{background:#2b6ef2;color:#fff}',
+  'html.theme-dark canvas.inlwc{background:#f6f3e9}',
+  'html.theme-dark #czOverlay .pad{background:#151b24;color:#e6e9ef}',
+  'html.theme-dark #czOverlay .hd,html.theme-dark #czOverlay .rowlab{color:#9fc3ff}',
+  'html.theme-dark #czOverlay .btns button{background:#1a212b;color:#dbe3ee;border-color:#2c3442}',
+  'html.theme-dark #czOverlay .btns .save{background:#2b6ef2;color:#fff}',
+  '@media print{.czbar,.czfull,#czOverlay{display:none!important}}'
+ ].join('');
+ var st=document.createElement('style');st.id='czModeCSS';st.textContent=css;document.head.appendChild(st);
+}
+
+function bindDraw(c){
+ var draw=false,last=null,ctx=c.getContext('2d');
+ function pos(ev){var r=c.getBoundingClientRect();var p=ev.touches?ev.touches[0]:ev;return{x:(p.clientX-r.left)*(c.width/r.width),y:(p.clientY-r.top)*(c.height/r.height)};}
+ function down(ev){if(ev.button!==undefined&&ev.button>0)return;draw=true;last=pos(ev);ctx.lineWidth=Math.max(2,Math.round(c.height/60));ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#123a6b';try{c.setPointerCapture(ev.pointerId);}catch(e){}ev.preventDefault();}
+ function move(ev){if(!draw)return;var p=pos(ev);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;ev.preventDefault();}
+ function up(ev){draw=false;try{if(ev&&ev.pointerId!=null)c.releasePointerCapture(ev.pointerId);}catch(e){}}
+ c.addEventListener('pointerdown',down);c.addEventListener('pointermove',move);c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
+}
+
+var ov=null,cur={type:'',target:null,rows:[]};
+function buildOverlay(){
+ if(ov)return;ov=document.createElement('div');ov.id='czOverlay';
+ ov.innerHTML='<div class="pad"><div class="hd"><span id="czTitle">全屏手写</span>'
+  +'<button id="czClose" type="button" style="border:1px solid #b6bfcb;background:#fff;border-radius:14px;padding:2px 12px;cursor:pointer">✕ 关闭</button></div>'
+  +'<div id="czBody"></div><div class="btns"><button id="czClear" type="button">清空</button><button id="czCancel" type="button">取消</button><button id="czSave" class="save" type="button">保存</button></div></div>';
+ document.body.appendChild(ov);
+ ov.addEventListener('click',function(e){if(e.target===ov)closeOv(false);});
+ $('#czClose',ov).onclick=function(){closeOv(false);};
+ $('#czCancel',ov).onclick=function(){closeOv(false);};
+ $('#czClear',ov).onclick=clearOv;
+ $('#czSave',ov).onclick=saveOv;
+}
+function openOv(){buildOverlay();ov.style.display='flex';}
+function closeOv(){if(ov)ov.style.display='none';}
+function clearOv(){
+ $$('canvas',ov).forEach(function(c){var x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);});
+}
+function saveOv(){
+ if(cur.type==='single'){
+  var t=cur.target;if(t){var x=t.getContext('2d');x.clearRect(0,0,t.width,t.height);x.drawImage(cur.pad,0,0,t.width,t.height);wbSaveOv(t.getAttribute('data-key'),t);}
+ } else if(cur.type==='sheet'){
+  cur.rows.forEach(function(r){wbSaveOv('czf'+r.n,r.canvas);var inl=$('canvas.inlwc[data-key="in'+r.n+'"]');if(inl){var x=inl.getContext('2d');x.clearRect(0,0,inl.width,inl.height);x.drawImage(r.canvas,0,0,inl.width,inl.height);wbSaveOv('in'+r.n,inl);}});
+ }
+ closeOv();
+}
+function openSingle(t){
+ openOv();cur={type:'single',target:t,pad:null,rows:[]};
+ $('#czTitle',ov).textContent='全屏手写 · '+((t.getAttribute('data-key')||'').replace(/^in/,'第')+' 空');
+ var W=Math.min(1500,Math.max(700,Math.round(window.innerWidth*0.9))),H=Math.round(W*120/420);
+ var body=$('#czBody',ov);body.innerHTML='';var c=document.createElement('canvas');c.width=W;c.height=H;body.appendChild(c);
+ var x=c.getContext('2d');try{x.drawImage(t,0,0,W,H);}catch(e){}
+ bindDraw(c);cur.pad=c;
+}
+function openSheet(){
+ openOv();cur={type:'sheet',target:null,pad:null,rows:[]};
+ $('#czTitle',ov).textContent='全屏手写 · 选词填空 26–35';
+ var body=$('#czBody',ov);body.innerHTML='';
+ for(var n=26;n<=35;n++){
+  var lab=document.createElement('div');lab.className='rowlab';lab.textContent='第 '+n+' 空';body.appendChild(lab);
+  var c=document.createElement('canvas');c.width=1500;c.height=150;body.appendChild(c);
+  var x=c.getContext('2d');
+  var inl=$('canvas.inlwc[data-key="in'+n+'"]');
+  if(localStorage.getItem(getWBK()+'czf'+n)){wbRestore('czf'+n,c);} else if(inl && inl.width){try{x.drawImage(inl,0,0,c.width,c.height);}catch(e){}}
+  bindDraw(c);cur.rows.push({n:n,canvas:c});
+ }
+}
+
+function mount(){
+ var sec=$('#q-cloze');if(!sec)return;
+ injectCSS();
+ // toolbar
+ var bar=document.createElement('div');bar.className='czbar';
+ bar.innerHTML='<span class="lbl">作答方式：</span>'
+  +'<button class="czbtn" data-m="both" type="button">两者都显示</button>'
+  +'<button class="czbtn" data-m="hand" type="button">✍ 手写</button>'
+  +'<button class="czbtn" data-m="choose" type="button">🅰 选词</button>'
+  +'<button class="czbtn" id="czSheet" type="button">⤢ 全屏手写（26–35）</button>'
+  +'<span class="czhint">蓝框＝手写；绿标“选词”＝选字母</span>';
+ var h3=sec.querySelector('h3');if(h3&&h3.parentNode)h3.parentNode.insertBefore(bar,h3.nextSibling);else sec.insertBefore(bar,sec.firstChild);
+ function apply(m){sec.classList.remove('czhand','czchoose');if(m==='hand')sec.classList.add('czhand');if(m==='choose')sec.classList.add('czchoose');$$('.czbtn[data-m]',bar).forEach(function(b){b.classList.toggle('on',b.getAttribute('data-m')===m);});try{localStorage.setItem(MKEY,m);}catch(e){}}
+ $$('.czbtn[data-m]',bar).forEach(function(b){b.onclick=function(){apply(b.getAttribute('data-m'));};});
+ var saved='both';try{saved=localStorage.getItem(MKEY)||'both';}catch(e){}
+ apply(saved);
+ $('#czSheet',bar).onclick=openSheet;
+ // per-blank fullscreen buttons
+ $$('canvas.inlwc[data-key]',sec).forEach(function(c){
+  if(c.getAttribute('data-czfull'))return;c.setAttribute('data-czfull','1');
+  var b=document.createElement('button');b.type='button';b.className='czfull';b.textContent='⤢';b.title='全屏手写本空';
+  b.onclick=function(){openSingle(c);};
+  if(c.parentNode)c.parentNode.insertBefore(b,c.nextSibling);
+ });
+ // tag the selection rows
+ $$('.mcq[data-group="cloze"]',sec).forEach(function(m){
+  if(m.getAttribute('data-cztag'))return;m.setAttribute('data-cztag','1');
+  var t=document.createElement('span');t.className='cztag c';t.textContent='选词';
+  m.insertBefore(t,m.firstChild);
+ });
+}
+
+ready(mount);
+})();
+
+</script>
+</body></html>
