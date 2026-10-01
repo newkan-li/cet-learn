@@ -6,7 +6,32 @@
   var D = null;
   function getD() { if (!D) D = dict(); return D; }
 
-  function load() { try { return JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { return []; } }
+  function load() {
+    var a = [];
+    try { a = JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { a = []; }
+    if (!Array.isArray(a)) {
+      if (a && typeof a === 'object') { var tmp = []; for (var kk in a) { var v = a[kk]; if (v && (v.w || v.word)) tmp.push(v); } a = tmp; }
+      else a = [];
+    }
+    /* 合并站内其它生词本（真题精讲页 cet4vbook* 等），避免“之前的生词不见了” */
+    try {
+      var have = {}; a.forEach(function (x) { if (x && x.w) have[x.w] = 1; });
+      var changed = false;
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (!k || k.indexOf('cet4vbook') !== 0) continue;
+        var arr; try { arr = JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { continue; }
+        if (!Array.isArray(arr)) continue;
+        arr.forEach(function (e) {
+          var w = norm(e && (e.w || e.word));
+          if (!w || have[w]) return;
+          have[w] = 1; a.push({ w: w, cn: (e.cn || ''), ipa: (e.uk || e.us || '') }); changed = true;
+        });
+      }
+      if (changed) { try { localStorage.setItem(KEY, JSON.stringify(a)); } catch (e) {} }
+    } catch (e) {}
+    return a;
+  }
   function save(a) { try { localStorage.setItem(KEY, JSON.stringify(a)); } catch (e) {} }
   var BOOK = load();
 
