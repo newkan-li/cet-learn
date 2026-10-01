@@ -48,6 +48,7 @@
     + '.kxpop .w{font-weight:700;color:#123a6b;font-size:15px}.kxpop .p{color:#8a94a3;font-size:12px;margin-left:6px}'
     + '.kxpop .c{color:#39424f;margin:4px 0 6px}.kxpop button{border:1px solid #b9c6d2;background:#fff;color:#2b6ef2;border-radius:12px;padding:2px 10px;cursor:pointer;font-size:12.5px}'
     + '.kxpop .sp{border:0;background:transparent;font-size:15px;cursor:pointer}'
+    + '.kxpop .cl{float:right;border:0;background:transparent;color:#8a94a3;font-size:14px;cursor:pointer;padding:0 2px}'
     + 'mark.kxmark{background:#fff3a3;color:inherit;border-radius:3px;padding:0 1px}'
     + 'details.kxvocab{margin:8px 0;border:1px solid #e4ddcd;border-radius:10px;padding:6px 10px;background:#fffdf8}'
     + 'details.kxvocab summary{cursor:pointer;color:#1b5fa8;font-weight:600;font-size:13.5px}'
@@ -112,15 +113,17 @@
   var pop = null;
   function hidePop() { if (pop) { pop.remove(); pop = null; } }
   function showPop(x, y, w, d) {
-    hidePop(); pop = el('div', 'kxpop');
+    hidePop(); pop = el('div', 'kxpop'); pop.id = 'kxpop';
     var ipa = d ? d.uk : ''; var cn = d ? d.cn : '（词典未收录，可手动记录）';
     pop.innerHTML = '<span class="w">' + esc(w) + '</span><span class="p">' + esc(ipa) + '</span>'
-      + '<button class="sp" title="朗读">🔊</button><div class="c">' + esc(cn) + '</div>';
+      + '<button class="sp" title="朗读">🔊</button><button class="cl" title="关闭">✕</button>'
+      + '<div class="c">' + esc(cn) + '</div>';
     var b = el('button', null, inBook(w) ? '已在生词本' : '＋生词本');
     if (inBook(w)) b.disabled = true;
     b.onclick = function () { if (add(w, d ? d.cn : '', ipa)) { b.textContent = '已加入 ✓'; b.disabled = true; } };
     pop.appendChild(b);
     pop.querySelector('.sp').onclick = function () { speak(w); };
+    pop.querySelector('.cl').onclick = function () { hidePop(); };
     document.body.appendChild(pop);
     var px = Math.min(x, window.innerWidth - 300), py = y + 12;
     if (py + pop.offsetHeight > window.innerHeight - 10) py = y - pop.offsetHeight - 12;
@@ -143,6 +146,13 @@
     var d = lookup(w);
     showPop(e.clientX, e.clientY, norm(w), d);
   });
+  /* 点别处 / 滚动 / Esc 关闭单词弹窗 */
+  document.addEventListener('mousedown', function (e) {
+    if (e.target.closest && e.target.closest('#kxpop,.kxfab,#kxpanel,.kxadd')) return;
+    hidePop();
+  });
+  document.addEventListener('scroll', function () { hidePop(); }, true);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hidePop(); });
 
   function unwrapMarks() {
     document.querySelectorAll('mark.kxmark').forEach(function (m) { var t = document.createTextNode(m.textContent); m.parentNode.replaceChild(t, m); });
