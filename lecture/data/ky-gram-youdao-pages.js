@@ -1,1 +1,1 @@
-window.PAGES={key:"ky-gram-youdao",title:"有道英语复习宝典基础精讲 · 语法基础+长难句应用",books:[{name:"有道英语复习宝典基础精讲 · 语法基础+长难句应用",img:"img/ky-gram-youdao",total:59,sections:[{name:"正文",a:1,b:59}]}]};
+window.PAGES={key:"ky-gram-youdao",title:"有道英语复习宝典基础精讲 · 语法基础+长难句应用",books:[{name:"有道英语复习宝典基础精讲 · 语法基础+长难句应用",img:"img/ky-gram-youdao",total:59,sections:[{name:"正文",a:1,b:24},{name:"二、分类",a:25,b:56},{name:"一、倒装",a:57,b:59}]}]};
