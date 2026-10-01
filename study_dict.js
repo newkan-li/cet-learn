@@ -36,8 +36,9 @@
   var css = ''
     + '.kxfab{position:fixed;right:16px;bottom:16px;z-index:9990;background:#2b6ef2;color:#fff;border:none;border-radius:24px;padding:9px 15px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.28)}'
     + '.kxfab .n{background:#fff;color:#2b6ef2;border-radius:10px;padding:0 6px;margin-left:6px;font-size:12px}'
-    + '#kxpanel{position:fixed;right:16px;bottom:64px;z-index:9991;width:min(360px,92vw);max-height:70vh;overflow:auto;background:#fff;border:1px solid #d4dae4;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.28);padding:10px 12px;display:none}'
-    + '#kxpanel.hd{font-weight:700;color:#234f7a}'
+    + '#kxpanel{position:fixed;top:0;right:0;bottom:0;z-index:9991;width:min(380px,94vw);height:100vh;overflow:auto;background:#fff;border-left:1px solid #d4dae4;box-shadow:-8px 0 26px rgba(0,0,0,.22);padding:12px 14px;display:none}'
+    + '#kxpanel .hd{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:#234f7a;position:sticky;top:0;background:inherit;padding:2px 0 8px;border-bottom:1px solid #eef2f7}'
+    + '#kxpanel .hd button.kxclose{border:0;background:transparent;color:#8a94a3;font-size:16px;cursor:pointer;padding:0 4px;line-height:1}'
     + '#kxpanel ul{list-style:none;margin:6px 0 0;padding:0}'
     + '#kxpanel li{display:flex;align-items:baseline;gap:6px;border-bottom:1px dashed #e6ecf3;padding:5px 0;font-size:13px}'
     + '#kxpanel li .w{font-weight:700;color:#123a6b}#kxpanel li .p{color:#8a94a3;font-size:11.5px}#kxpanel li .c{flex:1;color:#39424f}'
@@ -85,7 +86,7 @@
     });
   }
   function renderPanel() {
-    var h = '<div class="hd">📖 我的生词本（' + BOOK.length + '）</div>';
+    var h = '<div class="hd">📖 我的生词本（' + BOOK.length + '）<button class="kxclose" title="关闭">✕</button></div>';
     if (!BOOK.length) h += '<p style="color:#8a94a3;font-size:13px;margin:8px 0">还没有生词。阅读/完形里点单词或点“＋生词本”即可加入。</p>';
     else {
       h += '<ul>';
@@ -98,6 +99,7 @@
     }
     h += '<div class="row"><button id="kxExp">导出 txt</button><button id="kxClr">清空</button></div>';
     panel.innerHTML = h;
+    panel.querySelector('.kxclose').onclick = function () { panel.style.display = 'none'; };
     panel.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { del(b.getAttribute('data-del')); renderPanel(); }; });
     panel.querySelectorAll('[data-sp]').forEach(function (b) { b.onclick = function () { speak(b.getAttribute('data-sp')); }; });
     var ex = panel.querySelector('#kxExp'); if (ex) ex.onclick = exportTxt;
@@ -152,7 +154,7 @@
     hidePop();
   });
   document.addEventListener('scroll', function () { hidePop(); }, true);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hidePop(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { hidePop(); if (panel) panel.style.display = 'none'; } });
 
   function unwrapMarks() {
     document.querySelectorAll('mark.kxmark').forEach(function (m) { var t = document.createTextNode(m.textContent); m.parentNode.replaceChild(t, m); });
