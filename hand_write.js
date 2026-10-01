@@ -40,10 +40,17 @@
     + '.hw .hwtool{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}'
     + '.hw .hwtool button{border:1px solid #b9c6d2;background:#fff;color:#234f7a;border-radius:14px;padding:3px 12px;font-size:12.5px;cursor:pointer}'
     + '.hw .hwtool button.on{background:#c0392b;color:#fff;border-color:#c0392b}'
+    + '.hw details{margin-top:6px;border-top:1px dashed #e4ddcd;padding-top:6px}'
+    + '.hw details summary{cursor:pointer;color:#2b6ef2;font-weight:600;font-size:13px}'
+    + '.hw details p{margin:4px 0;font-size:13.5px;color:#39424f}'
+    + '.hw details ul{margin:4px 0 0 18px;padding:0}.hw details li{margin:2px 0;font-size:13.5px;color:#39424f}'
     + 'html.theme-dark .hw{background:#151b24;border-color:#2c3442}'
     + 'html.theme-dark .hw .hwstep{color:#9fc3ff}'
     + 'html.theme-dark canvas.hwcanvas{background:#f6f3e9}'
     + 'html.theme-dark .hw .hwtool button{background:#1a212b;color:#dbe3ee;border-color:#2c3442}'
+    + 'html.theme-dark .hw details{border-top-color:#2c3442}'
+    + 'html.theme-dark .hw details summary{color:#7fb0ff}'
+    + 'html.theme-dark .hw details p,html.theme-dark .hw details li{color:#dbe3ee}'
     + '@media print{.hw .hwtool{display:none}canvas.hwcanvas{background:#fff!important}}';
 
   function injectCSS() { if (document.getElementById('hwCSS')) return; var s = document.createElement('style'); s.id = 'hwCSS'; s.textContent = css; document.head.appendChild(s); }
