@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>考研英语 · 语法与长难句讲义（在线读）</title>
+<style>
+:root{--ink:#2c3038;--sub:#6b7280;--line:#e4ddcd;--bg:#f5f2ea;--card:#fffdf8;--blue:#2b6ef2;--red:#7a2a24}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 18px 50px}
+h1{font-size:24px;margin:0 0 6px}.lead{color:var(--sub);font-size:13.5px;margin:0 0 8px}
+a.back{color:var(--blue);text-decoration:none;font-size:14px}
+ul.books{list-style:none;margin:12px 0;padding:0}
+ul.books li{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:8px 0}
+ul.books .t{font-weight:600;color:#123a6b}ul.books .n{color:var(--sub);font-size:12.5px;flex:1}
+button.rd{border:0;background:#2b6ef2;color:#fff;border-radius:16px;padding:5px 14px;cursor:pointer;font-size:13px}
+a.dl{color:#234f7a;text-decoration:none;font-size:12.5px;border:1px solid var(--line);border-radius:16px;padding:3px 10px}
+#viewer{margin-top:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;height:82vh;display:none}
+#viewer iframe{width:100%;height:100%;border:0}
+.tip{background:#eef4ff;border:1px solid #c9dcff;border-radius:12px;padding:10px 14px;font-size:13px;color:#33456a;margin:12px 0}
+.rdtip{color:var(--sub);font-size:12.5px;margin:6px 0}
+html.theme-dark{--ink:#e6e9ef;--sub:#a9b2c0;--line:#2c3442;--bg:#0f1319;--card:#151b24}
+html.theme-dark ul.books .t{color:#9fc3ff}
+@media print{#viewer,button.rd{display:none}}
+</style></head><body><div class="wrap">
+<h1>考研英语 · 语法与长难句讲义（在线读）</h1>
+<p class="lead">点击「在线阅读」在本页内翻看原版讲义；也可新窗口打开或下载。配合在线专项页效果更好。</p>
+<p><a class="back" href="kaoyan-drill-grammar.html">← 语法与长难句专项练习</a>　·　<a class="back" href="kaoyan-hub.html">考研资料中心</a>　·　<a class="back" href="index.html">首页</a></p>
+<div class="tip">这些讲义为扫描版（PDF），在线阅读即直接翻看原书；如需文字版考点，请用上面的「语法与长难句专项练习」（长难句四步 + 语法练习）。仅供个人学习，请勿公开传播。</div>
+<ul class="books"><li><button class="rd" data-src="books/ky-lss-kaochong-handbook.pdf">📖 在线阅读</button><a class="dl" href="books/ky-lss-kaochong-handbook.pdf" target="_blank" rel="noopener">新窗口/下载</a><span class="t">2024 考虫英语长难句特训手册（英语一）</span><span class="n">长难句拆句与训练</span></li><li><button class="rd" data-src="books/ky-lss-tianjing.pdf">📖 在线阅读</button><a class="dl" href="books/ky-lss-tianjing.pdf" target="_blank" rel="noopener">新窗口/下载</a><span class="t">2024 田静句句真研 语法及长难句应试全攻略 · 答案解析册（英语一）</span><span class="n">语法+长难句答案解析</span></li><li><button class="rd" data-src="books/ky-lss-xinwendao.pdf">📖 在线阅读</button><a class="dl" href="books/ky-lss-xinwendao.pdf" target="_blank" rel="noopener">新窗口/下载</a><span class="t">2024 新文道英语语法长难句解密内部讲义</span><span class="n">语法与长难句方法</span></li><li><button class="rd" data-src="books/ky-gram-kaochong-G006.pdf">📖 在线阅读</button><a class="dl" href="books/ky-gram-kaochong-G006.pdf" target="_blank" rel="noopener">新窗口/下载</a><span class="t">2024 考虫英语语法讲义 G006（英语一）</span><span class="n">语法考点系统讲解</span></li><li><button class="rd" data-src="books/ky-gram-youdao.pdf">📖 在线阅读</button><a class="dl" href="books/ky-gram-youdao.pdf" target="_blank" rel="noopener">新窗口/下载</a><span class="t">2024 有道英语复习宝典基础精讲 · 语法基础+长难句应用</span><span class="n">语法基础+长难句应用</span></li></ul>
+<div id="viewer"><iframe id="fr" allowfullscreen></iframe></div>
+</div>
+<script>
+document.querySelectorAll('button.rd').forEach(function(b){
+ b.onclick=function(){
+  var v=document.getElementById('viewer'),fr=document.getElementById('fr');
+  fr.src=b.getAttribute('data-src')+'#page=1';v.style.display='block';
+  v.scrollIntoView({behavior:'smooth',block:'start'});
+ };
+});
+</script>
+<script src="auth.js"></script>
+</body></html>
