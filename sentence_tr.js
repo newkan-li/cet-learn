@@ -55,7 +55,7 @@
 
   var btn = null;
   function showBtn(rect, text) {
-    rm('kxstbtn'); rm('kxstpop');
+    rm('kxstbtn');            /* 只清按钮，不动已打开的译文弹窗 */
     btn = document.createElement('button'); btn.id = 'kxstbtn'; btn.className = 'kxstbtn'; btn.type = 'button';
     btn.textContent = '译这句 ▸';
     document.body.appendChild(btn);
@@ -87,6 +87,7 @@
   function short(s) { s = String(s).replace(/\s+/g, ' ').trim(); return s.length > 110 ? s.slice(0, 110) + '…' : s; }
 
   function checkSel() {
+    if (document.getElementById('kxstpop')) return;   /* 译文已打开时不再弹按钮，避免闪烁 */
     var sel = window.getSelection(); if (!sel || sel.isCollapsed) return;
     var txt = sel.toString().trim();
     if (txt.length < 15 || txt.split(/\s+/).length < 3) return;   // 至少 3 个词
