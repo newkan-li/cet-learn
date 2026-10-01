@@ -1,0 +1,1 @@
+window.PAGES={key:"ky-lss-xinwendao",title:"新文道英语语法长难句解密内部讲义",books:[{name:"新文道英语语法长难句解密内部讲义",img:"img/ky-lss-xinwendao",total:128,sections:[{name:"正文",a:1,b:128}]}]};

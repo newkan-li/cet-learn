@@ -1,0 +1,1 @@
+window.PAGES={key:"ky-gram-youdao",title:"有道英语复习宝典基础精讲 · 语法基础+长难句应用",books:[{name:"有道英语复习宝典基础精讲 · 语法基础+长难句应用",img:"img/ky-gram-youdao",total:59,sections:[{name:"正文",a:1,b:59}]}]};

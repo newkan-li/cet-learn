@@ -1,0 +1,1 @@
+window.PAGES={key:"ky-lss-tianjing",title:"田静句句真研 语法及长难句应试全攻略 · 答案解析册（英语一）",books:[{name:"田静句句真研 语法及长难句应试全攻略 · 答案解析册（英语一）",img:"img/ky-lss-tianjing",total:53,sections:[{name:"正文",a:1,b:53}]}]};
