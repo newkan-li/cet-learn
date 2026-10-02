@@ -210,7 +210,16 @@
     var t = r.startContainer.textContent, o = r.startOffset, l = o, rr = o;
     while (l > 0 && /[A-Za-z'\-]/.test(t[l - 1])) l--;
     while (rr < t.length && /[A-Za-z'\-]/.test(t[rr])) rr++;
-    var w = t.slice(l, rr); return w.length >= 2 ? w : null;
+    var w = t.slice(l, rr);
+    if (w.length < 2) return null;
+    try {
+      var rg = document.createRange(); rg.setStart(r.startContainer, l); rg.setEnd(r.startContainer, rr);
+      var rect = rg.getBoundingClientRect();
+      if (!rect || rect.width === 0 || rect.height === 0) return null;
+      var padX = 3, padY = 5;
+      if (x < rect.left - padX || x > rect.right + padX || y < rect.top - padY || y > rect.bottom + padY) return null;
+    } catch (e) { return null; }
+    return w;
   }
   document.addEventListener('click', function (e) {
     if (e.target.closest('button,a,input,textarea,summary,label,canvas,#kxpanel,.kxpop,.kxfab')) return;
