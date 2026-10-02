@@ -38,7 +38,7 @@
   }
 
   var css = ''
-    + '.kxstbtn{position:absolute;z-index:9993;background:#123a6b;color:#fff;border:none;border-radius:14px;padding:3px 10px;font-size:12.5px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}'
+    + '.kxstbtn{position:absolute;z-index:9993;background:#123a6b;color:#fff;border:none;border-radius:14px;padding:3px 10px;font-size:12.5px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}'+ '.kxstbtn:hover{background:#123a6b!important;color:#fff!important}'+ '.kxstpop button:hover{background:#fff!important;color:#234f7a!important}'
     + '.kxstpop{position:absolute;z-index:9994;background:#fff;border:1px solid #cbd5e1;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.24);padding:10px 12px;max-width:420px;font-size:13.5px}'
     + '.kxstpop .o{color:#8a94a3;font-size:12px;margin-bottom:4px}'
     + '.kxstpop .t{color:#123a6b;font-weight:600;line-height:1.6}'
