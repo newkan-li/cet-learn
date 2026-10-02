@@ -464,7 +464,7 @@ function rbkRedo(q){
 }
 window.addEventListener('load',function(){wrongStamp();try{if(document.getElementById('wrongbox'))wrongRender();}catch(e){}});
 </script>
-<div class="footer">先限时自测→展开解析→生词两向自测→复盘。本页自含可离线；取词释义优先本套375词，其次内置四级/六级/qwerty 词库(共4263词)；短语/整句联网翻译；生词本支持间隔复习、手写(Pencil)持久化与统计。</div></main>
+<div class="footer">先限时自测→展开解析→生词两向自测→复盘。本页自含可离线；取词释义优先本套375词，其次内置四级/六级/qwerty 词库(共4263词)；整句划句翻译；生词本支持间隔复习、手写(Pencil)持久化与统计。</div></main>
 <div id="vchip" style="display:none" onclick="vAdd(vSel)">＋ 加入生词本</div>
 <aside id="vdrawer" class="vdrawer">
   <div class="vdhead">📖 我的生词本
@@ -481,7 +481,7 @@ window.addEventListener('load',function(){wrongStamp();try{if(document.getElemen
     <button onclick="document.getElementById('vdrawer').classList.remove('show')">关闭</button>
   </div>
   <ul id="vList" class="vlist"></ul>
-  <div class="vdfoot hint">划词取词：单词自动配释义/音标；多词短语或整句→点「加为短语/句子并联网翻译」（需联网；离线可手填或点词条旁 🌐 重试）。支持两向自测、间隔复习(0/1/2/4/7/15天)、Apple Pencil 手写保存与统计。词库存本浏览器，导出/导入 json 可跨设备。<br>📝 翻译/作文手写作品会自动长期保存在本浏览器；点下方「💾 导出手写作品」备份可换设备或防浏览器清除。</div>
+  <div class="vdfoot hint">划词取词：单词自动配释义/音标；整句可用划句翻译：选中后点「译这句」（在线翻译）。支持两向自测、间隔复习(0/1/2/4/7/15天)、Apple Pencil 手写保存与统计。词库存本浏览器，导出/导入 json 可跨设备。<br>📝 翻译/作文手写作品会自动长期保存在本浏览器；点下方「💾 导出手写作品」备份可换设备或防浏览器清除。</div>
   <div class="vdfoot">
     <button class="ghost" onclick="wbExportAll()">💾 导出手写作品</button>
     <button class="ghost" onclick="document.getElementById('vHandInp').click()">导入手写作品</button>
@@ -778,7 +778,7 @@ function sUp(ev){var c=document.getElementById('sCanvas');if(!c||ev.target!==c)r
 document.addEventListener('mouseup',function(ev){
  var chip=document.getElementById('vchip');if(!chip)return;
  if(ev.target.closest('#vdrawer')||ev.target.closest('#vchip')||ev.target.closest('#vbtns'))return;
- setTimeout(function(){var sel=window.getSelection();if(!sel||sel.isCollapsed){chip.style.display='none';return;}var t=sel.toString().replace(/\s+/g,' ').trim();var toks=t?t.split(/\s+/).length:0;if(!t||t.length>320||toks>80){chip.style.display='none';return;}vSel=t;chip.textContent=toks>1?'＋ 加为短语/句子并联网翻译':'＋ 加入生词本';try{var r=sel.getRangeAt(0).getBoundingClientRect();chip.style.top=(window.scrollY+r.bottom+6)+'px';chip.style.left=(window.scrollX+r.left)+'px';chip.style.display='block';}catch(e){chip.style.display='none';}},10);
+ setTimeout(function(){var sel=window.getSelection();if(!sel||sel.isCollapsed){chip.style.display='none';return;}var t=sel.toString().replace(/\s+/g,' ').trim();var toks=t?t.split(/\s+/).length:0;if(!t||t.length>320||toks>80){chip.style.display='none';return;}vSel=t;if(toks>1){chip.style.display='none';return;}chip.textContent='＋ 加入生词本';try{var r=sel.getRangeAt(0).getBoundingClientRect();chip.style.top=(window.scrollY+r.bottom+6)+'px';chip.style.left=(window.scrollX+r.left)+'px';chip.style.display='block';}catch(e){chip.style.display='none';}},10);
 });
 addEventListener('selectionchange',function(){
  var chip=document.getElementById('vchip');if(!chip)return;
@@ -791,7 +791,7 @@ addEventListener('selectionchange',function(){
  }
  var t=sel.toString().replace(/\s+/g,' ').trim();var toks=t?t.split(/\s+/).length:0;
  if(!t||t.length>320||toks>80){chip.style.display='none';return;}
- vSel=t;chip.textContent=toks>1?'＋ 加为短语/句子并联网翻译':'＋ 加入生词本';
+ vSel=t;if(toks>1){chip.style.display='none';return;}chip.textContent='＋ 加入生词本';
  try{var r=sel.getRangeAt(0).getBoundingClientRect();chip.style.top=(window.scrollY+r.bottom+6)+'px';chip.style.left=(Math.max(4,window.scrollX+r.left))+'px';chip.style.display='block';}catch(e){chip.style.display='none';}
 },{passive:true});
 
