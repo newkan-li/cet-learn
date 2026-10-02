@@ -1,0 +1,126 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>错题本 · 考研/四级英语</title>
+<style>
+:root{--ink:#2c3038;--sub:#6b7280;--line:#e4ddcd;--bg:#f5f2ea;--card:#fffdf8;--blue:#2b6ef2;--red:#7a2a24;--grn:#1b7f3b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7}
+.wrap{max-width:940px;margin:0 auto;padding:26px 18px 70px}
+h1{font-size:23px;margin:0 0 4px}.lead{color:var(--sub);font-size:13.5px;margin:0 0 8px}
+a.back{color:var(--blue);text-decoration:none;font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.kpi b{display:block;font-size:24px;color:#123a6b}.kpi span{font-size:12.5px;color:var(--sub)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;align-items:center}
+.tools button,.tools select{border:1px solid var(--line);background:#fff;color:#234f7a;border-radius:12px;padding:6px 12px;cursor:pointer;font-size:13px}
+.tools button.on{background:#2b6ef2;color:#fff;border-color:#2b6ef2}
+.tools .danger{color:#c0392b;border-color:#e0c0c0}
+.q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:10px 0}
+.q .stem{font-weight:600;margin:0 0 4px}
+.q .meta{color:var(--sub);font-size:12px;margin:0 0 4px}
+.q .ans{margin:2px 0;font-size:13.5px}.q .ans .my{color:#c0392b;font-weight:700}.q .ans .ok{color:#1b7f3b;font-weight:700}
+.q .bar{margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}
+.q .bar button{border:1px solid var(--line);background:#fff;color:#234f7a;border-radius:10px;padding:2px 10px;cursor:pointer;font-size:12.5px}
+.q .bar .mst{color:#1b7f3b;border-color:#bfe3cc}
+.q.mastered{opacity:.55}
+.tip{background:#eef4ff;border:1px solid #c9dcff;border-radius:12px;padding:10px 14px;font-size:13px;color:#33456a;margin:12px 0}
+html.theme-dark{--ink:#e6e9ef;--sub:#a9b2c0;--line:#2c3442;--bg:#0f1319;--card:#151b24}
+html.theme-dark .tools button,html.theme-dark .tools select,html.theme-dark .q .bar button{background:#1a212b;color:#dbe3ee;border-color:#2c3442}
+@media print{.tools,a.back{display:none}}
+</style></head><body><div class="wrap">
+<h1>📕 错题本</h1>
+<p class="lead">自动收录你在全站做错的题（四级 / 真题精讲 / 阅读100篇 / 考虫 / 专项练习）。可标记「已掌握」、按模块筛选、导出复习。</p>
+<p><a class="back" href="kaoyan-hub.html">← 考研资料中心</a>　·　<a class="back" href="kaoyan-stats.html">学习统计</a>　·　<a class="back" href="index.html">首页</a></p>
+<div class="cards" id="kpis"></div>
+<div class="tools">
+ <button class="f on" data-f="wrong">未掌握</button>
+ <button class="f" data-f="all">全部错题</button>
+ <button class="f" data-f="mastered">已掌握</button>
+ <select id="mod"><option value="">全部模块</option></select>
+ <span style="flex:1"></span>
+ <button id="expTxt">导出 txt</button>
+ <button id="expAnki">导出 Anki</button>
+ <button id="clrMaster" class="danger">清除已掌握标记</button>
+</div>
+<div id="list"></div>
+<div class="tip">说明：错题来自本机作答记录；若重做该题并答对，最新记录会覆盖旧记录（不再显示）。标记「已掌握」后默认隐藏，可切到「已掌握」查看。</div>
+</div>
+<script>
+function L(k,d){try{var v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v;}catch(e){return d;}}
+function S(k,o){try{localStorage.setItem(k,JSON.stringify(o));}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+var LOG=L('kxlog',[])||[], MASTER=L('kxmaster',{})||{};
+// 每个 key 取最新一条作答
+var latest={};
+LOG.forEach(function(e){ if(e&&e.type==='ans'&&e.key) latest[e.key]=e; });
+var all=Object.keys(latest).map(function(k){return latest[k];});
+var wrong=all.filter(function(e){return e.ok===0;});
+function link(e){
+ var k=e.key||'', p=e.p||'', m;
+ if(m=k.match(/^r100-(\d+)-(\d+)$/))return 'kaoyan-r100-'+m[1]+'.html#q'+m[1]+'-'+m[2];
+ if(m=k.match(/^g001-(\d+)-(\d+)$/))return 'kaoyan-g001-sprint.html#q'+m[1]+'-'+m[2];
+ if(m=k.match(/^g001i-(\d+)-(\d+)$/))return 'kaoyan-g001-intensive.html#q'+m[1]+'-'+m[2];
+ if(/^cloze-/.test(k))return 'kaoyan-drill-cloze.html';
+ if(/^read-/.test(k))return 'kaoyan-drill-read.html';
+ if(/^partb-/.test(k))return 'kaoyan-drill-partb.html';
+ if(/^transl-/.test(k))return 'kaoyan-drill-transl.html';
+ if(/^writing-/.test(k))return 'kaoyan-drill-writing.html';
+ if(/^grammar-/.test(k))return 'kaoyan-drill-grammar.html';
+ return p||'';
+}
+var filter='wrong', modFilter='';
+function apply(){
+ var list=wrong.filter(function(e){
+   var mst=!!MASTER[e.key];
+   if(filter==='wrong'&&mst)return false;
+   if(filter==='mastered'&&!mst)return false;
+   if(modFilter&&e.mod!==modFilter)return false;
+   return true;
+ });
+ var el=document.getElementById('list');
+ if(!list.length){el.innerHTML='<p style="color:#8a94a3">（此处暂无题目 🎉）</p>';return;}
+ list.sort(function(a,b){return (b.t||0)-(a.t||0);});
+ el.innerHTML=list.map(function(e){
+   var mst=!!MASTER[e.key]; var lk=link(e);
+   return '<div class="q'+(mst?' mastered':'')+'"><p class="stem">'+esc(e.stem||e.key)+'</p>'
+     +'<p class="meta">'+(e.mod?'【'+esc(e.mod)+'】':'')+(e.typ?esc(e.typ)+' · ':'')+(e.d||'')+'</p>'
+     +'<p class="ans">正确答案：<span class="ok">'+esc(e.ans)+'</span>　你的答案：<span class="my">'+esc(e.my)+'</span></p>'
+     +'<div class="bar">'+(lk?'<button data-go="'+esc(lk)+'">去原题</button>':'')
+     +'<button class="mst" data-mst="'+esc(e.key)+'">'+(mst?'取消已掌握':'标记已掌握')+'</button></div></div>';
+ }).join('');
+ el.querySelectorAll('[data-go]').forEach(function(b){b.onclick=function(){location.href=b.getAttribute('data-go');};});
+ el.querySelectorAll('[data-mst]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-mst');if(MASTER[k])delete MASTER[k];else MASTER[k]=1;S('kxmaster',MASTER);render();};});
+}
+function render(){
+ // KPI
+ var byMod={}; wrong.forEach(function(e){byMod[e.mod||'其他']=(byMod[e.mod||'其他']||0)+1;});
+ var mst=wrong.filter(function(e){return MASTER[e.key];}).length;
+ document.getElementById('kpis').innerHTML=
+   '<div class="kpi"><b>'+wrong.length+'</b><span>错题总数</span></div>'
+  +'<div class="kpi"><b>'+(wrong.length-mst)+'</b><span>待复习</span></div>'
+  +'<div class="kpi"><b>'+mst+'</b><span>已掌握</span></div>'
+  +'<div class="kpi"><b>'+Object.keys(byMod).length+'</b><span>涉及模块</span></div>';
+ // module options
+ var sel=document.getElementById('mod'); var cur=sel.value;
+ sel.innerHTML='<option value="">全部模块</option>'+Object.keys(byMod).sort().map(function(m){return '<option value="'+esc(m)+'">'+esc(m)+'（'+byMod[m]+'）</option>';}).join('');
+ sel.value=cur;
+ // filter buttons
+ document.querySelectorAll('.f').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-f')===filter);});
+ apply();
+}
+document.querySelectorAll('.f').forEach(function(b){b.onclick=function(){filter=b.getAttribute('data-f');render();};});
+document.getElementById('mod').onchange=function(){modFilter=this.value;apply();};
+document.getElementById('clrMaster').onclick=function(){if(confirm('清除所有「已掌握」标记？')){MASTER={};S('kxmaster',MASTER);render();}};
+function dl(name,text,type){var b=new Blob([text],{type:type+';charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},2000);}
+document.getElementById('expTxt').onclick=function(){
+ var rows=wrong.map(function(e){return [e.mod||'',e.d||'', (e.stem||e.key), '我的:'+e.my, '正确:'+e.ans].join('\t');});
+ dl('错题本.txt',rows.join('\n'),'text/plain');
+};
+document.getElementById('expAnki').onclick=function(){
+ var rows=wrong.map(function(e){return (e.stem||e.key).replace(/\t/g,' ')+'\t'+(e.mod||'')+' 正确:'+e.ans+' ｜ 我的:'+e.my;});
+ dl('错题本-Anki.txt',rows.join('\n'),'text/tab-separated-values');
+};
+render();
+</script>
+<script src="cet4-dict.js"></script>
+<script src="study_dict.js"></script>
+<script src="auth.js"></script>
+</body></html>

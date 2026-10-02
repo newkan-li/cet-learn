@@ -24,8 +24,12 @@
     document.addEventListener('click',function(e){
       var b=e.target && e.target.closest && e.target.closest('.op,.mcb,.mcs'); if(!b) return;
       var q=b.closest('.q[data-qid],.mcq[data-q]'); if(!q) return;
-      var ans=q.getAttribute('data-ans'), l=b.getAttribute('data-l');
-      if(ans && l){ _push({d:_dstr(),t:Date.now(),type:'ans',mod:_mod(),ok:(l===ans)?1:0,typ:_typ(q)}); }
+      var ans=q.getAttribute('data-ans'), l=b.getAttribute('data-l'); if(!ans || !l) return;
+      var qid=q.getAttribute('data-qid');
+      var se=q.querySelector('.stem') || q.querySelector('p');
+      var stem=String(se?se.textContent:q.textContent||'').replace(/\s+/g,' ').trim().slice(0,180);
+      var key=qid || ('mcq|'+(location.pathname.split('/').pop()||'')+'|'+(q.getAttribute('data-q')||''));
+      _push({d:_dstr(),t:Date.now(),type:'ans',mod:_mod(),typ:_typ(q),ok:(l===ans)?1:0,key:key,stem:stem,my:l,ans:ans,p:(location.pathname.split('/').pop()||'')});
     },true);
     window.addEventListener('kx:word',function(){ _push({d:_dstr(),t:Date.now(),type:'word',mod:'词汇'}); });
     window.addEventListener('kx:checkin',function(){ _push({d:_dstr(),t:Date.now(),type:'checkin',mod:'打卡'}); });
