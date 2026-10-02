@@ -26,6 +26,13 @@ details.psg summary,details.tr summary{cursor:pointer;color:var(--blue);font-wei
 details.sol{margin-top:6px}
 details.sol summary{cursor:pointer;color:var(--red);font-weight:600;font-size:13.5px}
 details.sol p{margin:4px 0;font-size:14px}
+details.sol.hint summary{color:#1f5c8b}
+details.sol.hint p{font-size:13.5px;line-height:1.7}
+details.method{background:#fff8ec;border:1px solid #f0dcb8;border-radius:10px;padding:8px 12px;margin:8px 0}
+details.method summary{cursor:pointer;color:#9a6a12;font-weight:700;font-size:14px}
+details.method p,details.method li{font-size:13.5px;margin:4px 0}
+details.method td{font-size:13px;padding:3px 8px;border-bottom:1px solid #f0e2c8;vertical-align:top}
+details.method td:first-child{white-space:nowrap;color:#9a6a12;font-weight:600}
 .res{font-size:13px;margin-top:4px}.res.ok{color:#1f9d55;font-weight:700}.res.no{color:#c0392b;font-weight:700}
 .stbar{background:#eef4ff;border:1px solid #c9dcff;border-radius:10px;padding:6px 12px;margin:8px 0;font-size:13.5px;color:#2b4059}.stbar b{color:#123a6b}.stbar button{margin-left:10px;border:1px solid #b9c6d2;background:#fff;border-radius:12px;padding:2px 10px;cursor:pointer;font-size:12.5px}
 html.theme-dark{--ink:#e6e9ef;--sub:#a9b2c0;--line:#2c3442;--bg:#0f1319;--card:#151b24}
@@ -34,10 +41,21 @@ html.theme-dark .tools{background:#0f1319}html.theme-dark .tools button{backgrou
 @media print{.tools{display:none}}
 </style></head><body><div class="wrap">
 <h1>Text 91 · 考研英语阅读100篇（基础版）</h1>
-<p class="lead">题（原文+选项）与答案解析、参考译文（由原书 OCR 提取，可能有误差）。</p>
+<p class="lead">原文＋题目＋选项，每题含<b>解题思路与技巧</b>（按题型给方法步骤）＋答案解析＋参考译文（由原书 OCR 提取，可能有误差）。</p>
 <p><a class="back" href="kaoyan-r100.html">← 100篇目录</a>　·　<a class="back" href="kaoyan-hub.html">考研资料中心</a>　·　<a class="back" href="index.html">首页</a></p>
 <div class="tools"><input id="q" type="search" placeholder="搜索文章/题目/解析…"><button id="find">筛选</button><span class="muted" id="cnt"></span></div>
 <div class="stbar">📊 本页 <b id="stTotal">0</b> 题 · 已答 <b id="stAns">0</b> · 答对 <b id="stOk">0</b> · 错题 <b id="stWrong">0</b> · 正确率 <b id="stPct">—</b> <button id="stReset" type="button">重置本页作答</button></div>
+<details class="method"><summary>📘 阅读解题思路总览（做每题前先看这里）</summary>
+<table>
+<tr><td>细节题</td><td>题干关键词（名词/数字/专名）回文定位 → 选项与定位句<b>同义替换</b>即答案；排除“张冠李戴/无中生有/绝对化”。</td></tr>
+<tr><td>推断题</td><td>据原文做<b>一步</b>合理推断，不选原文照抄，也不选过度推断；答案仍由定位句支撑。</td></tr>
+<tr><td>主旨/标题题</td><td>读首尾段＋各段首句抓全文中心；选<b>覆盖全篇</b>的，排除只针对某段/某细节、以偏概全的。</td></tr>
+<tr><td>态度题</td><td>抓评价性形容词/副词、转折词、引语，判断作者或人物态度（positive / objective / critical…）。</td></tr>
+<tr><td>例证题</td><td>问“例子/引文说明什么”时，答案在例子<b>前后的论点句</b>，不是例子本身的细节。</td></tr>
+<tr><td>词义/句意题</td><td>据上下文线索（同义、反义、举例、因果、指代）推断，再把词义代回原句检验。</td></tr>
+</table>
+<p class="muted">通用四步：①读题干圈关键词 → ②回文定位 → ③比对选项找同义替换 → ④排除干扰项。每题下方“🧭 解题思路与技巧”会按本题题型给出具体步骤。</p>
+</details>
 <section class="t" id="t91"><h3>Text 91 <span class="muted">第7章 政治法律类</span></h3><details class="psg"><summary>📖 原文（点击展开）</summary></details><div class="qs"></div><details class="tr"><summary>参考译文</summary><p class="passage">[1]根据《循环》杂志上发表的微观模拟研究，在美国成年人的一生之中，减少包装食品中 20%的糖和饮料中40%的糖可以预防248万例心血管疾病事件、49万个心血管疾病死亡病例和75 万个糖尿病病例。 一组研究人员创建了一个模型，用于模拟和量化美国国家减盐降糖倡议（NSSRI）提出的降糖 政策对健康、经济和公平的影响。[2]在纽约市卫生部召集的100多个地方、州和国家卫生组织的 合作下，NSSRI于2018年发布了15类包装食品和饮料的降糖目标草案。不过，实施一项全国性的 政策将需要政府的支持，以监督企业实现目标的过程，并公开报告其进展。研究人员希望他们的模 型能在美国制定国家糖业改革政策的必要性方面达成共识。 根据该模型，在NSSRI政策实施十年后，美国预计节省的医疗费用净总额将达到42.8亿美元， 并在当前成年人口（35岁至79岁）的终生医疗花费方面节省1180.4亿美元。再加上美国人因过度 摄人糖分而罹患疾病并导致生产力下降的社会成本，NSSRI政策在成年人一生中节省的总成本增加 到1608.8亿美元。这项政策还可以缩小社会差距，预计黑人和西班牙裔成年人以及收入较低、受 教育程度较低的美国人健康收益最大一一由于不公平制度的历史后果，这些人群消耗的糖最多。 在产品改制方面做出的努力已经被证明这能够成功地减少其他有害的营养物质。然而，美国在 实施强有力的降糖政策方面落后于其他国家，而英国、挪威和新加坡等国在糖业改革方面处于领先 第7章政治法律类· 209 地位。[3]如果NSSRI提出的降糖目标得以实现，美国总有一天可能会成为保护人们免受过量食糖 危害的领军者。 食用含糖食品和饮料与肥胖和一些疾病密切相关，如ⅡI型糖尿病和心血管疾病，这些疾病是 美国人死亡的主要原因。五分之二以上的美国成年人肥胖，二分之一的人患有糖尿病或前驱糖尿病， 近二分之一的人患有心血管疾病，其中低收人人群负担过重。 达鲁斯·穆扎法里恩博士说：“糖是食品供应中最明显的添加剂之一，可以将其减少到合理的 量。[4]我们的研究结果表明，是时候实施一项带有自愿降糖目标的国家计划了，该计划可以在不 到十年内显著改善健康状况，弥补健康差距，减少医疗支出。”</p></details></section>
 </div>
 <script>
