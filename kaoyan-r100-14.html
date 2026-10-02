@@ -27,6 +27,7 @@ details.sol{margin-top:6px}
 details.sol summary{cursor:pointer;color:var(--red);font-weight:600;font-size:13.5px}
 details.sol p{margin:4px 0;font-size:14px}
 .res{font-size:13px;margin-top:4px}.res.ok{color:#1f9d55;font-weight:700}.res.no{color:#c0392b;font-weight:700}
+.stbar{background:#eef4ff;border:1px solid #c9dcff;border-radius:10px;padding:6px 12px;margin:8px 0;font-size:13.5px;color:#2b4059}.stbar b{color:#123a6b}.stbar button{margin-left:10px;border:1px solid #b9c6d2;background:#fff;border-radius:12px;padding:2px 10px;cursor:pointer;font-size:12.5px}
 html.theme-dark{--ink:#e6e9ef;--sub:#a9b2c0;--line:#2c3442;--bg:#0f1319;--card:#151b24}
 html.theme-dark .passage,html.theme-dark .op{background:#12181f;color:#e6e9ef}
 html.theme-dark .tools{background:#0f1319}html.theme-dark .tools button{background:#1a212b;color:#dbe3ee;border-color:#2c3442}
@@ -36,6 +37,7 @@ html.theme-dark .tools{background:#0f1319}html.theme-dark .tools button{backgrou
 <p class="lead">题（原文+选项）与答案解析、参考译文（由原书 OCR 提取，可能有误差）。</p>
 <p><a class="back" href="kaoyan-r100.html">← 100篇目录</a>　·　<a class="back" href="kaoyan-hub.html">考研资料中心</a>　·　<a class="back" href="index.html">首页</a></p>
 <div class="tools"><input id="q" type="search" placeholder="搜索文章/题目/解析…"><button id="find">筛选</button><span class="muted" id="cnt"></span></div>
+<div class="stbar">📊 本页 <b id="stTotal">0</b> 题 · 已答 <b id="stAns">0</b> · 答对 <b id="stOk">0</b> · 正确率 <b id="stPct">—</b> <button id="stReset" type="button">重置本页作答</button></div>
 <section class="t" id="t14"><h3>Text 14 <span class="muted">第1章 </span></h3><details class="psg"><summary>📖 原文（点击展开）</summary></details><div class="qs"></div><details class="tr"><summary>参考译文</summary><p class="passage">一对退休夫妇成为了一处新建住宅区完全3D打印房屋的第一批租客，支持者认为，这将开辟 一个新世界，未来房屋在形状和风格上可供任意选择。70岁的伊莉莎·卢茨和67岁的哈里·德克 斯来自阿姆斯特丹，以前是店主，两人昨天拿到了他们的数字钥匙一一这是一款应用程序，只需按 一下按钮，就可以打开他们的两居室平房的前门。[1]“它很漂亮。”卢茨说。“这儿有地堡的感觉一 感觉很安全。”德克斯补充道。 [2]该房屋的设计受巨石形状的启发，但采用传统方法建造巨石尺寸的房屋既困难又昂贵，它 是一家建筑公司为一块土地规划的五栋住宅中的第一栋，位于埃因霍温（荷兰南部城市）郊区的比 阿特利克斯运河旁。 在过去的两年里，法国和美国已经建造了部分由3D打印技术建造的房屋，新兴项目在世界各 地层出不穷。[3]但据报道，这座拥有94平方米（1，000平方英尺）居住空间的荷兰住宅的建造者 击败了竞争对手，他们打造了第一座供人合法居住和商业租赁的房产，其承重墙是用3D打印机喷 嘴建造的。WeberBenelux公司的首席执行官巴斯·休斯曼说：“这也是第一个完全得到地方当局 许可的房子，而且居住在这里的人都是真正付费的。” 这种3D打印方法有一个巨大的机械臂，上面带着一个喷嘴，喷嘴喷出一种特殊配方的水泥， 据说这种水泥具有搅打至松软的奶油的质地。水泥根据建筑师的设计被“打印出来”，一层又一层 打印成一面墙以增加其强度。[4]在这座新平房的墙壁图案中，可以看到工作数小时后必须更换喷 嘴头的位置，以及水泥打印中的小错误，使用过喷墨打印机的人可能都很熟悉。 [5]不过，尽管3D打印技术还处于起步阶段，但在建筑业的许多人看来，使用3D打印方法可 以减少水泥用量，从而降低成本和减少环境危害。在荷兰，在技术娴熟的砌砖工短缺之际，它也提 供了另一种选择。</p></details></section>
 </div>
 <script>
@@ -57,6 +59,22 @@ document.getElementById('find').onclick=function(){
   var ok=!v||s.textContent.toLowerCase().indexOf(v)>=0;s.style.display=ok?'':'none';if(ok)n++;});
  document.getElementById('cnt').textContent=v?('命中 '+n+' 篇'):('共 '+document.querySelectorAll('section.t').length+' 篇');
 };
+
+function kxUpdateStats(){
+ var qs=document.querySelectorAll('.q[data-qid]');var a={};
+ try{a=JSON.parse(localStorage.getItem('kxans')||'{}')||{};}catch(e){}
+ var an=0,ok=0;
+ qs.forEach(function(q){var id=q.getAttribute('data-qid');var r=a[id];if(!r)return;an++;if(typeof r==='string'){if(r===q.getAttribute('data-ans'))ok++;}else if(r.ok)ok++;});
+ document.getElementById('stTotal').textContent=qs.length;
+ document.getElementById('stAns').textContent=an;
+ document.getElementById('stOk').textContent=ok;
+ document.getElementById('stPct').textContent=an?Math.round(ok*100/an)+'%':'—';
+}
+document.addEventListener('click',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('op'))setTimeout(kxUpdateStats,60);},true);
+document.getElementById('stReset').onclick=function(){var a={};try{a=JSON.parse(localStorage.getItem('kxans')||'{}')||{};}catch(e){}
+ document.querySelectorAll('.q[data-qid]').forEach(function(q){delete a[q.getAttribute('data-qid')];q.querySelectorAll('.op').forEach(function(b){b.classList.remove('right','wrong');});var r=q.querySelector('.res');if(r){r.className='res';r.textContent='';}});
+ try{localStorage.setItem('kxans',JSON.stringify(a));}catch(e){}kxUpdateStats();};
+kxUpdateStats();
 </script>
 <script src="cet4-dict.js"></script>
 <script src="ky-dict.js"></script>

@@ -27,6 +27,7 @@ details.sol{margin-top:6px}
 details.sol summary{cursor:pointer;color:var(--red);font-weight:600;font-size:13.5px}
 details.sol p{margin:4px 0;font-size:14px}
 .res{font-size:13px;margin-top:4px}.res.ok{color:#1f9d55;font-weight:700}.res.no{color:#c0392b;font-weight:700}
+.stbar{background:#eef4ff;border:1px solid #c9dcff;border-radius:10px;padding:6px 12px;margin:8px 0;font-size:13.5px;color:#2b4059}.stbar b{color:#123a6b}.stbar button{margin-left:10px;border:1px solid #b9c6d2;background:#fff;border-radius:12px;padding:2px 10px;cursor:pointer;font-size:12.5px}
 html.theme-dark{--ink:#e6e9ef;--sub:#a9b2c0;--line:#2c3442;--bg:#0f1319;--card:#151b24}
 html.theme-dark .passage,html.theme-dark .op{background:#12181f;color:#e6e9ef}
 html.theme-dark .tools{background:#0f1319}html.theme-dark .tools button{background:#1a212b;color:#dbe3ee;border-color:#2c3442}
@@ -36,6 +37,7 @@ html.theme-dark .tools{background:#0f1319}html.theme-dark .tools button{backgrou
 <p class="lead">题（原文+选项）与答案解析、参考译文（由原书 OCR 提取，可能有误差）。</p>
 <p><a class="back" href="kaoyan-r100.html">← 100篇目录</a>　·　<a class="back" href="kaoyan-hub.html">考研资料中心</a>　·　<a class="back" href="index.html">首页</a></p>
 <div class="tools"><input id="q" type="search" placeholder="搜索文章/题目/解析…"><button id="find">筛选</button><span class="muted" id="cnt"></span></div>
+<div class="stbar">📊 本页 <b id="stTotal">0</b> 题 · 已答 <b id="stAns">0</b> · 答对 <b id="stOk">0</b> · 正确率 <b id="stPct">—</b> <button id="stReset" type="button">重置本页作答</button></div>
 <section class="t" id="t87"><h3>Text 87 <span class="muted">第6章 信息技术类</span></h3><details class="psg"><summary>📖 原文（点击展开）</summary></details><div class="qs"></div><details class="tr"><summary>参考译文</summary><p class="passage">伦敦城市机场成为世界上第一个采用数字系统的大型机场后，空中交通管制塔的尽头就近在眼 前了。该机场已经拆除了有30年历史的塔楼，取而代之的是70英里外由空中交通管制员监控的高 分辨率的摄像头。[1]这16个摄像头和传感器安装在一根50米高的榄杆上，可以360度俯瞰机场。 这些图像与飞机速度、雷达和天气数据等其他信息叠加在一起，旨在提供远比单独使用人工控 制所能提供的更清晰的进场飞机和离场飞机的视野。[2]从长远来看，成本也会降低。该系统已被 安装在瑞典的一些小型机场，两年前在贝德福德郡的克兰菲尔德机场投人使用。然而，伦敦城市机 场是第一个引进这项技术的大型商业机场。 自从一个多世纪前大规模发展动力飞行以来，空中交通管制塔基本上没改变过。[3]据说，伦 敦城市机场数字装置的安装可能会加速其他机场控制塔的淘汰，这些机场也在关注同样的技术。英 国最大的机场希思罗机场此前表示正在测试这一系统。 国家空中交通服务局的运营总监朱丽叶·肯尼迪说：“这是英国第一座大型数字控制塔，.代表 着一项重大的技术和运营成就。[4]数字塔台技术撕毁了100年来基本没有改变过的蓝图，使我们 能够从几乎任何地方安全地管理飞机，同时为我们的交通管制员提供了传统控制塔台无法实现的宝 贵的新工具。” 英国领空由位于几处中心的空中交通管制员管理，包括国家空中交通服务局南方总部。管制员 指挥飞机往返机场，或者确保飞机安全飞越英国上空，飞往世界其他地区。 飞机管理人员在距离机场几英里的控制塔内换班。这一职责通常由每个塔中的小型专门团队承 担。不过，在伦敦城市机场系统下，基于数字技术的远程系统也由位于斯旺维克的国家空中交通服 务局的工作人员操作。[5]机场视图通过超高速光纤连接来转播，并显示在14个高清屏幕上。图像 第6章信息技术类：199 上有数字数据，以提供一个“超逼真”的视野。像飞机进出机场的信号、高度和速度、天气数据和 跟踪移动物体的能力等信息都可以在一个视频显示屏幕上呈现。</p></details></section>
 </div>
 <script>
@@ -57,6 +59,22 @@ document.getElementById('find').onclick=function(){
   var ok=!v||s.textContent.toLowerCase().indexOf(v)>=0;s.style.display=ok?'':'none';if(ok)n++;});
  document.getElementById('cnt').textContent=v?('命中 '+n+' 篇'):('共 '+document.querySelectorAll('section.t').length+' 篇');
 };
+
+function kxUpdateStats(){
+ var qs=document.querySelectorAll('.q[data-qid]');var a={};
+ try{a=JSON.parse(localStorage.getItem('kxans')||'{}')||{};}catch(e){}
+ var an=0,ok=0;
+ qs.forEach(function(q){var id=q.getAttribute('data-qid');var r=a[id];if(!r)return;an++;if(typeof r==='string'){if(r===q.getAttribute('data-ans'))ok++;}else if(r.ok)ok++;});
+ document.getElementById('stTotal').textContent=qs.length;
+ document.getElementById('stAns').textContent=an;
+ document.getElementById('stOk').textContent=ok;
+ document.getElementById('stPct').textContent=an?Math.round(ok*100/an)+'%':'—';
+}
+document.addEventListener('click',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('op'))setTimeout(kxUpdateStats,60);},true);
+document.getElementById('stReset').onclick=function(){var a={};try{a=JSON.parse(localStorage.getItem('kxans')||'{}')||{};}catch(e){}
+ document.querySelectorAll('.q[data-qid]').forEach(function(q){delete a[q.getAttribute('data-qid')];q.querySelectorAll('.op').forEach(function(b){b.classList.remove('right','wrong');});var r=q.querySelector('.res');if(r){r.className='res';r.textContent='';}});
+ try{localStorage.setItem('kxans',JSON.stringify(a));}catch(e){}kxUpdateStats();};
+kxUpdateStats();
 </script>
 <script src="cet4-dict.js"></script>
 <script src="ky-dict.js"></script>
