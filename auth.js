@@ -1,5 +1,6 @@
 (function(){
   if(window.__authGate)return;window.__authGate=true;
+  try{ if(!document.getElementById('kxIndentCSS')){ var _s=document.createElement('style'); _s.id='kxIndentCSS'; _s.textContent='p.passage,div.passage{text-indent:2em}'; document.head.appendChild(_s);} }catch(e){}
   var SALT_B64="YSU7EFtFw59g7Bgp6dzAeQ==";
   var ITER=600000;
   var DK_B64="fpaePhZm/FUUMO06eRbyqecSqKtOz9iUGMbnWNPjmN0=";
