@@ -38,7 +38,7 @@ html.theme-dark .prog{background:#2a3342}
 </style></head><body><div class="wrap">
 <h1>考研英语 · 学习任务清单</h1>
 <p class="lead">勾选即可打卡，进度自动保存（本机）。可打印成纸质清单。</p>
-<p><a class="back" href="kaoyan-hub.html">← 返回考研资料中心</a>　·　<a class="back" href="index.html">英语学习首页</a></p>
+<p><a class="back" href="kaoyan-hub.html">← 返回考研资料中心</a>　·　<a class="back" href="kaoyan-stats.html">学习统计</a>　·　<a class="back" href="index.html">英语学习首页</a></p>
 <div class="tip">建议节奏：每天 40–60 分钟；周一/三/五 阅读，周二/四 专项，周六 整套限时，周日 复盘。详见 <a href="kaoyan-hub.html">资料中心·月度/每周计划</a>。</div>
 
 <div class="checkin" id="kxCheck">
@@ -96,7 +96,7 @@ html.theme-dark .prog{background:#2a3342}
    var id=e.getAttribute('data-id');var g=e.closest('ul').getAttribute('data-group');
    e.checked=(g==='daily')?!!((DU[dkey()]||{})[id]):!!st[id];
    e.addEventListener('change',function(){
-     if(g==='daily'){var t=dkey();DU[t]=DU[t]||{};if(e.checked)DU[t][id]=1;else delete DU[t][id];save();refresh('daily');}
+     if(g==='daily'){var t=dkey();DU[t]=DU[t]||{};if(e.checked)DU[t][id]=1;else delete DU[t][id];save();refresh('daily');var _ids=dailyIds();var _ds=DU[t]||{};if(_ids.length&&_ids.every(function(x){return _ds[x];})){{window.dispatchEvent(new CustomEvent('kx:checkin'));}catch(_e){}}}
      else{st[id]=e.checked;save();refresh(g);}
    });
   });

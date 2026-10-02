@@ -54,7 +54,7 @@
     w = norm(w); if (!w || inBook(w)) return false;
     var d = lookup(w);
     BOOK.push({ w: w, cn: cn || (d ? d.cn : '') || '', ipa: ipa || (d ? d.uk : '') || '' });
-    save(); refresh(); return true;
+    save(); refresh(); try{ window.dispatchEvent(new CustomEvent('kx:word')); }catch(e){} return true;
   }
   function del(w) { w = norm(w); for (var i = 0; i < BOOK.length; i++) if (BOOK[i].w === w) { BOOK.splice(i, 1); break; } save(); refresh(); }
 

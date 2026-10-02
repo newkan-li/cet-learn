@@ -1,6 +1,37 @@
 (function(){
   if(window.__authGate)return;window.__authGate=true;
   try{ if(!document.getElementById('kxIndentCSS')){ var _s=document.createElement('style'); _s.id='kxIndentCSS'; _s.textContent='p.passage,div.passage{text-indent:2em}'; document.head.appendChild(_s);} }catch(e){}
+
+  /* ===== 学习统计：统一活动日志 kxlog（type: ans/word/write/checkin）===== */
+  try{ (function(){
+    var LKEY='kxlog';
+    function _load(){ try{ var a=JSON.parse(localStorage.getItem(LKEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+    function _save(a){ try{ localStorage.setItem(LKEY,JSON.stringify(a)); }catch(e){} }
+    function _dstr(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+    function _mod(){ var p=(location.pathname.split('/').pop()||'').replace('.html','');
+      if(/^kaoyan-20\d\d$/.test(p)) return '真题'+p.slice(-4);
+      if(p==='kaoyan-r100') return '阅读100篇';
+      if(p.indexOf('kaoyan-g001-sprint')===0) return '考虫冲刺';
+      if(p.indexOf('kaoyan-g001-intensive')===0) return '考虫强化';
+      if(p.indexOf('kaoyan-drill-')===0) return '专项·'+p.replace('kaoyan-drill-','');
+      if(p.indexOf('cet4-')===0) return '四级';
+      if(p.indexOf('kaoyan-vocab')===0) return '词汇';
+      return p||'其他';
+    }
+    function _push(ev){ var a=_load(); a.push(ev); if(a.length>8000)a=a.slice(-8000); _save(a); }
+    window.KXLOG={push:_push,load:_load,dstr:_dstr,mod:_mod};
+    document.addEventListener('click',function(e){
+      var b=e.target && e.target.closest && e.target.closest('.op,.mcb,.mcs'); if(!b) return;
+      var q=b.closest('.q[data-qid],.mcq[data-q]'); if(!q) return;
+      var ans=q.getAttribute('data-ans'), l=b.getAttribute('data-l');
+      if(ans && l){ _push({d:_dstr(),t:Date.now(),type:'ans',mod:_mod(),ok:(l===ans)?1:0}); }
+    },true);
+    window.addEventListener('kx:word',function(){ _push({d:_dstr(),t:Date.now(),type:'word',mod:'词汇'}); });
+    window.addEventListener('kx:checkin',function(){ _push({d:_dstr(),t:Date.now(),type:'checkin',mod:'打卡'}); });
+    document.addEventListener('input',function(e){
+      var t=e.target; if(t && t.matches && t.matches('textarea[data-tk]') && !t._kxLogged){ t._kxLogged=1; _push({d:_dstr(),t:Date.now(),type:'write',mod:_mod()}); }
+    },true);
+  })(); }catch(e){}
   var SALT_B64="YSU7EFtFw59g7Bgp6dzAeQ==";
   var ITER=600000;
   var DK_B64="fpaePhZm/FUUMO06eRbyqecSqKtOz9iUGMbnWNPjmN0=";
