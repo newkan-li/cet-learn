@@ -178,9 +178,12 @@
       + '<button class="sp" title="朗读">🔊</button><button class="cl" title="关闭">✕</button>'
       + '<div class="c">' + esc(cn) + '</div><div class="src" style="color:#9aa3b0;font-size:11.5px;min-height:14px"></div>';
     var meaning = d ? d.cn : '';
-    var b = el('button', null, inBook(w) ? '已在生词本' : '＋生词本');
-    if (inBook(w)) b.disabled = true;
-    b.onclick = function () { if (add(w, meaning, ipa)) { b.textContent = '已加入 ✓'; b.disabled = true; } };
+    var b = el('button', null, inBook(w) ? '移出生词本' : '＋生词本');
+    if (inBook(w)) b.style.cssText = 'border-color:#e0c0c0;color:#c0392b';
+    b.onclick = function () {
+      if (inBook(w)) { del(w); b.textContent = '＋生词本'; b.style.cssText = ''; }
+      else if (add(w, meaning, ipa)) { b.textContent = '移出生词本'; b.style.cssText = 'border-color:#e0c0c0;color:#c0392b'; }
+    };
     pop.appendChild(b);
     pop.querySelector('.sp').onclick = function () { speak(w); };
     pop.querySelector('.cl').onclick = function () { hidePop(); };
@@ -210,7 +213,7 @@
     var w = t.slice(l, rr); return w.length >= 2 ? w : null;
   }
   document.addEventListener('click', function (e) {
-    if (e.target.closest('button,a,input,textarea,summary,label,canvas,mark.kxmark,#kxpanel,.kxpop,.kxfab')) return;
+    if (e.target.closest('button,a,input,textarea,summary,label,canvas,#kxpanel,.kxpop,.kxfab')) return;
     var w = wordAt(e.clientX, e.clientY); if (!w) return;
     var d = lookup(w);
     showPop(e.clientX, e.clientY, norm(w), d);
