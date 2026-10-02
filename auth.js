@@ -18,13 +18,14 @@
       if(p.indexOf('kaoyan-vocab')===0) return '词汇';
       return p||'其他';
     }
+    function _typ(q){ try{ var t=(q.textContent||''); var m=t.match(/(细节题|推断题|主旨题|标题题|态度题|词义题|句意题|例证题|写作手法题)/); return m?m[1]:''; }catch(e){ return ''; } }
     function _push(ev){ var a=_load(); a.push(ev); if(a.length>8000)a=a.slice(-8000); _save(a); }
     window.KXLOG={push:_push,load:_load,dstr:_dstr,mod:_mod};
     document.addEventListener('click',function(e){
       var b=e.target && e.target.closest && e.target.closest('.op,.mcb,.mcs'); if(!b) return;
       var q=b.closest('.q[data-qid],.mcq[data-q]'); if(!q) return;
       var ans=q.getAttribute('data-ans'), l=b.getAttribute('data-l');
-      if(ans && l){ _push({d:_dstr(),t:Date.now(),type:'ans',mod:_mod(),ok:(l===ans)?1:0}); }
+      if(ans && l){ _push({d:_dstr(),t:Date.now(),type:'ans',mod:_mod(),ok:(l===ans)?1:0,typ:_typ(q)}); }
     },true);
     window.addEventListener('kx:word',function(){ _push({d:_dstr(),t:Date.now(),type:'word',mod:'词汇'}); });
     window.addEventListener('kx:checkin',function(){ _push({d:_dstr(),t:Date.now(),type:'checkin',mod:'打卡'}); });

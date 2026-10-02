@@ -46,6 +46,9 @@ html.theme-dark .bar{background:#2a3342}
 <h2>分模块作答</h2>
 <div class="panel"><table class="tbl" id="mods"><thead><tr><th>模块</th><th>已答</th><th>答对</th><th>正确率</th></tr></thead><tbody></tbody></table></div>
 
+<h2>薄弱点诊断</h2>
+<div class="panel" id="diag"></div>
+
 <h2>错题清单</h2>
 <div class="panel wrong" id="wrong"></div>
 
@@ -146,6 +149,33 @@ function render(){
  // 模块表
  var modHtml=Object.keys(mods).sort().map(function(mm){var o=mods[mm];return '<tr><td>'+esc(mm)+'</td><td>'+o.a+'</td><td>'+o.r+'</td><td>'+pct(o.r,o.a)+'</td></tr>';}).join('') || '<tr><td colspan="4" style="color:#8a94a3">暂无作答记录</td></tr>';
  document.getElementById('mods').querySelector('tbody').innerHTML=modHtml;
+ // 薄弱点诊断：按题型
+ var typStats={};
+ LOG.forEach(function(e){ if(!e||e.type!=='ans'||!e.typ)return; var t=e.typ; typStats[t]=typStats[t]||{a:0,r:0}; typStats[t].a++; if(e.ok)typStats[t].r++; });
+ var arr=Object.keys(typStats).map(function(t){return {t:t,a:typStats[t].a,r:typStats[t].r,acc:typStats[t].a?typStats[t].r/typStats[t].a:0};});
+ arr.sort(function(x,y){return x.acc-y.acc;});
+ var weak=arr.filter(function(x){return x.a>=3 && x.acc<0.7;});
+ var show=weak.length?weak:arr.slice(0,3);
+ function typLink(t){ if(!t)return 'kaoyan-drills.html';
+   if(/完形|完型|选词/.test(t))return 'kaoyan-drill-cloze.html';
+   if(/新题型|小标题|排序|选句|匹配/.test(t))return 'kaoyan-drill-partb.html';
+   if(/翻译/.test(t))return 'kaoyan-drill-transl.html';
+   if(/写作/.test(t))return 'kaoyan-drill-writing.html';
+   if(/语法|长难句/.test(t))return 'kaoyan-drill-grammar.html';
+   return 'kaoyan-drill-read.html';
+ }
+ var dg=document.getElementById('diag');
+ if(show.length){
+   var rows=show.map(function(x){return '<tr><td>'+esc(x.t)+'</td><td>'+x.a+'</td><td>'+x.r+'</td><td>'+pct(x.r,x.a)+'</td><td><a href="'+typLink(x.t)+'">去练 →</a></td></tr>';}).join('');
+   dg.innerHTML='<p class="meta">依据活动日志中的题型作答自动诊断（样本≥3 且正确率<70% 视为薄弱；不足时显示正确率最低的前 3 项）。</p>'
+     +'<table class="tbl"><thead><tr><th>题型</th><th>已答</th><th>答对</th><th>正确率</th><th>建议</th></tr></thead><tbody>'+rows+'</tbody></table>'
+     +'<p style="margin-top:8px"><b>今日建议：</b>先练 <b>'+esc(show[0].t)+'</b>（正确率 '+pct(show[0].r,show[0].a)+'）：<a href="'+typLink(show[0].t)+'">立即去练 →</a></p>';
+ } else {
+   // 回退：模块级
+   var marr=Object.keys(mods).map(function(m){var o=mods[m];return {m:m,a:o.a,r:o.r,acc:o.a?o.r/o.a:0};}).filter(function(x){return x.a>=3;}).sort(function(x,y){return x.acc-y.acc;});
+   if(marr.length){ dg.innerHTML='<p class="meta">暂无题型级日志（做几道题后更准）。当前模块薄弱项：</p><p><b>'+esc(marr[0].m)+'</b>：正确率 '+pct(marr[0].r,marr[0].a)+' <a href="'+typLink(marr[0].m)+'">去练 →</a></p>'; }
+   else dg.innerHTML='<span style="color:#8a94a3">还没有足够的作答记录。做完题后会自动生成薄弱点诊断。</span>';
+ }
  // 错题
  var wrongs=[]; for(var q2 in ANS){ if(!Object.prototype.hasOwnProperty.call(ANS,q2))continue; var r2=ANS[q2]; if(r2&&typeof r2==='object'&&r2.ok===false)wrongs.push(q2); }
  wrongs.sort();
