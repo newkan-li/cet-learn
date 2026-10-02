@@ -63,6 +63,23 @@
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function stemOf(q) { var e = q.querySelector('.stem'); var t = e ? e.textContent.replace(/\s+/g, ' ').trim() : (q.getAttribute('data-qid') || ''); return t.length > 80 ? t.slice(0, 80) + '…' : t; }
 
+
+  function stemFull(q) { var e = q.querySelector('.stem'); return e ? e.textContent.replace(/\s+/g, ' ').trim() : (q.getAttribute('data-qid') || ''); }
+  function exportAnki() {
+    var list = qs(), base = location.href.split('#')[0];
+    var wrongs = list.filter(function (q) { var rec = aOf(q.getAttribute('data-qid')); return rec && rec.l !== q.getAttribute('data-ans'); });
+    var rows = wrongs.map(function (q) {
+      var id = q.getAttribute('data-qid'), rec = aOf(id), ans = q.getAttribute('data-ans');
+      var link = base + (q.id ? ('#' + q.id) : '');
+      var front = stemFull(q) || id;
+      var back = '正确答案: ' + ans + ' ｜ 你的答案: ' + (rec ? rec.l : '') + ' ｜ <a href="' + link + '">打开原题</a>';
+      return front.replace(/[\t\r\n]+/g, ' ') + '\t' + back.replace(/[\r\n]+/g, ' ');
+    });
+    var blob = new Blob([rows.join('\n')], { type: 'text/tab-separated-values;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '错题本-Anki.txt'; a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  }
+
   function render() {
     injectCSS();
     var modal = document.getElementById('kxstatModal'); if (!modal) return;
@@ -90,8 +107,9 @@
       + '<div class="kpi"><b>' + pct(g) + '</b><span>全站正确率</span></div></div>'
       + (yhtml ? '<h4>按年份</h4><ul>' + yhtml + '</ul>' : '')
       + '<h4>本页错题（' + wrongs.length + '）</h4><ul>' + wrongHtml + '</ul>'
-      + '<div class="bar"><button id="kxStatResetPage">重置本页作答</button><button id="kxStatClearAll">清空全部作答</button><button class="close" id="kxStatClose">关闭</button></div>'
+      + '<div class="bar"><button id="kxStatResetPage">重置本页作答</button><button id="kxStatAnki">导出错题 Anki</button><button id="kxStatClearAll">清空全部作答</button><button class="close" id="kxStatClose">关闭</button></div>'
       + '</div>';
+    var ak = modal.querySelector('#kxStatAnki'); if (ak) ak.onclick = exportAnki;
     modal.querySelector('#kxStatClose').onclick = function () { modal.style.display = 'none'; };
     modal.addEventListener('click', function (e) { if (e.target === modal) modal.style.display = 'none'; });
     modal.querySelector('#kxStatResetPage').onclick = function () {

@@ -20,6 +20,17 @@ ul.tasks input:checked + span{color:var(--sub);text-decoration:line-through}
 a.go{color:var(--blue);text-decoration:none;font-size:12.5px;white-space:nowrap;border:1px solid var(--line);border-radius:12px;padding:1px 9px}
 a.go:hover{background:#eef4ff}
 .tip{background:#eef4ff;border:1px solid #c9dcff;border-radius:12px;padding:10px 14px;font-size:13px;color:#33456a;margin:12px 0}
+.checkin{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
+.checkin .ct{font-size:15px;color:var(--ink);margin-bottom:6px}.checkin .ct b{color:var(--red)}
+.checkin .cb{height:10px;background:#e7e0cf;border-radius:6px;overflow:hidden;margin:4px 0 6px}.checkin .cb i{display:block;height:100%;width:0;background:linear-gradient(90deg,#c0392b,#1b7f3b)}
+.checkin .cx{font-size:13px;color:var(--sub);margin:2px 0 8px}
+.checkin .ctools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--sub)}
+.checkin .ctools button{border:1px solid var(--line);background:#fff;color:var(--red);border-radius:14px;padding:3px 12px;cursor:pointer;font-size:12.5px}
+.checkin .ctools input[type=time]{border:1px solid var(--line);border-radius:8px;padding:2px 6px;font-size:12.5px}
+.checkin .dots{display:flex;gap:4px;margin-left:auto}
+.checkin .dot{width:22px;height:22px;border-radius:50%;background:#e7e0cf;color:#9aa3b0;font-size:11px;display:flex;align-items:center;justify-content:center}
+.checkin .dot.on{background:#1b7f3b;color:#fff}
+html.theme-dark .checkin .cb{background:#2a3342}html.theme-dark .checkin .ctools button{background:#1a212b;color:#f0a79b;border-color:#2c3442}
 @media print{a.go,h2 .tool{display:none}body{background:#fff}.wrap{max-width:none}}
 html.theme-dark{--ink:#e6e9ef;--sub:#a9b2c0;--line:#2c3442;--bg:#0f1319;--card:#151b24}
 html.theme-dark h2 .tool button,html.theme-dark a.go{background:#1a212b;color:#9fc3ff;border-color:#2c3442}
@@ -29,6 +40,13 @@ html.theme-dark .prog{background:#2a3342}
 <p class="lead">勾选即可打卡，进度自动保存（本机）。可打印成纸质清单。</p>
 <p><a class="back" href="kaoyan-hub.html">← 返回考研资料中心</a>　·　<a class="back" href="index.html">英语学习首页</a></p>
 <div class="tip">建议节奏：每天 40–60 分钟；周一/三/五 阅读，周二/四 专项，周六 整套限时，周日 复盘。详见 <a href="kaoyan-hub.html">资料中心·月度/每周计划</a>。</div>
+
+<div class="checkin" id="kxCheck">
+<div class="ct"><b id="cxToday">今日打卡 0/0</b> · 连续打卡 <b id="cxStreak">0</b> 天</div>
+<div class="cb" id="cxBar"><i></i></div>
+<div class="cx" id="cxMsg"></div>
+<div class="ctools"><button id="cxNotify" type="button">开启浏览器提醒</button><label>提醒时间 <input type="time" id="cxTime" value="20:00"></label><span class="dots" id="cx7"></span></div>
+</div>
 
 <h2>每日任务 <span class="tool"><button data-reset="daily">重置每日</button></span></h2>
 <div class="prog" data-prog="daily"><i></i></div><p class="pinfo" data-info="daily"></p>
@@ -44,32 +62,63 @@ html.theme-dark .prog{background:#2a3342}
 </div>
 <script>
 (function(){
- var KEY='kytasks';var st={};try{st=JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){st={};}
- function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
- function box(id){return document.querySelector('input[data-id="'+id+'"]');}
+ var KEY='kytasks';
+ var st={},DU={},HIST={},REM={time:'20:00',on:false};
+ try{var o=JSON.parse(localStorage.getItem(KEY)||'{}')||{};if(o&&(o.DU||o.HIST||o.REM)){st=o.st||{};DU=o.DU||{};HIST=o.HIST||{};REM=o.REM||REM;}else{st=o||{};}}catch(e){}
+ function save(){try{localStorage.setItem(KEY,JSON.stringify({st:st,DU:DU,HIST:HIST,REM:REM}));}catch(e){}}
+ function pad(n){return (n<10?'0':'')+n;}
+ function dkey(d){d=d||new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
  function group(id){return document.querySelector('ul[data-group="'+id+'"]');}
+ function dailyIds(){return Array.prototype.map.call(group('daily').querySelectorAll('input[data-id]'),function(e){return e.getAttribute('data-id');});}
  function refresh(g){
   var els=group(g).querySelectorAll('input[data-id]');var n=0;els.forEach(function(e){if(e.checked)n++;});
   var bar=document.querySelector('[data-prog="'+g+'"] i');if(bar)bar.style.width=Math.round(100*n/els.length)+'%';
   var info=document.querySelector('[data-info="'+g+'"]');if(info)info.textContent='已完成 '+n+' / '+els.length;
+  if(g==='daily')statDaily();
+ }
+ function statDaily(){
+  var ids=dailyIds();var today=dkey();var ds=DU[today]||{};var n=0;ids.forEach(function(id){if(ds[id])n++;});
+  var all=ids.length>0&&n===ids.length;
+  if(all)HIST[today]=1;else delete HIST[today];
+  var ct=document.getElementById('cxToday');if(ct)ct.textContent='今日打卡 '+n+'/'+ids.length;
+  var bi=document.querySelector('#cxBar i');if(bi)bi.style.width=(ids.length?Math.round(100*n/ids.length):0)+'%';
+  var s=0;var d=new Date();if(!HIST[dkey(d)])d.setDate(d.getDate()-1);
+  while(HIST[dkey(d)]){s++;d.setDate(d.getDate()-1);}
+  var ss=document.getElementById('cxStreak');if(ss)ss.textContent=s;
+  var msg=document.getElementById('cxMsg');
+  if(msg){if(all)msg.innerHTML='🎉 今日任务全部完成，连续打卡 '+s+' 天，继续保持！';else{var left=ids.filter(function(id){return !ds[id];}).length;msg.innerHTML='⏰ 今日还有 <b>'+left+'</b> 项未完成，加油！';}}
+  var w=document.getElementById('cx7');
+  if(w){var h='';for(var i=6;i>=0;i--){var dd=new Date();dd.setDate(dd.getDate()-i);var k=dkey(dd);h+='<span class="dot'+(HIST[k]?' on':'')+'" title="'+k+'">'+dd.getDate()+'</span>';}w.innerHTML=h;}
+  save();
  }
  function init(){
   document.querySelectorAll('input[data-id]').forEach(function(e){
-   var id=e.getAttribute('data-id');e.checked=!!st[id];
-   e.addEventListener('change',function(){st[id]=e.checked;save();refresh(e.closest('ul').getAttribute('data-group'));});
+   var id=e.getAttribute('data-id');var g=e.closest('ul').getAttribute('data-group');
+   e.checked=(g==='daily')?!!((DU[dkey()]||{})[id]):!!st[id];
+   e.addEventListener('change',function(){
+     if(g==='daily'){var t=dkey();DU[t]=DU[t]||{};if(e.checked)DU[t][id]=1;else delete DU[t][id];save();refresh('daily');}
+     else{st[id]=e.checked;save();refresh(g);}
+   });
   });
   ['daily','weekly','month'].forEach(refresh);
   document.querySelectorAll('[data-reset]').forEach(function(b){
-   b.addEventListener('click',function(){
-    var g=b.getAttribute('data-reset');if(g==='daily')g='daily';if(g==='weekly')g='weekly';
-    group(g).querySelectorAll('input[data-id]').forEach(function(e){var id=e.getAttribute('data-id');e.checked=false;delete st[id];});
-    save();refresh(g);
+   b.addEventListener('click',function(){var g=b.getAttribute('data-reset');
+    if(g==='daily'){DU[dkey()]={};group('daily').querySelectorAll('input[data-id]').forEach(function(e){e.checked=false;});save();refresh('daily');}
+    else{group(g).querySelectorAll('input[data-id]').forEach(function(e){var id=e.getAttribute('data-id');e.checked=false;delete st[id];});save();refresh(g);}
    });
   });
+  var nb=document.getElementById('cxNotify');var tm=document.getElementById('cxTime');
+  if(tm){tm.value=REM.time||'20:00';tm.onchange=function(){REM.time=tm.value;save();schedule();};}
+  function supported(){return 'Notification' in window;}
+  function updNb(){if(!nb)return;if(!supported()){nb.style.display='none';return;}nb.textContent=(Notification.permission==='granted')?(REM.on?'浏览器提醒已开启 ✓':'开启浏览器提醒'):'开启浏览器提醒';}
+  function doneToday(){var ids=dailyIds();var ds=DU[dkey()]||{};return ids.length>0&&ids.every(function(id){return ds[id];});}
+  function fire(test){if(!supported())return;if(!test){if(!REM.on)return;if(doneToday())return;}try{new Notification('考研英语 · 今日任务提醒',{body:doneToday()?'今日任务已完成 🎉':'今天还有任务没打卡，去完成吧 💪',tag:'kytask'});}catch(e){}}
+  if(nb){nb.onclick=function(){if(!supported()){alert('当前浏览器不支持通知');return;}if(Notification.permission==='granted'){REM.on=!REM.on;save();updNb();if(REM.on)fire(true);}else{Notification.requestPermission().then(function(p){REM.on=(p==='granted');save();updNb();if(REM.on)fire(true);});}};}
+  function schedule(){if(!REM.on||!supported())return;var p=(REM.time||'20:00').split(':');var t=new Date();t.setHours(+p[0],+p[1],0,0);var ms=t-new Date();if(ms>0&&ms<6*3600*1000)setTimeout(function(){fire();},ms);}
+  updNb();schedule();
+  window.addEventListener('focus',function(){refresh('daily');});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh('daily');});
  }
  document.addEventListener('DOMContentLoaded',init);
 })();
-</script><script src="sentence_pairs.js"></script>
-<script src="sentence_tr.js"></script>
-<script src="auth.js"></script>
-</body></html>
+</script></body></html>

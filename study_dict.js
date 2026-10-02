@@ -122,18 +122,30 @@
       }
       h += '</ul>';
     }
-    h += '<div class="row"><button id="kxExp">导出 txt</button><button id="kxClr">清空</button></div>';
+    h += '<div class="row"><button id="kxExp">导出 txt</button><button id="kxAnki">导出 Anki</button><button id="kxClr">清空</button></div>';
     panel.innerHTML = h;
     panel.querySelector('.kxclose').onclick = function () { panel.style.display = 'none'; };
     panel.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { del(b.getAttribute('data-del')); renderPanel(); }; });
     panel.querySelectorAll('[data-sp]').forEach(function (b) { b.onclick = function () { speak(b.getAttribute('data-sp')); }; });
     var ex = panel.querySelector('#kxExp'); if (ex) ex.onclick = exportTxt;
+    var an = panel.querySelector('#kxAnki'); if (an) an.onclick = exportAnki;
     var cl = panel.querySelector('#kxClr'); if (cl) cl.onclick = function () { if (confirm('清空生词本？')) { BOOK = []; save(); refresh(); renderPanel(); } };
   }
   function exportTxt() {
     var lines = BOOK.map(function (b) { return b.w + '\t' + b.cn; });
     var blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '生词本.txt'; a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  }
+
+
+  function exportAnki() {
+    var rows = BOOK.map(function (b) {
+      var back = ((b.ipa ? b.ipa + ' ' : '') + (b.cn || '')).replace(/[\t\r\n]+/g, ' ').trim();
+      return b.w + '\t' + back;
+    });
+    var blob = new Blob([rows.join('\n')], { type: 'text/tab-separated-values;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '生词本-Anki.txt'; a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
   }
 
