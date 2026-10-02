@@ -156,7 +156,7 @@
   function apply(){ document.body.classList.toggle('kx-sticky', mode()==='sticky'); upd(); }
   function upd(){ document.querySelectorAll('.cloze-toggle').forEach(function(b){ var on=mode()==='sticky'; b.textContent= on?'📌 吸顶原文：开（点此关闭）':'📌 原文吸顶：关（点此开启）'; b.classList.toggle('on',on); }); }
   function flash(el){ if(!el)return; el.classList.add('cloze-flash'); setTimeout(function(){el.classList.remove('cloze-flash');},1200); }
-  function findSrc(q){ var p=q.previousElementSibling; while(p){ if(p.classList&&p.classList.contains('cloze-src'))return p; p=p.previousElementSibling; } return null; }
+  function findSrc(q){ var p=q; while(p){ var s=p.previousElementSibling; while(s){ if(s.classList&&s.classList.contains('cloze-src'))return s; if(s.querySelector&&s.querySelector('.cloze-src'))return s.querySelector('.cloze-src'); s=s.previousElementSibling; } p=p.parentElement; } return null; }
   function backBtn(q){ var a=document.createElement('button'); a.type='button'; a.className='cloze-back'; a.textContent='↑ 原文'; a.onclick=function(){ var s=findSrc(q); if(s){ s.scrollIntoView({behavior:'smooth',block:'start'}); flash(s); } }; return a; }
   function decorate(){
     document.querySelectorAll('.cloze-src').forEach(function(src){
@@ -173,7 +173,7 @@
       if(q.getAttribute('data-kxb'))return; q.setAttribute('data-kxb','1');
       var stem=q.querySelector('.stem'); if(stem){ stem.appendChild(document.createTextNode(' ')); stem.appendChild(backBtn(q)); }
     });
-    document.querySelectorAll('.mcq[data-group="cloze"],.mcq[data-group="read"]').forEach(function(q){
+    document.querySelectorAll('.mcq[data-group="cloze"],.mcq[data-group="read"],.mcq[data-group="match"]').forEach(function(q){
       if(q.getAttribute('data-kxb'))return; q.setAttribute('data-kxb','1');
       q.appendChild(document.createTextNode(' ')); q.appendChild(backBtn(q));
     });
