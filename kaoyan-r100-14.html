@@ -26,6 +26,7 @@ details.psg summary,details.tr summary{cursor:pointer;color:var(--blue);font-wei
 details.sol{margin-top:6px}
 details.sol summary{cursor:pointer;color:var(--red);font-weight:600;font-size:13.5px}
 details.sol p{margin:4px 0;font-size:14px}
+.res{font-size:13px;margin-top:4px}.res.ok{color:#1f9d55;font-weight:700}.res.no{color:#c0392b;font-weight:700}
 html.theme-dark{--ink:#e6e9ef;--sub:#a9b2c0;--line:#2c3442;--bg:#0f1319;--card:#151b24}
 html.theme-dark .passage,html.theme-dark .op{background:#12181f;color:#e6e9ef}
 html.theme-dark .tools{background:#0f1319}html.theme-dark .tools button{background:#1a212b;color:#dbe3ee;border-color:#2c3442}
@@ -57,5 +58,11 @@ document.getElementById('find').onclick=function(){
  document.getElementById('cnt').textContent=v?('命中 '+n+' 篇'):('共 '+document.querySelectorAll('section.t').length+' 篇');
 };
 </script>
+<script src="cet4-dict.js"></script>
+<script src="ky-dict.js"></script>
+<script src="sentence_pairs.js"></script>
+<script src="study_dict.js"></script>
+<script src="sentence_tr.js"></script>
+<script src="drill_stats.js"></script>
 <script src="auth.js"></script>
 </body></html>
