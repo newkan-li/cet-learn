@@ -149,21 +149,51 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
   }
 
+  var _wcache = {};
+  function onlineWord(w, cb) {
+    w = norm(w); if (!w) return;
+    if (_wcache[w]) { cb(_wcache[w]); return; }
+    var u = 'https://api.mymemory.translated.net/get?langpair=en|zh-CN&q=' + encodeURIComponent(w);
+    fetch(u).then(function (r) { return r.json(); }).then(function (j) {
+      var t = j && j.responseData && j.responseData.translatedText;
+      if (t && !/QUERY LENGTH LIMIT|INVALID|MYMEMORY WARNING/i.test(t) && !/^\s*$/.test(t)) {
+        var o = { cn: t, src: '在线翻译 · MyMemory' }; _wcache[w] = o; cb(o);
+      } else { googleWord(w, cb); }
+    }).catch(function () { googleWord(w, cb); });
+  }
+  function googleWord(w, cb) {
+    var u = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=' + encodeURIComponent(w);
+    fetch(u).then(function (r) { return r.json(); }).then(function (j) {
+      var t = (j && j[0] || []).map(function (x) { return x[0]; }).join('');
+      var o = { cn: t || '（在线翻译失败，请重试）', src: '在线翻译 · Google' }; _wcache[w] = o; cb(o);
+    }).catch(function () { cb({ cn: '（在线翻译不可用：请检查网络，或稍后重试）', src: '—' }); });
+  }
+
   var pop = null;
   function hidePop() { if (pop) { pop.remove(); pop = null; } }
   function showPop(x, y, w, d) {
-    hidePop(); pop = el('div', 'kxpop'); pop.id = 'kxpop';
-    var ipa = d ? d.uk : ''; var cn = d ? d.cn : '（词典未收录，可手动记录）';
+    hidePop(); pop = el('div', 'kxpop'); pop.id = 'kxpop'; pop._w = norm(w);
+    var ipa = d ? d.uk : ''; var cn = d ? d.cn : '查询中…';
     pop.innerHTML = '<span class="w">' + esc(w) + '</span><span class="p">' + esc(ipa) + '</span>'
       + '<button class="sp" title="朗读">🔊</button><button class="cl" title="关闭">✕</button>'
-      + '<div class="c">' + esc(cn) + '</div>';
+      + '<div class="c">' + esc(cn) + '</div><div class="src" style="color:#9aa3b0;font-size:11.5px;min-height:14px"></div>';
+    var meaning = d ? d.cn : '';
     var b = el('button', null, inBook(w) ? '已在生词本' : '＋生词本');
     if (inBook(w)) b.disabled = true;
-    b.onclick = function () { if (add(w, d ? d.cn : '', ipa)) { b.textContent = '已加入 ✓'; b.disabled = true; } };
+    b.onclick = function () { if (add(w, meaning, ipa)) { b.textContent = '已加入 ✓'; b.disabled = true; } };
     pop.appendChild(b);
     pop.querySelector('.sp').onclick = function () { speak(w); };
     pop.querySelector('.cl').onclick = function () { hidePop(); };
     document.body.appendChild(pop);
+    if (!d) {
+      onlineWord(norm(w), function (res) {
+        if (!pop || pop._w !== norm(w)) return;
+        meaning = res.cn;
+        var c = pop.querySelector('.c'); if (c) c.textContent = res.cn;
+        var s = pop.querySelector('.src'); if (s) s.textContent = '来源：' + res.src;
+        if (!inBook(w)) { b.textContent = '＋生词本'; b.disabled = false; }
+      });
+    }
     var px = Math.min(x, window.innerWidth - 300), py = y + 12;
     if (py + pop.offsetHeight > window.innerHeight - 10) py = y - pop.offsetHeight - 12;
     pop.style.left = Math.max(8, px) + 'px'; pop.style.top = Math.max(8, py) + window.scrollY + 'px';
