@@ -22,7 +22,7 @@ details.psg summary,details.tr summary{cursor:pointer;color:var(--blue);font-wei
 .op:hover{border-color:var(--blue)}
 .op.right{border-color:#1f9d55;background:rgba(31,157,85,.12);color:#1f9d55}
 .op.wrong{border-color:#d64545;background:rgba(214,69,69,.12);color:#d64545}
-.op.ok{border-color:#1f9d55}
+
 details.sol{margin-top:6px}
 details.sol summary{cursor:pointer;color:var(--red);font-weight:600;font-size:13.5px}
 details.sol p{margin:4px 0;font-size:14px}
@@ -37,7 +37,7 @@ html.theme-dark .tools{background:#0f1319}html.theme-dark .tools button{backgrou
 <p class="lead">题（原文+选项）与答案解析、参考译文（由原书 OCR 提取，可能有误差）。</p>
 <p><a class="back" href="kaoyan-r100.html">← 100篇目录</a>　·　<a class="back" href="kaoyan-hub.html">考研资料中心</a>　·　<a class="back" href="index.html">首页</a></p>
 <div class="tools"><input id="q" type="search" placeholder="搜索文章/题目/解析…"><button id="find">筛选</button><span class="muted" id="cnt"></span></div>
-<div class="stbar">📊 本页 <b id="stTotal">0</b> 题 · 已答 <b id="stAns">0</b> · 答对 <b id="stOk">0</b> · 正确率 <b id="stPct">—</b> <button id="stReset" type="button">重置本页作答</button></div>
+<div class="stbar">📊 本页 <b id="stTotal">0</b> 题 · 已答 <b id="stAns">0</b> · 答对 <b id="stOk">0</b> · 错题 <b id="stWrong">0</b> · 正确率 <b id="stPct">—</b> <button id="stReset" type="button">重置本页作答</button></div>
 <section class="t" id="t34"><h3>Text 34 <span class="muted">第1章 社会生活类</span></h3><details class="psg"><summary>📖 原文（点击展开）</summary></details><div class="qs"></div><details class="tr"><summary>参考译文</summary><p class="passage">一份关于“造成污染的精英”报告的作者警告说，鲍里斯·约翰逊的政府与商界的既得利益集 团关系“过于密切”，以致无法对气候危机采取有力行动。 苏塞克斯大学国际关系学教授彼得·纽威尔表示：“在这些利益团体和政府关系如此密切的情 况下，我们永远不会有变革。政府不愿意与这些利益集团较量，因为它与包括化石燃料领域在内的 大型企业有着密切的联系。”[1]他警告说：“现状的受益者并不急于改变。如果我们认真对待《巴 黎协定》，我们就必须打破企业与政府之间的密切关系。” [2]纽威尔呼吁提高从政党融资到政府机构的透明度。他说：“需要彻底搞清楚。（企业）捐 款去向需要透明。”国际气候行动的知名人士也向《卫报》透露了他们的担忧：由英国主办的联合 给人留下了很差的印象。 第2章自然环境类·77 [3]纽威尔指出，政府没有出台严格的规划法规，这些法规能够迫使房屋建筑商建造低碳的新房。 建造低碳房屋的技术是现成的，但会使房屋建筑成本增加几千英镑。相反，当现在建造的房屋需要 在几年后进行昂贵的翻新时，更高的成本将不得不由户主承担。 纽威尔还提到了运动型多用途汽车（SUV）。十年来，交通工具的碳排放量几乎没有变化，主 要是因为人们改用电动汽车所减少的碳排放量被运动型多用途汽车的销售量所抵消。[4]《卫报》 披露，政府本可以利用税收制度来减少运动型多用途汽车的吸引力，但燃油税十多年没有变化，同 时政府还支出270亿英镑用于新建道路，而此举的碳排放量被严重低估。 ．剑桥可持续发展委员会本周发布了一份报告，纽威尔是其主要作者，该报告指出，少数富裕人 群一即“造成污染的精英”一一产生的排放量远远高于英国普通公民。 [5]一位政府发言人说：“在应对气候变化方面，我们都出了一份力，在我们现有成功的基础上 再接再厉，过去30年，我们的减排速度比任何其他的七国集团国家都要快。通过英国首相的十点 计划，我们形成了一项策略，到2050年消除我们对气候变化造成的影响，包括到2030年停止销售 新的汽油和柴油汽车和货车，并投资于零排放的公共交通事业。” 第3章 科学研究类</p></details></section>
 </div>
 <script>
@@ -68,6 +68,7 @@ function kxUpdateStats(){
  document.getElementById('stTotal').textContent=qs.length;
  document.getElementById('stAns').textContent=an;
  document.getElementById('stOk').textContent=ok;
+ document.getElementById('stWrong').textContent=(an-ok);
  document.getElementById('stPct').textContent=an?Math.round(ok*100/an)+'%':'—';
 }
 document.addEventListener('click',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('op'))setTimeout(kxUpdateStats,60);},true);
