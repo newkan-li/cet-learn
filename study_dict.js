@@ -188,7 +188,7 @@
     unwrapMarks(); if (!BOOK.length) return;
     var set = {}; BOOK.forEach(function (b) { set[b.w] = 1; });
     var re = new RegExp('\\b(' + BOOK.map(function (b) { return b.w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')\\b', 'gi');
-    document.querySelectorAll('.passage,.stem').forEach(function (p) {
+    document.querySelectorAll('.passage,.stem,.question,.qopt,.sencn').forEach(function (p) {
       var walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null);
       var nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
       nodes.forEach(function (n) {
