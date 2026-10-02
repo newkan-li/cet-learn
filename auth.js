@@ -133,3 +133,55 @@
   try{ window.addEventListener('storage',function(e){ if(e.key===KEY) apply(get()); }); }catch(e){}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
+
+/* ===== 完形显示方案：普通 / 原文吸顶（点空号跳题，题目可回原文） ===== */
+(function(){
+  if(window.__kxCloze) return; window.__kxCloze=true;
+  var KEY='kxcloze';
+  var CSS=''
+   + '.cloze-hd{display:flex;justify-content:flex-end;margin:0 0 2px}'
+   + '.cloze-toggle{border:1px solid #ccd3dd;background:#fff;color:#234f7a;border-radius:12px;padding:3px 12px;font-size:12.5px;cursor:pointer}'
+   + '.cloze-toggle.on{background:#2b6ef2;color:#fff;border-color:#2b6ef2}'
+   + 'body.kx-sticky .cloze-src{position:sticky;top:0;z-index:6;max-height:46vh;overflow:auto;background:var(--card,#fffdf8);border:1px solid var(--line,#e4ddcd);border-radius:12px;padding:8px 12px;box-shadow:0 8px 22px rgba(20,30,60,.16)}'
+   + 'body.kx-sticky .cloze-src .cloze-hd{position:sticky;top:0;background:inherit;z-index:1}'
+   + 'a.blk{color:#c0392b;font-weight:700;text-decoration:none;border-bottom:1px dashed #c0392b;padding:0 1px}'
+   + 'a.blk:hover{background:#fff3c4}'
+   + '.cloze-back{border:1px solid #ccd3dd;background:#fff;color:#234f7a;border-radius:10px;padding:0 8px;font-size:12px;cursor:pointer;margin-left:6px}'
+   + '.q.cloze-flash,.mcq.cloze-flash{outline:2px solid #e6c200;outline-offset:2px}'
+   + 'html.theme-dark .cloze-toggle,html.theme-dark .cloze-back{background:#1a212b;color:#dbe3ee;border-color:#2c3442}'
+   + 'html.theme-dark body.kx-sticky .cloze-src{background:#151b24}'
+   + '@media print{body.kx-sticky .cloze-src{position:static;max-height:none;box-shadow:none}.cloze-toggle,.cloze-back{display:none}}';
+  function mode(){ try{ return localStorage.getItem(KEY)==='sticky'?'sticky':'normal'; }catch(e){ return 'normal'; } }
+  function set(m){ try{ localStorage.setItem(KEY,m); }catch(e){} apply(); }
+  function apply(){ document.body.classList.toggle('kx-sticky', mode()==='sticky'); upd(); }
+  function upd(){ document.querySelectorAll('.cloze-toggle').forEach(function(b){ var on=mode()==='sticky'; b.textContent= on?'📌 吸顶原文：开（点此关闭）':'📌 原文吸顶：关（点此开启）'; b.classList.toggle('on',on); }); }
+  function flash(el){ if(!el)return; el.classList.add('cloze-flash'); setTimeout(function(){el.classList.remove('cloze-flash');},1200); }
+  function findSrc(q){ var p=q.previousElementSibling; while(p){ if(p.classList&&p.classList.contains('cloze-src'))return p; p=p.previousElementSibling; } return null; }
+  function backBtn(q){ var a=document.createElement('button'); a.type='button'; a.className='cloze-back'; a.textContent='↑ 原文'; a.onclick=function(){ var s=findSrc(q); if(s){ s.scrollIntoView({behavior:'smooth',block:'start'}); flash(s); } }; return a; }
+  function decorate(){
+    document.querySelectorAll('.cloze-src').forEach(function(src){
+      if(src.getAttribute('data-kxsrc'))return; src.setAttribute('data-kxsrc','1');
+      var hd=document.createElement('div'); hd.className='cloze-hd';
+      var b=document.createElement('button'); b.type='button'; b.className='cloze-toggle';
+      b.onclick=function(){ set(mode()==='sticky'?'normal':'sticky'); };
+      hd.appendChild(b); src.insertBefore(hd,src.firstChild);
+    });
+    document.querySelectorAll('.q[data-qid^="cloze-"]').forEach(function(q){
+      if(q.getAttribute('data-kxb'))return; q.setAttribute('data-kxb','1');
+      var stem=q.querySelector('.stem'); if(stem){ stem.appendChild(document.createTextNode(' ')); stem.appendChild(backBtn(q)); }
+    });
+    document.querySelectorAll('.mcq[data-group="cloze"]').forEach(function(q){
+      if(q.getAttribute('data-kxb'))return; q.setAttribute('data-kxb','1');
+      q.appendChild(document.createTextNode(' ')); q.appendChild(backBtn(q));
+    });
+    upd();
+  }
+  document.addEventListener('click',function(e){
+    var a=e.target && e.target.closest && e.target.closest('a.blk'); if(!a)return; e.preventDefault();
+    var n=a.getAttribute('data-n'); var src=a.closest('.cloze-src'); var y=src?src.getAttribute('data-year'):'';
+    var q=document.getElementById('q-cloze-'+y+'-'+n);
+    if(q){ q.scrollIntoView({behavior:'smooth',block:'center'}); flash(q); }
+  });
+  if(!document.getElementById('kxClozeCSS')){ var st=document.createElement('style'); st.id='kxClozeCSS'; st.textContent=CSS; document.head.appendChild(st); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',decorate); else decorate();
+})();
