@@ -95,7 +95,7 @@
     // 必须落在正文里
     try {
       var node = sel.anchorNode; var el = node && (node.nodeType === 3 ? node.parentNode : node);
-      if (!el || !el.closest || !el.closest('.passage,.q,.stem,.ans,.cn,.tip,.question,.qopt,.sencn,.hint')) return;
+      if (!el || !el.closest || !el.closest('.passage,.q,.stem,.ans,.cn,.tip,.question,.qopt,.sencn,.hint,.exp,.wans,.model-essay')) return;
     } catch (e) { return; }
     var rect = sel.getRangeAt(0).getBoundingClientRect();
     if (!rect || (!rect.width && !rect.height)) return;
