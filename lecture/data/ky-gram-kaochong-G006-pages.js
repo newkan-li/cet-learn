@@ -1,1 +1,0 @@
-window.PAGES={key:"ky-gram-kaochong-G006",title:"考虫英语语法讲义 G006（英语一）",books:[{name:"考虫英语语法讲义 G006（英语一）",img:"img/ky-gram-kaochong-G006",total:31,sections:[{name:"正文",a:1,b:16},{name:"二、分裂结构",a:17,b:25},{name:"Unit 4特殊句式",a:26,b:31}]}]};

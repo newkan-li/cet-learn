@@ -1,1 +1,0 @@
-window.PAGES={key:"ky-lss-kaochong-handbook",title:"考虫英语长难句特训手册（英语一）",books:[{name:"考虫英语长难句特训手册（英语一）",img:"img/ky-lss-kaochong-handbook",total:34,sections:[{name:"第 1–12 页",a:1,b:12},{name:"第 13–24 页",a:13,b:24},{name:"第 25–34 页",a:25,b:34}]}]};
