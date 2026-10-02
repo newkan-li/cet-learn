@@ -13,7 +13,7 @@
     var id = q.getAttribute('data-qid'), ans = q.getAttribute('data-ans'), rec = aOf(id);
     q.querySelectorAll('.op').forEach(function (b) {
       b.classList.remove('right', 'wrong');
-      if (b.getAttribute('data-l') === ans) b.classList.add('right');
+      if (rec && rec.l === b.getAttribute('data-l') && rec.l === ans) b.classList.add('right');
       if (rec && rec.l === b.getAttribute('data-l') && rec.l !== ans) b.classList.add('wrong');
     });
     var res = q.querySelector('.res');
