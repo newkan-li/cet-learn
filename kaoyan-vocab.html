@@ -1373,10 +1373,11 @@ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'
 function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
 function bookOf(w){for(var i=0;i<Vbook.length;i++)if(Vbook[i].w===w)return Vbook[i];return null;}
 function addBook(w){if(bookOf(w))return;var e=D[w]||{};Vbook.push({w:w,cn:e.cn||'',uk:e.uk||'',us:e.us||'',pos:e.pos||'',lv:0,due:Date.now(),ok:0,miss:0});persist();}
+function addMainBook(w){try{var a=JSON.parse(localStorage.getItem('kxvocab')||'[]');if(!Array.isArray(a))a=[];var ex=false;for(var i=0;i<a.length;i++)if(a[i]&&a[i].w===w){ex=true;break;}if(!ex){var e=D[w]||{};a.push({w:w,cn:e.cn||'',ipa:e.us||e.uk||''});localStorage.setItem('kxvocab',JSON.stringify(a));}}catch(e){}}
 function delBook(w){Vbook=Vbook.filter(function(x){return x.w!==w;});persist();}
 function grade(w,ok){var e=bookOf(w);if(!e)return;var day=86400000;
  if(ok){e.ok++;e.lv=Math.min(5,(e.lv||0)+1);e.due=Date.now()+day*(e.lv>=5?30:e.lv>=3?7:e.lv>=2?4:2);}
- else{e.miss++;e.lv=Math.max(1,Math.min(e.lv||1,1));e.due=Date.now()+day;if(!Wrong.some(function(x){return x.w===w;}))Wrong.push({w:w,t:Date.now()});}
+ else{e.miss++;e.lv=Math.max(1,Math.min(e.lv||1,1));e.due=Date.now()+day;if(!Wrong.some(function(x){return x.w===w;}))Wrong.push({w:w,t:Date.now()});addMainBook(w);}
  Stat[today()]=Stat[today()]||{ok:0,no:0}; if(ok)Stat[today()].ok++;else Stat[today()].no++;
  persist();}
 function tierWords(t){var out=[];for(var w in D){var v=D[w];if(t==='sense'){if(v.sense&&v.tier==='高')out.push(w);}else if(t==='wrong'){if(Wrong.some(function(x){return x.w===w;}))out.push(w);}else if(v.tier===t)out.push(w);}return out;}
@@ -1457,9 +1458,9 @@ function startSession(){
     _ops.forEach(function(b){b.classList.add('locked'); if(b.getAttribute('data-pick')===w)b.classList.add('ok');});
     if(!correct)t.classList.add('no');
     var _card=box.querySelector('.kycard');
-    if(_card){var fb=document.createElement('p');fb.className='kyfb';fb.textContent=correct?'✓ 正确':'✗ 正确答案：'+w;_card.appendChild(fb);}
-    if(correct){ok++;grade(w,true);}else{no++;grade(w,false);}
+    if(_card){var fb=document.createElement('p');fb.className='kyfb';fb.textContent=correct?'✓ 正确':('✗ 正确答案：'+w+'（已加入生词本）');_card.appendChild(fb);}
     if(!bookOf(w))addBook(w);
+    if(correct){ok++;grade(w,true);}else{no++;grade(w,false);}
     Plan[today()]=(Plan[today()]||0)+(bookOf(w).lv<=1?1:0);persist();
     setTimeout(function(){box.remove();i++;step();}, correct?550:1000);
    } else if(t.getAttribute&&t.getAttribute('data-skip')){box.remove();i++;step();}
