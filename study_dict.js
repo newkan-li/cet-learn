@@ -122,11 +122,12 @@
       }
       h += '</ul>';
     }
-    h += '<div class="row"><button id="kxExp">导出 txt</button><button id="kxAnki">生成 Anki(.apkg)</button><button id="kxClr">清空</button></div>';
+    h += '<div class="row"><button id="kxRvw">🔁 卡片复习</button><button id="kxExp">导出 txt</button><button id="kxAnki">生成 Anki(.apkg)</button><button id="kxClr">清空</button></div>';
     panel.innerHTML = h;
     panel.querySelector('.kxclose').onclick = function () { panel.style.display = 'none'; };
     panel.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { del(b.getAttribute('data-del')); renderPanel(); }; });
     panel.querySelectorAll('[data-sp]').forEach(function (b) { b.onclick = function () { speak(b.getAttribute('data-sp')); }; });
+    var rv = panel.querySelector('#kxRvw'); if (rv) rv.onclick = function () { startReview(); };
     var ex = panel.querySelector('#kxExp'); if (ex) ex.onclick = exportTxt;
     var an = panel.querySelector('#kxAnki'); if (an) an.onclick = exportAnki;
     var cl = panel.querySelector('#kxClr'); if (cl) cl.onclick = function () { if (confirm('清空生词本？')) { BOOK = []; save(); refresh(); renderPanel(); } };
@@ -170,6 +171,40 @@
       var t = (j && j[0] || []).map(function (x) { return x[0]; }).join('');
       var o = { cn: t || '（在线翻译失败，请重试）', src: '在线翻译 · Google' }; _wcache[w] = o; cb(o);
     }).catch(function () { cb({ cn: '（在线翻译不可用：请检查网络，或稍后重试）', src: '—' }); });
+  }
+
+  var KX_RVW_CSS='.kxreview{position:fixed;inset:0;z-index:9999;background:rgba(15,22,35,.72);display:flex;align-items:center;justify-content:center;padding:16px}.kxreview .card{background:#fff;border-radius:16px;max-width:540px;width:100%;min-height:300px;padding:16px 18px;box-shadow:0 16px 50px rgba(0,0,0,.4);display:flex;flex-direction:column}.kxreview .head{display:flex;justify-content:space-between;align-items:center;color:#6b7280;font-size:13px}.kxreview .body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:10px}.kxreview .w{font-size:32px;font-weight:800;color:#123a6b}.kxreview .p{color:#8a94a3}.kxreview .c{font-size:20px;color:#2c3038;margin-top:6px}.kxreview .bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}.kxreview button{border:1px solid #b9c6d2;background:#fff;color:#234f7a;border-radius:12px;padding:9px 16px;font-size:14px;cursor:pointer}.kxreview .ok{background:#1b7f3b;color:#fff;border-color:#1b7f3b}.kxreview .no{background:#c0392b;color:#fff;border-color:#c0392b}.kxreview .show{background:#2b6ef2;color:#fff;border-color:#2b6ef2}html.theme-dark .kxreview .card{background:#151b24;color:#e6e9ef}html.theme-dark .kxreview .w{color:#9fc3ff}html.theme-dark .kxreview .c{color:#dbe3ee}';
+
+  function startReview(list) {
+    var words = (list && list.length) ? list : BOOK;
+    if (!words.length) { alert('生词本为空'); return; }
+    if (!document.getElementById('kxRvwCSS')) { var _s = document.createElement('style'); _s.id = 'kxRvwCSS'; _s.textContent = KX_RVW_CSS; document.head.appendChild(_s); }
+    var queue = words.slice(), i;
+    for (i = queue.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = queue[i]; queue[i] = queue[j]; queue[j] = t; }
+    var idx = 0, ok = 0, no = 0, unknown = [];
+    var ov = document.createElement('div'); ov.className = 'kxreview';
+    ov.innerHTML = '<div class="card"><div class="head"><span id="kxrProg"></span><button class="cl">✕</button></div><div class="body"></div><div class="bar"></div></div>';
+    document.body.appendChild(ov);
+    var body = ov.querySelector('.body'), bar = ov.querySelector('.bar');
+    function done() {
+      body.innerHTML = '<div class="w">完成 🎉</div><div class="c">认识 ' + ok + ' · 不认识 ' + no + '</div>';
+      bar.innerHTML = '';
+      if (unknown.length) { var rb = document.createElement('button'); rb.className = 'show'; rb.textContent = '再练不认识(' + unknown.length + ')'; rb.onclick = function () { ov.remove(); startReview(unknown); }; bar.appendChild(rb); }
+      var cb = document.createElement('button'); cb.textContent = '关闭'; cb.onclick = function () { ov.remove(); }; bar.appendChild(cb);
+    }
+    function showCard() {
+      if (idx >= queue.length) { done(); return; }
+      var e = queue[idx];
+      ov.querySelector('#kxrProg').textContent = '卡片 ' + (idx + 1) + '/' + queue.length + ' · 认识 ' + ok + ' · 不认识 ' + no;
+      body.innerHTML = '<div class="w">' + esc(e.w) + '</div>' + (e.ipa ? '<div class="p">[' + esc(e.ipa) + ']</div>' : '') + '<div class="c" id="kxrAns" style="visibility:hidden">' + esc(e.cn || '') + '</div>';
+      bar.innerHTML = '';
+      var sb = document.createElement('button'); sb.className = 'show'; sb.textContent = '显示答案'; sb.onclick = function () { var a = body.querySelector('#kxrAns'); if (a) a.style.visibility = 'visible'; sb.disabled = true; };
+      var okb = document.createElement('button'); okb.className = 'ok'; okb.textContent = '认识 ✓'; okb.onclick = function () { ok++; idx++; showCard(); };
+      var nob = document.createElement('button'); nob.className = 'no'; nob.textContent = '不认识 ✗'; nob.onclick = function () { no++; unknown.push(queue[idx]); idx++; showCard(); };
+      bar.appendChild(sb); bar.appendChild(okb); bar.appendChild(nob);
+    }
+    ov.querySelector('.cl').onclick = function () { ov.remove(); };
+    showCard();
   }
 
   var pop = null;
