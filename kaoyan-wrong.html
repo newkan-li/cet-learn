@@ -25,6 +25,16 @@ a.back{color:var(--blue);text-decoration:none;font-size:14px}
 html.theme-dark{--ink:#e6e9ef;--sub:#a9b2c0;--line:#2c3442;--bg:#0f1319;--card:#151b24}
 html.theme-dark .tools button,html.theme-dark .tools select,html.theme-dark .q .bar button{background:#1a212b;color:#dbe3ee;border-color:#2c3442}
 @media print{.tools,a.back{display:none}}
+.kxreview{position:fixed;inset:0;z-index:9999;background:rgba(15,22,35,.72);display:flex;align-items:center;justify-content:center;padding:16px}
+.kxreview .card{background:#fff;border-radius:16px;max-width:640px;width:100%;min-height:300px;padding:16px 18px;box-shadow:0 16px 50px rgba(0,0,0,.4);display:flex;flex-direction:column}
+.kxreview .head{display:flex;justify-content:space-between;color:#6b7280;font-size:13px}
+.kxreview .body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:10px}
+.kxreview .q{font-size:18px;font-weight:600;color:#123a6b;line-height:1.6}
+.kxreview .a{font-size:16px;color:#2c3038;margin-top:6px}.kxreview .a b{color:#1b7f3b}
+.kxreview .bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.kxreview button{border:1px solid #b9c6d2;background:#fff;color:#234f7a;border-radius:12px;padding:9px 16px;font-size:14px;cursor:pointer}
+.kxreview .ok{background:#1b7f3b;color:#fff;border-color:#1b7f3b}.kxreview .no{background:#c0392b;color:#fff;border-color:#c0392b}.kxreview .show{background:#2b6ef2;color:#fff;border-color:#2b6ef2}
+html.theme-dark .kxreview .card{background:#151b24;color:#e6e9ef}html.theme-dark .kxreview .q{color:#9fc3ff}html.theme-dark .kxreview .a{color:#dbe3ee}
 </style></head><body><div class="wrap">
 <h1>📕 错题本</h1>
 <p class="lead">自动收录你在全站做错的题（四级 / 真题精讲 / 阅读100篇 / 考虫 / 专项练习）。可标记「已掌握」、按模块筛选、导出复习。</p>
@@ -36,6 +46,7 @@ html.theme-dark .tools button,html.theme-dark .tools select,html.theme-dark .q .
  <button class="f" data-f="mastered">已掌握</button>
  <select id="mod"><option value="">全部模块</option></select>
  <span style="flex:1"></span>
+ <button id="rvw">🔁 卡片复习</button>
  <button id="expTxt">导出 txt</button>
  <button id="expAnki">导出 Anki</button>
  <button id="clrMaster" class="danger">清除已掌握标记</button>
@@ -118,6 +129,34 @@ document.getElementById('expAnki').onclick=function(){
  var rows=wrong.map(function(e){return (e.stem||e.key).replace(/\t/g,' ')+'\t'+(e.mod||'')+' 正确:'+e.ans+' ｜ 我的:'+e.my;});
  dl('错题本-Anki.txt',rows.join('\n'),'text/tab-separated-values');
 };
+var KXRVW_CSS=1;
+function startReview(){
+ var list=wrong.filter(function(e){return !MASTER[e.key];});
+ if(!list.length){alert('没有待复习的错题');return;}
+ var queue=list.slice(),i;for(i=queue.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=queue[i];queue[i]=queue[j];queue[j]=t;}
+ var idx=0,ok=0,no=0,bad=[];
+ var ov=document.createElement('div');ov.className='kxreview';
+ ov.innerHTML='<div class="card"><div class="head"><span id="kxrProg"></span><button class="cl">✕</button></div><div class="body"></div><div class="bar"></div></div>';
+ document.body.appendChild(ov);
+ var body=ov.querySelector('.body'),bar=ov.querySelector('.bar');
+ function done(){body.innerHTML='<div class="q">完成 🎉</div><div class="a">答对 '+ok+' · 答错 '+no+'</div>';bar.innerHTML='';
+   if(bad.length){var rb=document.createElement('button');rb.className='show';rb.textContent='再练答错('+bad.length+')';rb.onclick=function(){ov.remove();startReviewList(bad);};bar.appendChild(rb);}
+   var cb=document.createElement('button');cb.textContent='关闭';cb.onclick=function(){ov.remove();};bar.appendChild(cb);}
+ function show(){ if(idx>=queue.length){done();return;} var e=queue[idx];
+   ov.querySelector('#kxrProg').textContent='卡片 '+(idx+1)+'/'+queue.length+' · 对 '+ok+' · 错 '+no;
+   body.innerHTML='<div class="q">'+esc(e.stem||e.key)+'</div><div class="a" style="visibility:hidden" id="kxrA"><b>正确答案：'+esc(e.ans)+'</b>　你的答案：'+esc(e.my)+'</div>';
+   bar.innerHTML='';
+   var sb=document.createElement('button');sb.className='show';sb.textContent='显示答案';sb.onclick=function(){var a=body.querySelector('#kxrA');if(a)a.style.visibility='visible';sb.disabled=true;};
+   var ob=document.createElement('button');ob.className='ok';ob.textContent='答对了';ob.onclick=function(){ok++;idx++;show();};
+   var nb=document.createElement('button');nb.className='no';nb.textContent='仍答错';nb.onclick=function(){no++;bad.push(queue[idx]);idx++;show();};
+   var gb=document.createElement('button');gb.textContent='去原题';var lk=link(e);if(lk)gb.onclick=function(){location.href=lk;};else gb.style.display='none';
+   bar.appendChild(sb);bar.appendChild(ob);bar.appendChild(nb);bar.appendChild(gb);
+ }
+ function startReviewList(l){var save=wrong;wrong=l;startReview();wrong=save;}
+ ov.querySelector('.cl').onclick=function(){ov.remove();};show();
+}
+document.getElementById('rvw').onclick=startReview;
+
 render();
 </script>
 <script src="cet4-dict.js"></script>
