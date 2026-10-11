@@ -1437,35 +1437,49 @@ function startSession(){
  var fresh=tierWords('高').filter(function(w){return !bookOf(w);}).slice(0,need);
  var q=due.concat(fresh);
  if(!q.length){alert('今天没有待复习/新词任务了 🎉');return;}
- var i=0, ok=0, no=0;
+ var i=0, answered={};
+ var box=document.createElement('div'); document.body.appendChild(box);
+ function cnt(){var o=0,n=0;for(var k in answered){if(answered[k].correct)o++;else n++;}return {o:o,n:n};}
  function step(){
-  if(i>=q.length){alert('完成：'+q.length+' 词（对 '+ok+' / 错 '+no+'）');return;}
-  var w=q[i];
+  if(i<0)i=0; if(i>=q.length)i=q.length-1;
+  var w=q[i], v=D[w]||{}, c=cnt();
   var others=tierWords('高').filter(function(x){return x!==w;});
   var opts=[w];while(opts.length<4&&others.length){opts.push(others.splice(Math.floor(Math.random()*others.length),1)[0]);}
   opts.sort(function(){return Math.random()-0.5;});
-  var v=D[w]||{};
   var h='<div class="kymask"><div class="kycard"><h3>'+esc(w)+' <span class="ipa">'+esc(v.us||v.uk||'')+'</span></h3>'
-   +'<p class="hint">选择正确释义（'+(i+1)+'/'+q.length+'）</p>';
-  opts.forEach(function(o){h+='<button type="button" class="kyopt" data-pick="'+esc(o)+'" data-correct="'+esc(w)+'">'+esc(((D[o]||{}).cn||o).slice(0,50))+'</button>';});
-  h+='<div class="kybtns"><button type="button" data-skip="1">跳过</button></div></div></div>';
-  var box=document.createElement('div');box.innerHTML=h;document.body.appendChild(box);
-  box.addEventListener('click',function(ev){
-   var t=ev.target;
-   if(t.getAttribute&&t.getAttribute('data-pick')){
-    var pick=t.getAttribute('data-pick'); var correct=(pick===w);
-    var _ops=box.querySelectorAll('.kyopt');
-    _ops.forEach(function(b){b.classList.add('locked'); if(b.getAttribute('data-pick')===w)b.classList.add('ok');});
-    if(!correct)t.classList.add('no');
-    var _card=box.querySelector('.kycard');
-    if(_card){var fb=document.createElement('p');fb.className='kyfb';fb.textContent=correct?'✓ 正确':('✗ 正确答案：'+w+'（已加入生词本）');_card.appendChild(fb);}
-    if(!bookOf(w))addBook(w);
-    if(correct){ok++;grade(w,true);}else{no++;grade(w,false);}
-    Plan[today()]=(Plan[today()]||0)+(bookOf(w).lv<=1?1:0);persist();
-    setTimeout(function(){box.remove();i++;step();}, correct?550:1000);
-   } else if(t.getAttribute&&t.getAttribute('data-skip')){box.remove();i++;step();}
-  });
+   +'<p class="hint">选择正确释义（第 '+(i+1)+'/'+q.length+' 题 · 对 '+c.o+' · 错 '+c.n+'）</p>';
+  opts.forEach(function(o){h+='<button type="button" class="kyopt" data-pick="'+esc(o)+'">'+esc(((D[o]||{}).cn||o).slice(0,50))+'</button>';});
+  h+='<div class="kybtns"><button type="button" data-prev="1">← 上一个</button>'
+   +'<button type="button" data-next="1">下一个 →</button>'
+   +'<button type="button" data-skip="1">跳过</button>'
+   +'<button type="button" data-end="1">结束</button></div></div></div>';
+  box.innerHTML=h;
+  var card=box.querySelector('.kycard');
+  if(answered[i]){var rec=answered[i];
+   card.querySelectorAll('.kyopt').forEach(function(b){b.classList.add('locked');if(b.getAttribute('data-pick')===w)b.classList.add('ok');});
+   if(!rec.correct)card.querySelectorAll('.kyopt').forEach(function(b){if(b.getAttribute('data-pick')===rec.pick)b.classList.add('no');});
+   var fb=document.createElement('p');fb.className='kyfb';fb.textContent=rec.correct?'✓ 答对了':'✗ 答错了，正确答案：'+w+'（已加入生词本）';card.appendChild(fb);
+  }
+  var pv=box.querySelector('[data-prev]'); if(pv)pv.disabled=(i===0);
+  var nx=box.querySelector('[data-next]'); if(nx)nx.disabled=(i>=q.length-1);
  }
+ function finish(){var c=cnt();box.remove();alert('完成：共 '+q.length+' 题（对 '+c.o+' / 错 '+c.n+'）。答错的词已加入生词本/错词本 ✓');}
+ box.addEventListener('click',function(ev){
+  var t=ev.target; if(!t.getAttribute)return;
+  if(t.getAttribute('data-prev')){i--;step();return;}
+  if(t.getAttribute('data-next')){i++;step();return;}
+  if(t.getAttribute('data-skip')){i++;if(i>=q.length){finish();}else{step();}return;}
+  if(t.getAttribute('data-end')){finish();return;}
+  if(t.getAttribute('data-pick')){
+   if(answered[i])return;
+   var w=q[i], pick=t.getAttribute('data-pick'), correct=(pick===w);
+   if(!bookOf(w))addBook(w);
+   if(correct){grade(w,true);}else{grade(w,false);}
+   Plan[today()]=(Plan[today()]||0)+(bookOf(w).lv<=1?1:0);persist();
+   answered[i]={pick:pick,correct:correct};
+   step();
+  }
+ });
  step();
 }
 function render(){
