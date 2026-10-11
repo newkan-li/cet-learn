@@ -100,7 +100,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = KX_ANKI_BU
     export: function (book, opts) {
       opts = opts || {};
       return init().then(function (SQL) {
-        var bytes = buildApkg(SQL, book, opts.deck || '考研英语生词', opts.model || '英语生词');
+        var bytes = KX_ANKI_BUILD.buildApkg(SQL, book, opts.deck || '考研英语生词', opts.model || '英语生词');
         var blob = new Blob([bytes], { type: 'application/octet-stream' });
         var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
         a.download = opts.name || '英语生词.apkg'; document.body.appendChild(a); a.click();
