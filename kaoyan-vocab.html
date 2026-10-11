@@ -1436,7 +1436,13 @@ function startSession(){
  var need=Math.max(0,25-(Plan[today()]||0));
  var fresh=tierWords('高').filter(function(w){return !bookOf(w);}).slice(0,need);
  var q=due.concat(fresh);
- if(!q.length){alert('今天没有待复习/新词任务了 🎉');return;}
+ if(!q.length){
+  var moreNew=tierWords('高').filter(function(w){return !bookOf(w);});
+  if(moreNew.length){ q=moreNew.slice(0,25); }                 /* 今日目标已完成，继续学新词 */
+  else { q=Vbook.map(function(e){return e.w;}).slice(0,25); }  /* 没有新词了→复习已学 */
+  if(!q.length){ alert('词库都学完啦 🎉'); return; }
+  alert('今日25词目标已完成 🎉 继续加量：本次再练 '+q.length+' 个词（可在卡片里用「上一个/下一个」）。');
+ }
  var i=0, answered={};
  var box=document.createElement('div'); document.body.appendChild(box);
  function cnt(){var o=0,n=0;for(var k in answered){if(answered[k].correct)o++;else n++;}return {o:o,n:n};}
