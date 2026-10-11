@@ -146,7 +146,7 @@
         .catch(function (e) { alert('生成 Anki 失败：' + (e && e.message ? e.message : e)); });
     };
     if (window.KX_ANKI) { doExport(); return; }
-    var s = document.createElement('script'); s.src = 'anki_export.js';
+    var s = document.createElement('script'); s.src = 'anki_export.js?v=3';
     s.onload = doExport;
     s.onerror = function () { alert('加载 Anki 生成器失败（anki_export.js / sql-wasm.* 缺失）'); };
     document.head.appendChild(s);

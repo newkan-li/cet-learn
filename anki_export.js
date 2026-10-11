@@ -90,7 +90,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = KX_ANKI_BU
     SQLP = new Promise(function (res, rej) {
       function go() { window.initSqlJs({ locateFile: function (f) { return f; } }).then(res, rej); }
       if (window.initSqlJs) { go(); return; }
-      var s = document.createElement('script'); s.src = 'sql-wasm.js';
+      var s = document.createElement('script'); s.src = 'sql-wasm.js?v=3';
       s.onload = go; s.onerror = function () { rej(new Error('sql-wasm.js 加载失败')); };
       document.head.appendChild(s);
     });
@@ -100,7 +100,9 @@ if (typeof module !== 'undefined' && module.exports) module.exports = KX_ANKI_BU
     export: function (book, opts) {
       opts = opts || {};
       return init().then(function (SQL) {
-        var bytes = KX_ANKI_BUILD.buildApkg(SQL, book, opts.deck || '考研英语生词', opts.model || '英语生词');
+        var B = (typeof KX_ANKI_BUILD !== 'undefined') ? KX_ANKI_BUILD : window.KX_ANKI_BUILD;
+        if (!B || !B.buildApkg) throw new Error('anki 生成器未加载，请强制刷新（Ctrl+Shift+R）后重试');
+        var bytes = B.buildApkg(SQL, book, opts.deck || '考研英语生词', opts.model || '英语生词');
         var blob = new Blob([bytes], { type: 'application/octet-stream' });
         var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
         a.download = opts.name || '英语生词.apkg'; document.body.appendChild(a); a.click();
