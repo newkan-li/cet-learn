@@ -1403,7 +1403,8 @@ function list(){
   h.push('<button type="button" class="kytab'+(t===curTab?' on':'')+'" data-tab="'+t+'">'+lab+'</button>');
  });
  h.push('<input id="kySearch" placeholder="搜单词/释义" value="'+esc(q)+'">');
- h.push('<button type="button" id="kyStart">▶ 开始今日任务</button></div>');
+ h.push('<button type="button" id="kyStart">▶ 开始今日任务</button>');
+ h.push('<button type="button" id="kyFree" title="不设每日上限，学完为止">♾ 不限量</button></div>');
  h.push('<div class="kycount">共 '+all.length+' 词　第 '+(page+1)+'/'+pages+' 页</div>');
  h.push('<div class="kylist">');
  seg.forEach(function(w){
@@ -1431,9 +1432,9 @@ function card(w){
   +'<button type="button" data-del="'+esc(w)+'">移出生词本</button>'
   +'<button type="button" data-close="1">关闭</button></div></div></div>';
 }
-function startSession(){
+function startSession(limit){
  var due=Vbook.filter(function(e){return (e.due||0)<=Date.now();}).map(function(e){return e.w;});
- var need=Math.max(0,25-(Plan[today()]||0));
+ var need=(limit===0)?1e9:Math.max(0,25-(Plan[today()]||0));
  var fresh=tierWords('高').filter(function(w){return !bookOf(w);}).slice(0,need);
  var q=due.concat(fresh);
  if(!q.length){
@@ -1527,6 +1528,7 @@ function init(){
   var rv=t.getAttribute('data-reveal'); if(rv){var sp=document.querySelector('[data-ans="'+rv+'"]');if(sp)sp.style.display='inline';return;}
   var pg=t.getAttribute('data-pg'); if(pg){page+=parseInt(pg,10);render();return;}
   if(t.id==='kyStart'){startSession();return;}
+ if(t.id==='kyFree'){startSession(0);return;}
   var add=t.getAttribute('data-add'); if(add){addBook(add);alert('已加入生词本');render();return;}
   var ok=t.getAttribute('data-ok'); if(ok){grade(ok,true);alert('已记录：认识');render();return;}
   var no=t.getAttribute('data-no'); if(no){grade(no,false);alert('已记录：不认识（进错词本）');render();return;}
