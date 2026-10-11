@@ -188,3 +188,13 @@
   if(!document.getElementById('kxClozeCSS')){ var st=document.createElement('style'); st.id='kxClozeCSS'; st.textContent=CSS; document.head.appendChild(st); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',decorate); else decorate();
 })();
+
+/* ===== 手写画布：禁止触摸/Apple Pencil 写入时页面滚动 ===== */
+(function(){
+  try{
+    if(document.getElementById('kxCanvasCSS')) return;
+    var st=document.createElement('style'); st.id='kxCanvasCSS';
+    st.textContent='canvas[data-key],canvas.hwcanvas,.inlwc,.wbline,.pmshort,.pmow,.wb,.grfill{touch-action:none!important;-ms-touch-action:none!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}';
+    (document.head||document.documentElement).appendChild(st);
+  }catch(e){}
+})();
