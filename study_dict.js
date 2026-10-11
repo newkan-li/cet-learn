@@ -196,7 +196,9 @@
       if (idx >= queue.length) { done(); return; }
       var e = queue[idx];
       ov.querySelector('#kxrProg').textContent = '卡片 ' + (idx + 1) + '/' + queue.length + ' · 认识 ' + ok + ' · 不认识 ' + no;
-      body.innerHTML = '<div class="w">' + esc(e.w) + '</div>' + (e.ipa ? '<div class="p">[' + esc(e.ipa) + ']</div>' : '') + '<div class="c" id="kxrAns" style="visibility:hidden">' + esc(e.cn || '') + '</div>';
+      var _cn = e.cn || '';
+      body.innerHTML = '<div class="w">' + esc(e.w) + '</div>' + (e.ipa ? '<div class="p">[' + esc(e.ipa) + ']</div>' : '') + '<div class="c" id="kxrAns" style="visibility:hidden">' + (_cn ? esc(_cn) : '（显示答案后自动在线查询…）') + '</div>';
+      if (!_cn) { try { onlineWord(e.w, function (res) { var _a = body.querySelector('#kxrAns'); if (_a) _a.textContent = res.cn || '（在线未查到，可点词查）'; e.cn = res.cn || ''; try { save(); } catch (_e) {} }); } catch (_e) {} }
       bar.innerHTML = '';
       var sb = document.createElement('button'); sb.className = 'show'; sb.textContent = '显示答案'; sb.onclick = function () { var a = body.querySelector('#kxrAns'); if (a) a.style.visibility = 'visible'; sb.disabled = true; };
       var okb = document.createElement('button'); okb.className = 'ok'; okb.textContent = '认识 ✓'; okb.onclick = function () { ok++; idx++; showCard(); };
