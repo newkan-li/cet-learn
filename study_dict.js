@@ -122,7 +122,7 @@
       }
       h += '</ul>';
     }
-    h += '<div class="row"><button id="kxExp">导出 txt</button><button id="kxAnki">导出 Anki</button><button id="kxClr">清空</button></div>';
+    h += '<div class="row"><button id="kxExp">导出 txt</button><button id="kxAnki">生成 Anki(.apkg)</button><button id="kxClr">清空</button></div>';
     panel.innerHTML = h;
     panel.querySelector('.kxclose').onclick = function () { panel.style.display = 'none'; };
     panel.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { del(b.getAttribute('data-del')); renderPanel(); }; });
@@ -140,13 +140,16 @@
 
 
   function exportAnki() {
-    var rows = BOOK.map(function (b) {
-      var back = ((b.ipa ? b.ipa + ' ' : '') + (b.cn || '')).replace(/[\t\r\n]+/g, ' ').trim();
-      return b.w + '\t' + back;
-    });
-    var blob = new Blob([rows.join('\n')], { type: 'text/tab-separated-values;charset=utf-8' });
-    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '生词本-Anki.txt'; a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    if (!BOOK.length) { alert('生词本为空'); return; }
+    var doExport = function () {
+      window.KX_ANKI.export(BOOK, { deck: '英语生词本', model: '英语生词', name: '英语生词.apkg' })
+        .catch(function (e) { alert('生成 Anki 失败：' + (e && e.message ? e.message : e)); });
+    };
+    if (window.KX_ANKI) { doExport(); return; }
+    var s = document.createElement('script'); s.src = 'anki_export.js';
+    s.onload = doExport;
+    s.onerror = function () { alert('加载 Anki 生成器失败（anki_export.js / sql-wasm.* 缺失）'); };
+    document.head.appendChild(s);
   }
 
   var _wcache = {};
