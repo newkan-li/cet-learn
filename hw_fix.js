@@ -1,5 +1,9 @@
-/* 手写修复（iPadOS / Apple Pencil）：不再依赖 setPointerCapture，
-   改用 window 级 pointermove/up 跟踪整笔，抬笔后再落笔也能正常书写。
+/* 手写修复（iPadOS / Apple Pencil）：
+   - 弃用 setPointerCapture，改用 window 级 pointermove/up 跟踪整笔；
+   - 不在 pointerdown/move 里 preventDefault（避免 iPadOS 丢掉下一笔），
+     用非被动的 touchstart/touchmove 阻止滚动与系统菜单；
+   - 仅在整个 html 上临时禁选中（不动 touch-action，避免动态改动干扰下一笔）；
+   - 一笔内只认同一 pointerId；保存防抖合并，避免抬笔 toDataURL 卡住下一笔。
    覆盖：.wbline / .grfill / .inlwc / .pmshort / canvas.wc(.wb 板) / 全屏手写层。 */
 (function(){
  if(window.__hwFix)return;window.__hwFix=true;
@@ -18,7 +22,8 @@
  function cssInject(){
   if(document.getElementById('hwFixCSS'))return;
   var s=document.createElement('style');s.id='hwFixCSS';
-  s.textContent='html.hw-writing,html.hw-writing *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;touch-action:none!important}';
+  /* 仅禁选中与系统长按菜单；不改 touch-action（避免动态改动影响落笔） */
+  s.textContent='html.hw-writing,html.hw-writing *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}';
   document.head.appendChild(s);
  }
  function setWriting(on){
@@ -30,6 +35,12 @@
  function loc(c,ev){var r=c.getBoundingClientRect();var p=(ev.touches&&ev.touches[0])||ev;return{x:(p.clientX-r.left)*(c.width/r.width),y:(p.clientY-r.top)*(c.height/r.height)};}
  function erasing(){return (typeof ERASER!=='undefined')&&ERASER;}
  var act=null;
+ /* ---- 防抖合并保存：抬笔后 400ms 才写盘，且多笔合并，避免同步 toDataURL 阻塞下一笔 ---- */
+ var dirty=[],saveTimer=null;
+ function saveNow(c){var k=keyOf(c);if(!k)return;try{if(typeof wbSave==='function')wbSave(k,c);else localStorage.setItem(((typeof WBK!=='undefined'?WBK:'kxhw:')+k),c.toDataURL('image/jpeg',0.8));}catch(e){}}
+ function markDirty(c){if(dirty.indexOf(c)<0)dirty.push(c);}
+ function flushSave(){saveTimer=null;var list=dirty;dirty=[];for(var i=0;i<list.length;i++)saveNow(list[i]);}
+ function scheduleSave(){if(saveTimer)clearTimeout(saveTimer);saveTimer=setTimeout(flushSave,400);}
  function dot(ctx,x,y,w){
   try{
    if(erasing()){ctx.globalCompositeOperation='destination-out';ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=w;ctx.strokeStyle='rgba(0,0,0,1)';ctx.globalAlpha=1;ctx.beginPath();ctx.arc(x,y,w/2,0,6.2832);ctx.fill();}
@@ -55,32 +66,37 @@
    last=p;st.push([p.x,p.y]);}
  }
  function down(ev){var c=ev.target;if(!isWrite(c)||!ok(ev))return;
-  ev.stopImmediatePropagation();
+  ev.stopImmediatePropagation();      /* 阻止内置引擎重复绘制（不 preventDefault，避免丢下一笔） */
   setWriting(true);clearSel();killPopups();
   if(typeof pnHold==='function')pnHold(c,true);
   var st=c._st||c._wbst||(c._st=[]);
   if(st.length&&st[st.length-1]!==null)st.push(null);
-  act={c:c,st:st};
+  act={c:c,st:st,pid:(ev.pointerId!=null?ev.pointerId:null)};
   var p=loc(c,ev);st.push([p.x,p.y]);dot(c.getContext('2d'),p.x,p.y,((typeof pnW==='function')?pnW(ev):3));
   window.addEventListener('pointermove',move,true);
   window.addEventListener('pointerup',end,true);
   window.addEventListener('pointercancel',end,true);
-  try{ev.preventDefault();}catch(e){}
  }
- function move(ev){if(!act||!ok(ev))return;clearSel();paint(act.c,ev);try{ev.preventDefault();}catch(e){}}
- function end(ev){if(!act)return;var c=act.c;act=null;
+ function move(ev){if(!act)return;if(act.pid!=null&&ev.pointerId!=null&&ev.pointerId!==act.pid)return;clearSel();paint(act.c,ev);}
+ function end(ev){if(!act)return;if(act.pid!=null&&ev&&ev.pointerId!=null&&ev.pointerId!==act.pid)return;var c=act.c;act=null;
   window.removeEventListener('pointermove',move,true);
   window.removeEventListener('pointerup',end,true);
   window.removeEventListener('pointercancel',end,true);
   clearSel();
-  setTimeout(function(){if(!act){setWriting(false);clearSel();}},480);
+  setTimeout(function(){if(!act){setWriting(false);clearSel();}},360);
   if(typeof pnHold==='function')pnHold(c,false);
   if(typeof resetCtx==='function')resetCtx(c.getContext('2d'));
-  var k=keyOf(c);
-  if(k){try{if(typeof wbSave==='function')wbSave(k,c);else localStorage.setItem(((typeof WBK!=='undefined'?WBK:'kxhw:')+k),c.toDataURL('image/jpeg',0.8));}catch(e){}}
+  markDirty(c);scheduleSave();
  }
  cssInject();
+ /* 关闭内置引擎在每次落笔时的同步 toDataURL 快照（undo 用），避免卡住下一笔 */
+ try{if(typeof snapCap==='function')window.snapCap=function(){return null;};}catch(e){}
+ /* 非被动 touch 监听：阻止滚动与系统长按菜单（不在 pointer 事件里 preventDefault） */
+ document.addEventListener('touchstart',function(e){if(isWrite(e.target)){try{e.preventDefault();}catch(x){}}},{capture:true,passive:false});
+ document.addEventListener('touchmove',function(e){if(act){try{e.preventDefault();}catch(x){}}},{capture:true,passive:false});
  document.addEventListener('contextmenu',function(e){if(window.__hwWriting){try{e.preventDefault();}catch(x){}}},true);
  document.addEventListener('selectstart',function(e){if(window.__hwWriting){try{e.preventDefault();}catch(x){}}},true);
  document.addEventListener('pointerdown',down,true);
+ window.addEventListener('pagehide',function(){if(saveTimer){clearTimeout(saveTimer);flushSave();}});
+ document.addEventListener('visibilitychange',function(){if(document.hidden&&saveTimer){clearTimeout(saveTimer);flushSave();}});
 })();
