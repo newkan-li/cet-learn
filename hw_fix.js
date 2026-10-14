@@ -18,7 +18,9 @@
   return false;
  }
  function keyOf(c){var k=c.getAttribute('data-key');if(k)return k;var p=c.closest&&(c.closest('.wb')||c.closest('.wbsheet'));return p?p.getAttribute('data-key'):null;}
- function ok(ev){return !!(ev&&ev.pointerType&&(ev.pointerType==='pen'||ev.pointerType==='mouse'||(window.FINGER_DRAW&&ev.pointerType==='touch')));}
+ function ok(ev){var pt=ev&&ev.pointerType; if(pt==='touch'&&Date.now()-__hwPenT<5000)return false; return !!(pt==='pen'||pt==='mouse'||(window.FINGER_DRAW&&pt==='touch'));}
+ var __hwPenT=0;
+ document.addEventListener('pointerdown',function(e){if(e.pointerType==='pen')__hwPenT=Date.now();},true);
  function cssInject(){
   if(document.getElementById('hwFixCSS'))return;
   var s=document.createElement('style');s.id='hwFixCSS';
@@ -38,10 +40,29 @@
  var act=null;
  /* ---- 防抖合并保存：抬笔后 400ms 才写盘，且多笔合并，避免同步 toDataURL 阻塞下一笔 ---- */
  var dirty=[],saveTimer=null;
- function saveNow(c){var k=keyOf(c);if(!k)return;try{if(typeof wbSave==='function')wbSave(k,c);else localStorage.setItem(((typeof WBK!=='undefined'?WBK:'kxhw:')+k),c.toDataURL('image/jpeg',0.8));}catch(e){}}
+ function saveNow(c){var k=keyOf(c);if(!k)return;try{if(typeof wbSave==='function')wbSave(k,c);else localStorage.setItem(((typeof WBK!=='undefined'?WBK:'kxhw:')+k),c.toDataURL('image/jpeg',0.8));}catch(e){try{if(window.__hwQuotaWarn!==1&&String(e&&e.name).indexOf('Quota')>=0){window.__hwQuotaWarn=1;alert('本机存储已满：手写可能无法保存。请导出/清理后可继续（生词本里有「导出手写作品」）。');}}catch(x){}}}
  function markDirty(c){if(dirty.indexOf(c)<0)dirty.push(c);}
  function flushSave(){saveTimer=null;var list=dirty;dirty=[];for(var i=0;i<list.length;i++)saveNow(list[i]);}
  function scheduleSave(){if(saveTimer)clearTimeout(saveTimer);saveTimer=setTimeout(flushSave,400);}
+ /* ---- 会话内矢量撤销/重做：保留已恢复的底图，仅撤销本次新写的笔画 ---- */
+ function hwVecEnsure(c){if(c._hwVec)return;c._hwVec=[];c._hwRedo=[];try{c._hwBase=c.toDataURL('image/png');}catch(e){c._hwBase=null;}}
+ function hwVecRedraw(c){
+  var dpr=window.devicePixelRatio||1;var r=c.getBoundingClientRect();if(!r.width)return;
+  var w=Math.max(1,Math.round(r.width*dpr)),h=Math.max(1,Math.round(r.height*dpr));
+  if(c.width!==w||c.height!==h){c.width=w;c.height=h;}
+  var ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,r.width,r.height);
+  function vec(){(c._hwVec||[]).forEach(function(s){ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.strokeStyle='#123a6b';ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=s.w||2;ctx.beginPath();var pts=s.pts||[];for(var i=0;i<pts.length;i++){var x=pts[i][0]*r.width,y=pts[i][1]*r.height;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();});}
+  if(c._hwBase){var im=c._hwImg;if(!im){im=new Image();im.onload=function(){c._hwImg=im;hwVecRedraw(c);};im.src=c._hwBase;return;}try{ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.drawImage(im,0,0,r.width,r.height);}catch(e){}}
+  vec();
+ }
+ function hwUndo(redo){
+  var c=window._hwLast;if(!c||!c._hwVec)return;
+  if(redo){if(c._hwRedo&&c._hwRedo.length){c._hwVec.push(c._hwRedo.pop());hwVecRedraw(c);markDirty(c);scheduleSave();}return;}
+  if(!c._hwVec.length)return;c._hwRedo=c._hwRedo||[];c._hwRedo.push(c._hwVec.pop());hwVecRedraw(c);markDirty(c);scheduleSave();
+ }
+ window.__hwUndo=hwUndo;
+ document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('#inkundo,#inkredo');if(!b)return;e.preventDefault();e.stopImmediatePropagation();hwUndo(b.id==='inkredo');},true);
+ document.addEventListener('keydown',function(e){if(!(e.ctrlKey||e.metaKey))return;var k=(e.key||'').toLowerCase();if(k!=='z'||!window._hwLast)return;e.preventDefault();hwUndo(!!e.shiftKey);},true);
  function dot(ctx,x,y,w){
   try{
    if(erasing()){ctx.globalCompositeOperation='destination-out';ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=w;ctx.strokeStyle='rgba(0,0,0,1)';ctx.globalAlpha=1;ctx.beginPath();ctx.arc(x,y,w/2,0,6.2832);ctx.fill();}
@@ -64,7 +85,7 @@
   var st=act.st,last=st.length?st[st.length-1]:null;
   for(var i=0;i<evs.length;i++){var p=locA(act,evs[i]);
    if(last&&last.length===2)line(ctx,last[0],last[1],p.x,p.y,w);else dot(ctx,p.x,p.y,w);
-   last=p;st.push([p.x,p.y]);}
+   last=p;st.push([p.x,p.y]);if(act.pts)act.pts.push([p.x/act.cw,p.y/act.ch]);}
  }
  function down(ev){var c=ev.target;if(!isWrite(c)||!ok(ev))return;
   ev.stopImmediatePropagation();      /* 阻止内置引擎重复绘制（不 preventDefault，避免丢下一笔） */
@@ -75,12 +96,13 @@
   var r=c.getBoundingClientRect();
   act={c:c,st:st,pid:(ev.pointerId!=null?ev.pointerId:null),rect:r,cw:c.width,ch:c.height,dh:r.height};
   var p=locA(act,ev);st.push([p.x,p.y]);dot(c.getContext('2d'),p.x,p.y,((typeof pnW==='function')?pnW(ev):3));
+  hwVecEnsure(c);window._hwLast=c;act.pts=[[p.x/act.cw,p.y/act.ch]];act.w=((typeof pnW==='function')?pnW(ev):3);
   window.addEventListener('pointermove',move,true);
   window.addEventListener('pointerup',end,true);
   window.addEventListener('pointercancel',end,true);
  }
  function move(ev){if(!act)return;if(act.pid!=null&&ev.pointerId!=null&&ev.pointerId!==act.pid)return;paint(act.c,ev);}
- function end(ev){if(!act)return;if(act.pid!=null&&ev&&ev.pointerId!=null&&ev.pointerId!==act.pid)return;var c=act.c;act=null;
+ function end(ev){if(!act)return;if(act.pid!=null&&ev&&ev.pointerId!=null&&ev.pointerId!==act.pid)return;var c=act.c;if(act.pts&&act.pts.length&&c._hwVec)c._hwVec.push({w:act.w,pts:act.pts});act=null;
   window.removeEventListener('pointermove',move,true);
   window.removeEventListener('pointerup',end,true);
   window.removeEventListener('pointercancel',end,true);
@@ -91,7 +113,7 @@
   markDirty(c);scheduleSave();
  }
  cssInject();
- /* 关闭内置引擎在每次落笔时的同步 toDataURL 快照（undo 用），避免卡住下一笔 */
+ /* 内置快照撤销是死代码（被同名 doUndo 覆盖），这里关掉它的同步 toDataURL，改用下方矢量撤销 */
  try{if(typeof snapCap==='function')window.snapCap=function(){return null;};}catch(e){}
  /* 非被动 touch 监听：阻止滚动与系统长按菜单（不在 pointer 事件里 preventDefault） */
  document.addEventListener('touchstart',function(e){if(isWrite(e.target)){try{e.preventDefault();}catch(x){}}},{capture:true,passive:false});
