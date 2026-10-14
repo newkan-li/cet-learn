@@ -51,7 +51,7 @@
   var w=Math.max(1,Math.round(r.width*dpr)),h=Math.max(1,Math.round(r.height*dpr));
   if(c.width!==w||c.height!==h){c.width=w;c.height=h;}
   var ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,r.width,r.height);
-  function vec(){(c._hwVec||[]).forEach(function(s){ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.strokeStyle='#123a6b';ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=s.w||2;ctx.beginPath();var pts=s.pts||[];for(var i=0;i<pts.length;i++){var x=pts[i][0]*r.width,y=pts[i][1]*r.height;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();});}
+  function vec(){(c._hwVec||[]).forEach(function(s){ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.strokeStyle='#123a6b';ctx.lineCap='round';ctx.lineJoin='round';var pts=s.pts||[];if(!pts.length)return;if(pts.length===1){ctx.lineWidth=(pts[0][2]||2);ctx.beginPath();ctx.arc(pts[0][0]*r.width,pts[0][1]*r.height,(pts[0][2]||2)/2,0,7);ctx.fill();return;}for(var i=1;i<pts.length;i++){var a=pts[i-1],b=pts[i];ctx.lineWidth=(((a[2]||2)+(b[2]||2))/2);ctx.beginPath();ctx.moveTo(a[0]*r.width,a[1]*r.height);ctx.lineTo(b[0]*r.width,b[1]*r.height);ctx.stroke();}});}
   if(c._hwBase){var im=c._hwImg;if(!im){im=new Image();im.onload=function(){c._hwImg=im;hwVecRedraw(c);};im.src=c._hwBase;return;}try{ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.drawImage(im,0,0,r.width,r.height);}catch(e){}}
   vec();
  }
@@ -85,7 +85,7 @@
   var st=act.st,last=st.length?st[st.length-1]:null;
   for(var i=0;i<evs.length;i++){var p=locA(act,evs[i]);
    if(last&&last.length===2)line(ctx,last[0],last[1],p.x,p.y,w);else dot(ctx,p.x,p.y,w);
-   last=p;st.push([p.x,p.y]);if(act.pts)act.pts.push([p.x/act.cw,p.y/act.ch]);}
+   last=p;st.push([p.x,p.y]);if(act.pts)act.pts.push([p.x/act.cw,p.y/act.ch,w]);}
  }
  function down(ev){var c=ev.target;if(!isWrite(c)||!ok(ev))return;
   ev.stopImmediatePropagation();      /* 阻止内置引擎重复绘制（不 preventDefault，避免丢下一笔） */
@@ -96,7 +96,7 @@
   var r=c.getBoundingClientRect();
   act={c:c,st:st,pid:(ev.pointerId!=null?ev.pointerId:null),rect:r,cw:c.width,ch:c.height,dh:r.height};
   var p=locA(act,ev);st.push([p.x,p.y]);dot(c.getContext('2d'),p.x,p.y,((typeof pnW==='function')?pnW(ev):3));
-  hwVecEnsure(c);window._hwLast=c;act.pts=[[p.x/act.cw,p.y/act.ch]];act.w=((typeof pnW==='function')?pnW(ev):3);
+  hwVecEnsure(c);window._hwLast=c;act.w=((typeof pnW==='function')?pnW(ev):3);act.pts=[[p.x/act.cw,p.y/act.ch,act.w]];
   window.addEventListener('pointermove',move,true);
   window.addEventListener('pointerup',end,true);
   window.addEventListener('pointercancel',end,true);
