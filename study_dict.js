@@ -262,6 +262,7 @@
     return w;
   }
   document.addEventListener('click', function (e) {
+    if (window.__hwWriting) return;   /* 正在手写：不弹点词翻译 */
     if (e.target.closest('button,a,input,textarea,summary,label,canvas,#kxpanel,.kxpop,.kxfab')) return;
     var w = wordAt(e.clientX, e.clientY); if (!w) return;
     var d = lookup(w);

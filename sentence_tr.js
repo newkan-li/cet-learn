@@ -87,6 +87,7 @@
   function short(s) { s = String(s).replace(/\s+/g, ' ').trim(); return s.length > 110 ? s.slice(0, 110) + '…' : s; }
 
   function checkSel() {
+    if (window.__hwWriting) return;   /* 正在手写：不弹选句翻译 */
     if (document.getElementById('kxstpop')) return;   /* 译文已打开时不再弹按钮，避免闪烁 */
     var sel = window.getSelection(); if (!sel || sel.isCollapsed) return;
     var txt = sel.toString().trim();
