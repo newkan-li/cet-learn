@@ -811,19 +811,22 @@ function apRender(){
  chunk.forEach(function(pr,ii){
    var gi=st+ii;var w=String(pr[0]||'');var c=String(pr[1]||'');
    var k=keyp+'_'+(AP.mode==='e'?'e':'c')+'_'+gi;
-   var lbl=AP.mode==='e'?( (gi+1)+'. '+w+'（英）' ):( (gi+1)+'. '+c+'（汉）' );
-   html+='<div class="wline"><span class="wlnum">'+esc2(lbl)+'</span>'
-        +'<canvas class="wbline" data-key="'+esc2(k)+'" width="1000" height="200"></canvas></div>';
+   var pr2=AP.mode==='e'?((gi+1)+'. '+w):((gi+1)+'. '+c);
+   var an=AP.mode==='e'?c:w;
+   html+='<div class="wb" data-key="'+esc2(k)+'"><p class="wprompt">'+esc2(pr2)+'</p>'
+        +'<canvas class="wc" width="1200" height="240"></canvas>'
+        +'<div class="wbtool"><button type="button" data-act="clear">清空</button><button type="button" data-act="reveal">显示答案</button></div>'
+        +'<details class="sol wans"><summary>答案</summary><p>'+esc2(an)+'</p></details></div>';
  });
  box.innerHTML=html;
  var lab=document.getElementById('apPage');
  if(lab)lab.textContent='第 '+(AP.page+1)+'/'+pages+' 页（共 '+total+' 词）';
- box.querySelectorAll('canvas[data-key]').forEach(function(c){bindWBLine(c);wbRestoreLine(c);});
+ box.querySelectorAll('.wb').forEach(function(wb){wbInitBoard(wb);});
+ wbRestoreAll();
 }
 function apMode(m){AP.mode=m;AP.page=0;apRender();}
 function apNav(d){AP.page+=d;apRender();}
-function apClear(){var box=document.getElementById('apsheet');if(!box)return;var ns=box.querySelectorAll('canvas[data-key]');ns.forEach(function(c){wbErase(c.getAttribute('data-key'),c);});}
-function apInit(){
+function apClear(){var box=document.getElementById('apsheet');if(!box)return;box.querySelectorAll('.wb').forEach(function(wb){var k=wb.getAttribute('data-key');var c=wb.querySelector('canvas.wc');if(k&&c)wbErase(k,c);});}function apInit(){
  var bar=document.getElementById('apbar');
  if(!bar||!document.getElementById('apsheet'))return;
  apRender();
