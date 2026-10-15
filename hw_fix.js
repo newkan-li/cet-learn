@@ -40,21 +40,38 @@
  var act=null;
  /* ---- 防抖合并保存：抬笔后 400ms 才写盘，且多笔合并，避免同步 toDataURL 阻塞下一笔 ---- */
  var dirty=[],saveTimer=null;
- function saveNow(c){var k=keyOf(c);if(!k)return;try{if(typeof wbSave==='function')wbSave(k,c);else localStorage.setItem(((typeof WBK!=='undefined'?WBK:'kxhw:')+k),c.toDataURL('image/jpeg',0.8));}catch(e){try{if(window.__hwQuotaWarn!==1&&String(e&&e.name).indexOf('Quota')>=0){window.__hwQuotaWarn=1;alert('本机存储已满：手写可能无法保存。请导出/清理后可继续（生词本里有「导出手写作品」）。');}}catch(x){}}}
+ function saveNow(c){var k=keyOf(c);if(!k)return;try{if(typeof wbSave==='function')wbSave(k,c);else hwSaveCanvas(c);}catch(e){quotaWarn();}}
  function markDirty(c){if(dirty.indexOf(c)<0)dirty.push(c);}
  function flushSave(){saveTimer=null;var list=dirty;dirty=[];for(var i=0;i<list.length;i++)saveNow(list[i]);}
  function scheduleSave(){if(saveTimer)clearTimeout(saveTimer);saveTimer=setTimeout(flushSave,400);}
- /* ---- 会话内矢量撤销/重做：保留已恢复的底图，仅撤销本次新写的笔画 ---- */
- function hwVecEnsure(c){if(c._hwVec)return;c._hwVec=[];c._hwRedo=[];try{c._hwBase=c.toDataURL('image/png');}catch(e){c._hwBase=null;}}
+ /* ---- 矢量存储（体积小、无配额压力）：键值 = JSON {v:2,b:底图,s:笔画}；旧位图自动兼容 ---- */
+ function storeKey(k){return (typeof WBK!=='undefined'?WBK:'wbcanvas:')+k;}
+ function quotaWarn(){if(window.__hwQuotaWarn)return;window.__hwQuotaWarn=1;try{alert('本机存储已满：手写可能无法保存。请到「生词本」里「导出手写作品」备份后清理部分手写，再继续。');}catch(e){}}
+ function hwVecEnsure(c){if(c._hwVec)return;c._hwVec=[];c._hwRedo=[];}
  function hwVecRedraw(c){
-  var dpr=window.devicePixelRatio||1;var r=c.getBoundingClientRect();if(!r.width)return;
-  var w=Math.max(1,Math.round(r.width*dpr)),h=Math.max(1,Math.round(r.height*dpr));
-  if(c.width!==w||c.height!==h){c.width=w;c.height=h;}
-  var ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,r.width,r.height);
-  function vec(){(c._hwVec||[]).forEach(function(s){var pts=s.pts||[];if(!pts.length)return;ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.strokeStyle='#123a6b';ctx.lineCap='round';ctx.lineJoin='round';if(pts.length===1){ctx.lineWidth=(pts[0][2]||2);ctx.beginPath();ctx.arc(pts[0][0]*r.width,pts[0][1]*r.height,(pts[0][2]||2)/2,0,7);ctx.fill();return;}for(var i=0;i<pts.length-2;i++){var a=pts[i],b=pts[i+1],cc=pts[i+2];var m1x=(a[0]+b[0])/2*r.width,m1y=(a[1]+b[1])/2*r.height,m2x=(b[0]+cc[0])/2*r.width,m2y=(b[1]+cc[1])/2*r.height;ctx.lineWidth=(b[2]||2);ctx.beginPath();ctx.moveTo(m1x,m1y);ctx.quadraticCurveTo(b[0]*r.width,b[1]*r.height,m2x,m2y);ctx.stroke();}var a2=pts[pts.length-2],b2=pts[pts.length-1];var mx=(a2[0]+b2[0])/2*r.width,my=(a2[1]+b2[1])/2*r.height;ctx.lineWidth=(b2[2]||2);ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(b2[0]*r.width,b2[1]*r.height);ctx.stroke();});}
-  if(c._hwBase){var im=c._hwImg;if(!im){im=new Image();im.onload=function(){c._hwImg=im;hwVecRedraw(c);};im.src=c._hwBase;return;}try{ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.drawImage(im,0,0,r.width,r.height);}catch(e){}}
+  var CW=c.width||600,CH=c.height||200;var ctx=c.getContext('2d');if(!ctx)return;
+  ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,CW,CH);
+  function vec(){(c._hwVec||[]).forEach(function(s){var pts=s.pts||[];if(!pts.length)return;ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.strokeStyle='#123a6b';ctx.lineCap='round';ctx.lineJoin='round';if(pts.length===1){ctx.lineWidth=(pts[0][2]||2);ctx.beginPath();ctx.arc(pts[0][0]*CW,pts[0][1]*CH,(pts[0][2]||2)/2,0,7);ctx.fill();return;}for(var i=0;i<pts.length-2;i++){var a=pts[i],b=pts[i+1],cc=pts[i+2];var m1x=(a[0]+b[0])/2*CW,m1y=(a[1]+b[1])/2*CH,m2x=(b[0]+cc[0])/2*CW,m2y=(b[1]+cc[1])/2*CH;ctx.lineWidth=(b[2]||2);ctx.beginPath();ctx.moveTo(m1x,m1y);ctx.quadraticCurveTo(b[0]*CW,b[1]*CH,m2x,m2y);ctx.stroke();}var a2=pts[pts.length-2],b2=pts[pts.length-1];var mx=(a2[0]+b2[0])/2*CW,my=(a2[1]+b2[1])/2*CH;ctx.lineWidth=(b2[2]||2);ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(b2[0]*CW,b2[1]*CH);ctx.stroke();});}
+  if(c._hwBase){var im=c._hwImg;if(!im){im=new Image();im.onload=function(){c._hwImg=im;hwVecRedraw(c);};im.src=c._hwBase;return;}try{ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.drawImage(im,0,0,CW,CH);}catch(e){}}
   vec();
  }
+ function hwSaveCanvas(c){
+  var k=keyOf(c);if(!k)return;var val;
+  if(c._hwVec||c._hwBase!==undefined){ val=JSON.stringify({v:2,b:(c._hwBase||''),s:(c._hwVec||[])}); }
+  else{ try{var tmp=document.createElement('canvas');var dw=600;tmp.width=dw;tmp.height=Math.max(1,Math.round(c.height*dw/c.width));var tc=tmp.getContext('2d');tc.fillStyle='#fffdf7';tc.fillRect(0,0,tmp.width,tmp.height);tc.drawImage(c,0,0,tmp.width,tmp.height);val=tmp.toDataURL('image/png');}catch(e){return;} }
+  try{localStorage.setItem(storeKey(k),val);}catch(e){quotaWarn();}
+ }
+ function hwRestoreCanvas(c){
+  var k=keyOf(c);if(!k)return;var raw=null;try{raw=localStorage.getItem(storeKey(k));}catch(e){}
+  if(!raw){c._hwVec=c._hwVec||[];c._hwRedo=c._hwRedo||[];return;}
+  if(raw.charAt(0)==='{'){try{var o=JSON.parse(raw);if(o&&o.v){c._hwVec=o.s||[];c._hwRedo=[];c._hwBase=o.b||'';c._hwImg=undefined;hwVecRedraw(c);return;}}catch(e){}}
+  c._hwVec=[];c._hwRedo=[];c._hwBase=raw;c._hwImg=undefined;hwVecRedraw(c);
+ }
+ /* ---- 覆盖内置栅格持久化：改存矢量（旧位图兼容读取） ---- */
+ try{window.wbSave=function(k,c){if(c)hwSaveCanvas(c);};}catch(e){}
+ try{window.wbRestoreLine=function(c){hwRestoreCanvas(c);};}catch(e){}
+ try{window.wbRestoreAll=function(){try{document.querySelectorAll('.wb').forEach(function(wb){var c=wb.querySelector('canvas.wc');if(c)hwRestoreCanvas(c);});}catch(e){}};}catch(e){}
+ try{window.commit=function(c){if(c)hwSaveCanvas(c);};}catch(e){}
  function hwUndo(redo){
   var c=window._hwLast;if(!c||!c._hwVec)return;
   if(redo){if(c._hwRedo&&c._hwRedo.length){c._hwVec.push(c._hwRedo.pop());hwVecRedraw(c);markDirty(c);scheduleSave();}return;}
