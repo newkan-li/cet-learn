@@ -46,7 +46,40 @@
  function scheduleSave(){if(saveTimer)clearTimeout(saveTimer);saveTimer=setTimeout(flushSave,400);}
  /* ---- 矢量存储（体积小、无配额压力）：键值 = JSON {v:2,b:底图,s:笔画}；旧位图自动兼容 ---- */
  function storeKey(k){return (typeof WBK!=='undefined'?WBK:'wbcanvas:')+k;}
- function quotaWarn(){if(window.__hwQuotaWarn)return;window.__hwQuotaWarn=1;try{alert('本机存储已满：手写可能无法保存。请到「生词本」里「导出手写作品」备份后清理部分手写，再继续。');}catch(e){}}
+ function hwClearAll(){
+  var pref=(typeof WBK!=='undefined'?WBK:'wbcanvas:'), dels=[];
+  try{for(var i=localStorage.length-1;i>=0;i--){var k=localStorage.key(i);if(k&&k.indexOf(pref)===0)dels.push(k);}}catch(e){}
+  var n=0;dels.forEach(function(k){try{localStorage.removeItem(k);n++;}catch(e){}});
+  /* 清空内存中的笔迹并重绘为空白 */
+  try{document.querySelectorAll('canvas').forEach(function(c){ if(c._hwVec||c._hwBase!==undefined){c._hwVec=[];c._hwRedo=[];c._hwBase='';c._hwImg=undefined;if(c._redraw)c._redraw();} });}catch(e){}
+  return n;
+ }
+ window.__hwClearAll=function(){return hwClearAll();};
+ function quotaWarn(){
+  if(window.__hwQuotaWarn)return;
+  window.__hwQuotaWarn=1;
+  try{
+   var box=document.createElement('div');
+   box.id='hwQuotaBox';
+   box.style.cssText='position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(15,22,35,.6);padding:16px';
+   box.innerHTML='<div style="background:#fff;border-radius:14px;max-width:430px;width:100%;padding:18px 20px;box-shadow:0 12px 40px rgba(0,0,0,.35);font-size:14px;line-height:1.75;color:#23303f">'
+    +'<h3 style="margin:0 0 6px;color:#c0392b">⚠️ 手写存储已满</h3>'
+    +'<p style="margin:0 0 12px">本机（Safari）存储空间已满，手写/生词可能无法继续保存。建议先<b>导出手写作品</b>备份，再<b>清除手写</b>释放空间。</p>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">'
+    +'<button id="hwqExp" type="button" style="border:1px solid #b9c6d2;background:#fff;color:#234f7a;border-radius:12px;padding:6px 14px;font-size:13px;cursor:pointer">💾 导出手写作品</button>'
+    +'<button id="hwqClr" type="button" style="border:none;background:#c0392b;color:#fff;border-radius:12px;padding:6px 14px;font-size:13px;cursor:pointer">🧹 清除手写</button>'
+    +'<button id="hwqNo" type="button" style="border:1px solid #b9c6d2;background:#fff;color:#234f7a;border-radius:12px;padding:6px 14px;font-size:13px;cursor:pointer">稍后</button>'
+    +'</div></div>';
+   document.body.appendChild(box);
+   var ex=document.getElementById('hwqExp'); if(ex)ex.onclick=function(){try{if(typeof wbExportAll==='function')wbExportAll();}catch(e){}};
+   var no=document.getElementById('hwqNo'); if(no)no.onclick=function(){box.remove();window.__hwQuotaWarn=0;};
+   var cl=document.getElementById('hwqClr'); if(cl)cl.onclick=function(){
+    if(!confirm('确定清除本机全部手写笔迹吗？此操作不可撤销（建议先「导出手写作品」备份）。'))return;
+    var n=hwClearAll(); box.remove(); window.__hwQuotaWarn=0;
+    try{alert('已清除手写 '+n+' 项，空间已释放，可继续书写。');}catch(e){}
+   };
+  }catch(e){ try{alert('本机存储已满：请到「生词本」里「导出手写作品」备份后清理手写，再继续。');}catch(x){} }
+ }
  function hwVecEnsure(c){if(c._hwVec)return;c._hwVec=[];c._hwRedo=[];}
  function hwVecRedraw(c){
   var CW=c.width||600,CH=c.height||200;var ctx=c.getContext('2d');if(!ctx)return;
