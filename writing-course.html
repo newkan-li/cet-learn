@@ -1,0 +1,470 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>英语写作系统教程 · A1–C1</title>
+<style>
+:root{--ink:#2c3038;--sub:#6b7280;--line:#e4ddcd;--bg:#f5f2ea;--card:#fffdf8;--blue:#2b6ef2;--red:#7a2a24;--grn:#1b7f3b;--hl:#fff8e1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.75}
+.wrap{max-width:920px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:24px;margin:0 0 4px}.lead{color:var(--sub);font-size:13.5px;margin:0 0 10px}
+a.back{color:var(--blue);text-decoration:none;font-size:14px}
+h2{font-size:19px;margin:26px 0 10px;border-left:5px solid var(--red);padding-left:10px}
+h3{font-size:16.5px;margin:0 0 6px}
+h4{font-size:14.5px;margin:16px 0 6px;color:#123a6b}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:13.5px}
+.tip{background:#eef4ff;border:1px solid #d6e4ff;border-radius:12px;padding:10px 14px;font-size:13.5px;margin:10px 0}
+.warn{background:#fff7e6;border:1px solid #e8d3a3;border-radius:12px;padding:10px 14px;font-size:13px;margin:10px 0}
+table.tbl{width:100%;border-collapse:collapse;font-size:13.5px;margin:6px 0}
+table.tbl th,table.tbl td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.tbl th{color:var(--sub);font-weight:600}
+.bar{position:sticky;top:0;z-index:50;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.bar .lv{border:1px solid var(--line);background:var(--card);color:#123a6b;border-radius:16px;padding:5px 14px;font-size:13px;cursor:pointer}
+.bar .lv.on{background:var(--red);color:#fff;border-color:var(--red)}
+.pbar{flex:1;min-width:120px;height:8px;background:#e7e0d2;border-radius:6px;overflow:hidden}
+.pbar i{display:block;height:100%;width:0;background:var(--grn);transition:width .3s}
+.unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
+.unit.done{border-color:#bfe3cc;box-shadow:0 0 0 2px #eaf6ee inset}
+.goal{color:#1b7f3b;font-size:13.5px;margin:2px 0 6px}
+.model{background:#fffdf7;border:1px dashed #d9cfb8;border-radius:10px;padding:8px 12px}
+.model p{text-indent:2em;margin:6px 0}
+.phr td:first-child{color:#123a6b}
+.err td:first-child{color:#c0392b;text-decoration:line-through}
+.err td:nth-child(2){color:#1b7f3b}
+.task{background:var(--hl);border:1px solid #ead9a0;border-radius:10px;padding:8px 12px;font-size:13.5px;margin:8px 0}
+textarea{width:100%;min-height:120px;border:1px solid #cdd8e6;border-radius:10px;padding:8px 10px;font-size:14px;line-height:1.7;font-family:inherit;background:#fff;color:#222}
+.tools{display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap;font-size:12.5px;color:var(--sub)}
+.tools button{border:1px solid var(--line);background:var(--card);color:#123a6b;border-radius:12px;padding:4px 12px;font-size:12.5px;cursor:pointer}
+.chk{list-style:none;margin:6px 0 0 0;padding:0}
+.chk li{margin:6px 0 6px 2px}
+.chk input{margin-right:6px;transform:scale(1.15)}
+.donebox{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;color:var(--sub);cursor:pointer}
+.tag{display:inline-block;font-size:11px;color:#fff;background:var(--grn);border-radius:10px;padding:1px 8px;margin-left:6px;vertical-align:middle}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.links a{background:var(--blue);color:#fff;text-decoration:none;border-radius:20px;padding:6px 14px;font-size:13px}
+html.theme-dark{--ink:#e6e9ef;--sub:#a9b2c0;--line:#2c3442;--bg:#0f1319;--card:#151b24}
+html.theme-dark .model{background:#12181f;border-color:#2c3442}
+html.theme-dark textarea{background:#12181f;color:#e6e9ef;border-color:#2c3442}
+html.theme-dark .tip{background:#16202b;border-color:#2a3342}
+html.theme-dark .warn{background:#2b2a1e;border-color:#4a4430}
+html.theme-dark .task{background:#2b2a1e;border-color:#4a4430}
+html.theme-dark .pbar{background:#2c3442}
+html[data-theme="sepia"] body{background:#f6efe0}
+@media print{.bar,.tools,.links{display:none!important}.unit{break-inside:avoid}}
+</style></head><body><div class="wrap">
+<h1>✍️ 英语写作系统教程 · A1–C1</h1>
+<p class="lead">按 CEFR 等级（A1→C1）从写对句子到写出论证文：结构框架 + 范文 + 常用句型 + 易错点 + 动手写 + 自查。点词可查义、划句可翻译；每篇写完可点「✍️ 作文批改」自评。</p>
+<div class="links"><a href="index.html">← 首页</a><a href="kaoyan-hub.html">考研资料中心</a><a href="kaoyan-tasks.html">任务清单</a><a href="kaoyan-stats.html">学习统计</a></div>
+
+<div class="tip"><b>怎么用：</b>① 选一个级别 → ② 先读「框架」知道每段写什么 → ③ 读范文并划句翻译 → ④ 背 3–5 个句型 → ⑤ 按 task 动手写 → ⑥ 用「自查清单」逐条核对。写完后点右下角「✍️ 作文批改」做词数/重复词/连接词检查。进度自动保存在本机。</div>
+
+<h2>写作四步法与评分维度</h2>
+<table class="tbl"><thead><tr><th>四步</th><th>做什么</th></tr></thead><tbody>
+<tr><td>① 审题</td><td>看体裁（邮件/议论/报告/书评）、读者（朋友/老师/公司）、要点（3–4 个），圈出关键词。</td></tr>
+<tr><td>② 列提纲</td><td>每段一个中心：开头点题 → 主体 2 段（理由/经历/建议）→ 结尾回应。</td></tr>
+<tr><td>③ 写初稿</td><td>先写短句保证语法对，再用连接词和从句把它们连起来。</td></tr>
+<tr><td>④ 检查</td><td>时态、主谓一致、单复数、冠词、拼写、标点；有没有漏要点。</td></tr>
+</tbody></table>
+<table class="tbl"><thead><tr><th>评分维度</th><th>高分做法</th></tr></thead><tbody>
+<tr><td>任务完成</td><td>要点全覆盖；体裁与语气对（正式/非正式）。</td></tr>
+<tr><td>连贯衔接</td><td>段落分明；用 however / therefore / for example / on the other hand 等过渡。</td></tr>
+<tr><td>词汇</td><td>准确优先，再求多样；避免一个词反复用。</td></tr>
+<tr><td>语法</td><td>句式有变化（简单句+从句+非谓语），错误少。</td></tr>
+</tbody></table>
+
+<h2>常用连接词速查</h2>
+<table class="tbl"><thead><tr><th>功能</th><th>表达</th></tr></thead><tbody>
+<tr><td>递进</td><td>firstly, secondly, moreover, in addition, what is more</td></tr>
+<tr><td>转折</td><td>however, nevertheless, on the other hand, although</td></tr>
+<tr><td>因果</td><td>because, since, therefore, as a result, consequently</td></tr>
+<tr><td>举例</td><td>for example, for instance, such as, namely</td></tr>
+<tr><td>总结</td><td>in conclusion, to sum up, overall, in short</td></tr>
+<tr><td>让步</td><td>admittedly, it is true that…, while…</td></tr>
+</tbody></table>
+<div class="warn"><b>常见中式英语：</b>“非常喜欢”别写 very like（→ like … very much / be fond of）；“我认为”别写 I think that… 连用太多（换 In my view / From my perspective）；“越来越多的人”用 more and more people 可以，但升级为 a growing number of people；避免“open the light”（→ turn on the light）、“learn knowledge”（→ acquire/gain knowledge）。</div>
+
+<div class="bar" id="bar">
+ <span style="font-size:13px;color:var(--sub)">级别：</span>
+ <button class="lv on" data-lv="all">全部</button>
+ <button class="lv" data-lv="A1">A1</button><button class="lv" data-lv="A2">A2</button><button class="lv" data-lv="B1">B1</button><button class="lv" data-lv="B2">B2</button><button class="lv" data-lv="C1">C1</button>
+ <span class="pbar"><i id="pfill"></i></span><span id="ptext" style="font-size:12.5px;color:var(--sub)">0/0</span>
+ <button class="lv" id="preset" title="清除本页进度">重置进度</button>
+</div>
+
+<div id="units"></div>
+
+<p class="lead" style="margin-top:24px">说明：本教程为本站原创，按 CEFR（A1–C1）写作能力描述自编，不复制 British Council 原文；范文与练习均为教学示例。若要更系统，可配合本站「真题精讲」的写作五步法与「错题本/学习统计」一起用。</p>
+</div>
+
+<script>
+var UNITS=[
+/* ================= A1 ================= */
+{lvl:'A1',id:'a1-1',title:'个人信息与表格（Personal information & forms）',
+ goal:'能用简单句写姓名、年龄、国家、职业、电话、爱好；能填常见表格并写一两句自我介绍。',
+ steps:['第1句：姓名 + 来自哪里','第2句：年龄/职业/学习','第3句：电话/邮箱','第4句：爱好'],
+ model:[
+  'My name is Li Hua. I am from China. I am twenty years old.',
+  'I am a student at a university in Beijing. I study English.',
+  'My phone number is 138-0000-0000. My email is lihua@example.com.',
+  'In my free time, I like reading and playing basketball.'
+ ],
+ phr:[['My name is …','我叫……'],['I am from …','我来自……'],['I am … years old.','我……岁。'],['I study / work at …','我在……学习/工作。'],['In my free time, I like …','空闲时我喜欢……'],['My phone number is …','我的电话是……']],
+ err:[['I am 20 years.','I am 20 years old.','years 后要加 old'],['I from China.','I am from China.','be 动词不能省'],['My hobby is play basketball.','My hobby is playing basketball.','is 后接动名词']],
+ task:'写 4–5 句介绍自己（姓名、城市、年龄、身份、爱好），并补一句电话或邮箱。',
+ chk:['每句都有主语和动词','be 动词没漏','年龄用了 years old','爱好用 -ing 或名词']
+},
+{lvl:'A1',id:'a1-2',title:'明信片与短消息（Postcard & text message）',
+ goal:'能用 3–5 句写明信片/短信：问候、我在哪、天气/活动、结尾。',
+ steps:['称呼/问候','我在哪里、和谁','天气或做了什么','一句感受','结尾'],
+ model:[
+  'Dear Tom,',
+  'I am in Hainan now. I am here with my family. The weather is sunny and warm.',
+  'Every day we swim in the sea and eat fresh fruit. I am very happy.',
+  'See you soon!',
+  'Li Hua'
+ ],
+ phr:[['I am in … now.','我现在在……'],['I am here with …','我和……在这里'],['The weather is …','天气……'],['Every day we …','每天我们……'],['See you soon!','回头见！']],
+ err:[['I very happy.','I am very happy.','形容词前要有 be'],['We swimming.','We are swimming.','现在进行时要有 be + -ing'],['The weather is sun.','The weather is sunny.','天气用形容词 sunny']],
+ task:'给朋友写一张 4–5 句的明信片：你在哪、天气、你做了什么、感受。',
+ chk:['有称呼和结尾','用了现在进行时或一般现在时','天气用了形容词','句子完整']
+},
+{lvl:'A1',id:'a1-3',title:'简单自我介绍（Introducing yourself）',
+ goal:'能用 5–6 句在课堂/聚会上介绍自己：基本信息、学习、兴趣、性格。',
+ steps:['基本信息','学习/工作','兴趣','性格','一句期待'],
+ model:[
+  'Hello, everyone. My name is Wang Fang, and I am from Chengdu.',
+  'I am a first-year student. I study computer science.',
+  'I like music and travel. On weekends, I often go hiking with my friends.',
+  'I am a quiet but friendly person. I hope we can be good friends. Thank you.'
+ ],
+ phr:[['Hello, everyone.','大家好。'],['I am a first-year student.','我是大一学生。'],['I like … and …','我喜欢……和……'],['I am a … person.','我是个……的人。'],['I hope we can be good friends.','希望我们能成为好朋友。']],
+ err:[['I am study computer science.','I study computer science.','study 是动词，前面不加 am'],['I like music and travel.','（正确）','like 后接名词/-ing 均可'],['I hope we are good friends.','I hope we can be good friends.','表达愿望用 can']],
+ task:'写一段 5–6 句的自我介绍，包含：姓名/城市、身份、两个爱好、性格、一句期待。',
+ chk:['信息完整（5 项都有）','动词形式正确','有连接词或顺序词','结尾有礼貌用语']
+},
+{lvl:'A1',id:'a1-4',title:'描述日常（My day / routine）',
+ goal:'能用一般现在时 + 频率副词描述一天：起床、上学/上班、活动、睡觉。',
+ steps:['时间顺序','用 first / then / after that','加频率副词','一句感受'],
+ model:[
+  'I usually get up at seven o’clock. I have breakfast and then go to school by bus.',
+  'In the morning, I have four classes. At noon, I have lunch with my classmates.',
+  'After that, I sometimes study in the library. In the evening, I do my homework and watch TV.',
+  'I go to bed at about eleven. I feel tired but happy.'
+ ],
+ phr:[['I usually … at …','我通常……点……'],['then / after that','然后'],['sometimes / often / always','有时/经常/总是'],['I go to bed at …','我……点睡觉'],['I feel …','我感到……']],
+ err:[['I get up at seven o’clock every day.','（正确）','时间表达：at + 点钟'],['Then I go to school by foot.','Then I go to school on foot.','步行是 on foot'],['I am go to bed at 11.','I go to bed at 11.','一般现在时不用 am']],
+ task:'写 6–8 句描述你的一天，按时间顺序，至少用 3 个频率副词。',
+ chk:['一般现在时','有 at + 时间','用了 first/then/after that','至少 3 个频率副词']
+},
+/* ================= A2 ================= */
+{lvl:'A2',id:'a2-1',title:'邀请与回复（Invitation & reply）',
+ goal:'能写简短邀请（时间、地点、活动）并礼貌接受或拒绝。',
+ steps:['开头说明目的','时间+地点+活动','期待回复','接受/拒绝 + 理由'],
+ model:[
+  'Hi Anna,',
+  'I am having a birthday party at my home this Saturday. It starts at 6 p.m.',
+  'We will have dinner and watch a movie. Would you like to come?',
+  'Please let me know before Friday.',
+  'Best wishes, Li Hua',
+  '— Reply —',
+  'Hi Li Hua, thank you for inviting me. I would love to come. See you on Saturday!'
+ ],
+ phr:[['I am having a … at …','我将在……举办……'],['It starts at …','……点开始'],['Would you like to come?','你愿意来吗？'],['I would love to come.','我很愿意来。'],['I’m afraid I can’t, because …','恐怕不行，因为……']],
+ err:[['I will have a party in Saturday.','I will have a party on Saturday.','具体某天用 on'],['Would you like come?','Would you like to come?','would like to do'],['I am sorry, I can’t come because I am busy.','（可更礼貌）I’m afraid I can’t come because I’ll be busy.','拒绝时用 I’m afraid 更礼貌']],
+ task:'写一封 5–6 句的邀请（活动、时间、地点），再写一句接受或婉拒的回复。',
+ chk:['时间用 on/at 正确','用了 Would you like to…','接受或拒绝都给了理由','有称呼与结尾']
+},
+{lvl:'A2',id:'a2-2',title:'简单邮件：请求与道歉（Email: request & apology）',
+ goal:'能写短邮件提出请求，或为迟到/失误道歉并说明补救。',
+ steps:['称呼 + 写信目的','说明情况/请求','希望与感谢','道歉 + 补救（如适用）'],
+ model:[
+  'Dear Mr. Smith,',
+  'I am writing to ask for a day off next Monday. I have a doctor’s appointment in the morning.',
+  'I will finish my work before Friday. Could you please approve my request?',
+  'Thank you very much. Best regards, Li Hua',
+  '— Apology —',
+  'Dear Ms. Lee, I am sorry that I was late for the meeting yesterday. The traffic was very heavy.',
+  'I will arrive earlier next time. Please accept my apology.'
+ ],
+ phr:[['I am writing to ask for …','我写信是想申请……'],['Could you please …?','您能否……？'],['I am sorry that …','很抱歉……'],['Please accept my apology.','请接受我的道歉。'],['I will … next time.','下次我会……']],
+ err:[['I am writing for ask a day off.','I am writing to ask for a day off.','to do 表目的'],['I will finish my work until Friday.','I will finish my work by Friday.','by=不迟于；until=直到'],['Sorry for late.','Sorry for being late.','for 后接名词/-ing']],
+ task:'写一封 5–6 句邮件：向老师请假（说明原因 + 承诺补上），或为迟到道歉（原因 + 补救）。',
+ chk:['有称呼与落款','说明目的清楚','时态正确','有礼貌表达']
+},
+{lvl:'A2',id:'a2-3',title:'描述过去经历（A past trip / event）',
+ goal:'能用一般过去时叙述一次旅行或活动：时间、地点、经过、感受。',
+ steps:['时间与地点','和谁、做了什么','一个细节','感受/收获'],
+ model:[
+  'Last summer, I went to Xi’an with my family. We stayed there for four days.',
+  'On the first day, we visited the City Wall and ate local food. The next day, we saw the Terracotta Warriors.',
+  'The weather was hot, but we were very excited. I took many photos.',
+  'It was a wonderful trip, and I hope to go there again.'
+ ],
+ phr:[['Last summer, I went to …','去年夏天我去了……'],['We stayed there for …','我们在那待了……'],['On the first day, we …','第一天我们……'],['The weather was …','天气……'],['It was a wonderful trip.','这是一次很棒的旅行。']],
+ err:[['Last summer I go to Xi’an.','Last summer I went to Xi’an.','过去时间用过去式'],['We visit many places.','We visited many places.','过去式'],['I very excited.','I was very excited.','形容词前要有 be（过去式 was）']],
+ task:'写 7–8 句叙述一次旅行：时间地点、同行、两件做过的事、感受。',
+ chk:['全文一般过去时','不规则动词正确（went/saw/took）','有 first/then/next','有感受句']
+},
+{lvl:'A2',id:'a2-4',title:'简单观点：喜好与理由（Likes, dislikes & opinion）',
+ goal:'能用 I like/prefer…because… 表达喜好并给 1–2 个理由。',
+ steps:['表明喜好','理由 1','理由 2','一句总结'],
+ model:[
+  'I prefer studying in the morning. There are two reasons for this.',
+  'First, I feel more energetic after a good sleep, so I can focus better.',
+  'Second, it is quiet in the morning, and there are fewer distractions.',
+  'For these reasons, morning is the best time for me to study.'
+ ],
+ phr:[['I prefer …','我更喜欢……'],['There are two reasons for this.','有两个原因。'],['First, … Second, …','第一……第二……'],['so I can …','所以我能……'],['For these reasons, …','因此……']],
+ err:[['I prefer to studying in the morning.','I prefer studying in the morning.','prefer doing / prefer to do（不混用）'],['Because it is quiet.','（不能单独成句）It is quiet, so I can focus.','because 从句不能单独成句'],['I like study.','I like studying.','like + -ing']],
+ task:'写 4–5 句：你更喜欢早上还是晚上学习？给两个理由和一句总结。',
+ chk:['明确表达喜好','有两个理由','用了 first/second 或 because/so','结尾有总结']
+},
+/* ================= B1 ================= */
+{lvl:'B1',id:'b1-1',title:'正式与非正式邮件（Formal vs informal email）',
+ goal:'能根据对象选择语气：给朋友用缩写与口语，给老师/公司用完整句与礼貌表达。',
+ steps:['判断对象 → 选语气','正式：Dear…/I am writing to…/Yours sincerely','非正式：Hi…/Just writing to…/Best','正文 2–3 句','结尾'],
+ model:[
+  '【正式】Dear Professor Chen,',
+  'I am writing to ask whether you could write a reference letter for my exchange application. I have attached my CV and the program details.',
+  'I would be grateful if you could reply by next Friday. Thank you for your time.',
+  'Yours sincerely, Li Hua',
+  '【非正式】Hi Alex,',
+  'Just writing to ask if you’re free this weekend. A few of us are going hiking on Saturday. Fancy joining us?',
+  'Let me know! Best, Li Hua'
+ ],
+ phr:[['I am writing to …','我写信是为了……'],['I would be grateful if …','如果……我将不胜感激'],['I look forward to your reply.','期待您的回复。'],['Just writing to …','只是写信来……'],['Fancy joining us?','想一起来吗？']],
+ err:[['Dear Mr. Chen, … Yours sincerely, Li Hua','（正式）正确','正式邮件用 Dear + 姓，结尾 Yours sincerely'],['Hi Professor, … Cheers','（混用）Hi + Cheers 太随意','语气要一致'],['I am writing for ask…','I am writing to ask…','to do 表目的']],
+ task:'同一件事各写一封：向朋友借书（非正式，3 句）；向老师申请延期（正式，4–5 句）。',
+ chk:['称呼/结尾与语气一致','正式邮件无缩写、无口语','目的句清楚','礼貌表达到位']
+},
+{lvl:'B1',id:'b1-2',title:'观点短文：利弊分析（Advantages & disadvantages）',
+ goal:'能就一个话题写 4 段短文：引入、优点、缺点、结论。',
+ steps:['引入话题（现象/争议）','优点（2 点）','缺点（2 点）','结论（平衡观点）'],
+ model:[
+  'Nowadays, more and more students use smartphones in class. This has both advantages and disadvantages.',
+  'On the one hand, smartphones give students quick access to information. They can also use learning apps to review vocabulary.',
+  'On the other hand, phones can easily distract students. Some of them play games or chat instead of listening to the teacher.',
+  'In my opinion, students should use phones for learning only, and schools can set clear rules. In this way, we can enjoy the benefits and avoid the problems.'
+ ],
+ phr:[['Nowadays, …','如今……'],['This has both advantages and disadvantages.','这有利也有弊。'],['On the one hand, … On the other hand, …','一方面……另一方面……'],['In my opinion, …','在我看来……'],['In this way, …','这样……']],
+ err:[['On one hand… on other hand…','On the one hand… on the other hand…','固定搭配'],['It has many advantage.','It has many advantages.','many 后接复数'],['I think students should to use…','I think students should use…','should + 动词原形']],
+ task:'选“学生上课用手机/线上学习/住校或走读”，写 4 段利弊短文（约 120 词）。',
+ chk:['4 段结构','优点缺点各 2 点','用了 on the one hand/on the other hand','结论有自己观点']
+},
+{lvl:'B1',id:'b1-3',title:'叙述文：一次难忘的经历（A memorable experience）',
+ goal:'能用过去时 + 时间线 + 细节写一次难忘经历，并有感悟。',
+ steps:['背景（时间/地点/人物）','起因','经过（2–3 个细节）','结果与感悟'],
+ model:[
+  'Two years ago, I took part in a volunteer program in a small village. I went there with five classmates and stayed for two weeks.',
+  'Our job was to teach children English. At first, I was nervous because I had never taught before. However, the children were friendly, and they listened carefully.',
+  'By the end of the trip, we had become good friends. On the last day, they gave us handmade cards.',
+  'This experience taught me that small help can make a big difference. It is one of the most meaningful things I have ever done.'
+ ],
+ phr:[['Two years ago, I …','两年前我……'],['At first, I was …','起初我……'],['However, …','然而……'],['By the end of …, …','到……结束时……'],['This experience taught me that …','这段经历让我明白……']],
+ err:[['I have never taught before that trip.','I had never taught before that trip.','过去的过去用过去完成时'],['The children were friend.','The children were friendly.','形容词 friendly'],['It teach me a lot.','It taught me a lot.','过去式 taught']],
+ task:'写一次难忘经历（约 120 词）：时间地点、起因、两个细节、结果与感悟。',
+ chk:['过去时为主','有 at first/however 等过渡','至少两个具体细节','结尾有感悟']
+},
+{lvl:'B1',id:'b1-4',title:'书评 / 影评（A review）',
+ goal:'能写简短评论：介绍作品、概述内容、评价优缺点、推荐对象。',
+ steps:['作品信息（书名/作者/类型）','内容概述（不剧透太多）','评价（优点/不足）','推荐给谁'],
+ model:[
+  'I recently read the novel Wonder by R. J. Palacio. It is a story about a boy with a facial difference who goes to school for the first time.',
+  'The book is moving and easy to read. What I like most is that it tells the story from different people’s views, so we can understand each character better.',
+  'One small weakness is that some parts are a little repetitive. However, this does not spoil the story.',
+  'I would recommend it to teenagers and parents. It teaches us to be kind and brave.'
+ ],
+ phr:[['I recently read/saw …','我最近读了/看了……'],['It is a story about …','这是一个关于……的故事'],['What I like most is …','我最喜欢的是……'],['One small weakness is that …','一个小缺点是……'],['I would recommend it to …','我会把它推荐给……']],
+ err:[['It is a story about a boy who he has…','…a boy who has…','定语从句中 who 已作主语，不再加 he'],['I recommend it for teenagers.','I recommend it to teenagers.','recommend sth to sb'],['It very moving.','It is very moving.','形容词前要 be']],
+ task:'写一篇 100–120 词的影评或书评：介绍、概述、评价、推荐。',
+ chk:['有作品信息','概述不冗长','有优点也有不足','有明确推荐对象']
+},
+/* ================= B2 ================= */
+{lvl:'B2',id:'b2-1',title:'议论：同意或不同意（Argument essay）',
+ goal:'能写 4–5 段议论文：立场、两个论据（例证）、让步反驳、结论。',
+ steps:['引入+表明立场','论据 1 + 例子','论据 2 + 例子','让步 + 反驳','结论重申'],
+ model:[
+  'Some people argue that university students should not take part-time jobs because work may affect their studies. Personally, I disagree with this view.',
+  'To begin with, part-time work helps students develop practical skills that cannot be learned in class. For example, working in a café teaches communication and time management.',
+  'In addition, a part-time job gives students financial experience. They learn how to plan a budget and become more independent.',
+  'Admittedly, too many working hours can harm academic performance. However, this problem can be solved if students work only at weekends and keep a balance.',
+  'In conclusion, part-time jobs are valuable as long as students manage their time wisely.'
+ ],
+ phr:[['Some people argue that …','有人主张……'],['Personally, I disagree with this view.','我个人不同意这个观点。'],['To begin with, … For example, …','首先……例如……'],['Admittedly, … However, …','诚然……然而……'],['In conclusion, … as long as …','总之……只要……']],
+ err:[['I am disagree with …','I disagree with …','disagree 是动词'],['Although it is hard, but …','Although it is hard, …','although 与 but 不连用'],['It can help students to developing skills.','It can help students develop skills.','help sb (to) do']],
+ task:'选“大学生该不该做兼职/该不该禁止手机进校园”，写 4–5 段议论文（约 160 词），含让步反驳。',
+ chk:['立场明确','两个论据各有例子','有一段让步+反驳','结论呼应开头']
+},
+{lvl:'B2',id:'b2-2',title:'报告与建议（Report & recommendations）',
+ goal:'能写简短报告：背景、发现（分点）、建议（分点），语气客观。',
+ steps:['目的/背景','调查方法与发现','建议 1–2 条（可执行）','结尾'],
+ model:[
+  'The purpose of this report is to suggest ways to improve the school library. The report is based on a survey of 200 students.',
+  'The survey shows two main problems. First, many students cannot find the books they need because the shelves are not well organized. Second, the library closes too early, so students have little time to study there in the evening.',
+  'I would like to make the following recommendations. The library should reorganize the shelves by subject and update the online catalogue. In addition, it should stay open until 9 p.m. during exam weeks.',
+  'I hope these suggestions will be considered.'
+ ],
+ phr:[['The purpose of this report is to …','本报告的目的是……'],['The report is based on …','本报告基于……'],['The survey shows that …','调查显示……'],['I would like to make the following recommendations.','我想提出以下建议。'],['It should …','它应该……']],
+ err:[['The purpose is suggest…','The purpose is to suggest…','be to do'],['We should to open…','We should open…','should + 原形'],['Many student…','Many students…','many 后复数']],
+ task:'就“食堂/图书馆/宿舍”写一份 120–150 词报告：目的、两个发现、两条建议。',
+ chk:['有目的句','发现分点','建议具体可执行','语气客观（少用 I think）']
+},
+{lvl:'B2',id:'b2-3',title:'申请 / 求职信（Application & cover letter）',
+ goal:'能写正式申请信：说明职位/项目、匹配的能力与经历、表达意愿、礼貌结尾。',
+ steps:['称呼 + 申请什么','为什么胜任（能力+经历）','为什么选择贵方','期待面试 + 结尾'],
+ model:[
+  'Dear Sir or Madam,',
+  'I am writing to apply for the position of marketing intern advertised on your website.',
+  'I am a third-year student majoring in business. Last summer, I worked as a sales assistant, where I learned how to communicate with customers and manage time under pressure. I am also familiar with social media tools and data analysis.',
+  'I have long admired your company’s creative campaigns, and I believe this internship would help me grow professionally.',
+  'I would welcome the opportunity to discuss my application at an interview. Thank you for your consideration.',
+  'Yours faithfully, Li Hua'
+ ],
+ phr:[['I am writing to apply for …','我写信申请……'],['I am a … student majoring in …','我是……专业……年级学生'],['I learned how to …','我学会了……'],['I have long admired …','我一直很欣赏……'],['I would welcome the opportunity to …','我很希望有机会……']],
+ err:[['I am writing to apply the position.','I am writing to apply for the position.','apply for a job'],['I am major in business.','I am a business major. / I major in business.','major 用法'],['I look forward to hear from you.','I look forward to hearing from you.','look forward to + -ing']],
+ task:'写一封 140–160 词求职/申请信（岗位/能力经历/选择理由/期待面试）。',
+ chk:['正式称呼与结尾','能力有具体经历支撑','说明为何选择对方','无语法硬伤']
+},
+{lvl:'B2',id:'b2-4',title:'图表描述（Describing data）',
+ goal:'能描述图表趋势：总体趋势、具体数据、对比、原因与结论。',
+ steps:['总述图表主题','总体趋势（上升/下降/波动）','关键数据（最高/最低/对比）','原因或结论'],
+ model:[
+  'The chart shows the number of people using shared bikes in a city from 2018 to 2022.',
+  'Overall, the number rose steadily during this period. In 2018, about 200,000 people used shared bikes, while in 2022 the figure reached nearly 800,000.',
+  'The largest increase occurred between 2020 and 2021, when the number almost doubled. By contrast, growth slowed down in 2022.',
+  'This trend may be explained by lower prices and growing environmental awareness. It suggests that shared bikes will remain popular in the future.'
+ ],
+ phr:[['The chart shows …','图表显示……'],['Overall, the number rose steadily.','总体来看，数量稳步上升。'],['The largest increase occurred between … and …','最大增长出现在……到……'],['By contrast, …','相比之下……'],['This trend may be explained by …','这一趋势可能由……解释']],
+ err:[['The number increased 20%.','The number increased by 20%.','increase by + 幅度'],['It is more popular than before.','（口语）更正式：It has become more popular.','学术写作少用口语'],['The number were…','The number was…','the number 作主语用单数']],
+ task:'描述一张你熟悉的图表（如某城市共享单车/网购人数 4 年变化，约 140 词）。',
+ chk:['有总述','有总体趋势','有具体数据与对比','有原因或结论']
+},
+/* ================= C1 ================= */
+{lvl:'C1',id:'c1-1',title:'论证性文章：让步与反驳（Discursive / argumentative）',
+ goal:'能写结构严谨的论证文：提出论点、分层论证、承认对方合理处再反驳、结论升华。',
+ steps:['引出争议 + 明确论点','论据一（数据/例证/推理）','论据二（递进）','让步并反驳（admittedly… nevertheless…）','结论（呼吁/展望）'],
+ model:[
+  'The rise of remote work has sparked a heated debate about its long-term value. While critics warn that it weakens teamwork, I would argue that, if managed well, remote work can make organizations more efficient and more humane.',
+  'First, remote work widens the talent pool. Companies are no longer limited by geography, and employees can choose where to live. This not only reduces commuting costs but also allows firms to hire skilled workers who would otherwise be excluded.',
+  'Moreover, flexibility can improve well-being. When people control their schedules, they are better able to balance work and family, which in turn raises productivity and reduces burnout.',
+  'Admittedly, remote work may weaken informal communication. Nevertheless, this drawback is not inevitable: regular video meetings, clear goals and occasional face-to-face gatherings can preserve team spirit.',
+  'In conclusion, remote work is neither a panacea nor a disaster. Its success depends on thoughtful management, and organizations that adapt wisely are likely to gain a lasting advantage.'
+ ],
+ phr:[['has sparked a heated debate','引发了激烈争论'],['While critics warn that …, I would argue that …','尽管批评者警告……我认为……'],['This not only … but also …','这不仅……而且……'],['Admittedly, … Nevertheless, …','诚然……然而……'],['is neither … nor …','既不是……也不是……']],
+ err:[['Despite of the benefits…','Despite the benefits…','despite 后不加 of'],['It is not only cheap, but also it is convenient.','It is not only cheap but also convenient.','not only…but also 结构对称'],['The reason is because…','The reason is that…','reason 与 because 不连用']],
+ task:'就“AI 是否让学习更高效/远程办公的利弊/该不该推迟退休”写一篇 200–250 词论证文，必须含一段让步反驳。',
+ chk:['论点一句话清晰','论证分层且有例证','有一段 Admittedly…Nevertheless…','结论不只是重复开头']
+},
+{lvl:'C1',id:'c1-2',title:'提案 / 项目建议书（Proposal）',
+ goal:'能写项目提案：背景与问题、目标、方案与步骤、预期成果、可行性。',
+ steps:['标题 + 摘要','背景与问题','目标（可衡量）','方案与实施步骤','预期成果/可行性'],
+ model:[
+  'Proposal: A Campus Reading Program',
+  'Summary: This proposal outlines a one-semester reading program designed to encourage students to read more outside their textbooks.',
+  'Background: A recent survey shows that nearly half of our students read fewer than two books a month. Many say they lack time and guidance.',
+  'Objectives: The program aims to help 500 students read at least four books in one semester and to build a habit of daily reading.',
+  'Plan: First, we will publish a recommended book list and form small reading groups. Second, we will hold a monthly sharing session with teachers. Third, participants will record their progress in a simple app.',
+  'Expected outcomes: Students will broaden their knowledge and improve their reading and writing skills. Given the low cost and strong student interest, the program is highly feasible.'
+ ],
+ phr:[['This proposal outlines …','本提案概述……'],['Background: …','背景：……'],['The program aims to …','该项目旨在……'],['Plan: First… Second… Third…','方案：第一……第二……第三……'],['Given …, the program is highly feasible.','鉴于……该项目完全可行。']],
+ err:[['aims to helping','aims to help','aim to do'],['Expected outcome are…','Expected outcomes are…','复数'],['We will held…','We will hold…','will + 原形']],
+ task:'写一份 180–220 词提案：校园读书活动/垃圾分类/心理健康周（含背景、目标、方案、成果）。',
+ chk:['有摘要与背景','目标可衡量','方案分步骤','有预期成果与可行性']
+},
+{lvl:'C1',id:'c1-3',title:'学术摘要（Abstract）',
+ goal:'能写规范摘要：背景、目的、方法、结果、结论（五要素，约 150–200 词）。',
+ steps:['背景（研究空白）','目的','方法','主要结果（带数据）','结论与意义'],
+ model:[
+  'Background: Although online learning has expanded rapidly, little is known about how it affects students’ sustained attention.',
+  'Objective: This study examines the relationship between short video-based lessons and attention span among first-year university students.',
+  'Methods: Data were collected from 240 students over eight weeks. Participants were divided into two groups, and their attention was measured through weekly quizzes and self-reports.',
+  'Results: The experimental group showed a 15% improvement in quiz completion, but no significant change in self-reported focus.',
+  'Conclusion: Short videos may improve engagement with tasks, yet they do not necessarily strengthen long-term attention. Future research should examine longer periods and different subjects.'
+ ],
+ phr:[['Although …, little is known about …','尽管……人们对……知之甚少'],['This study examines …','本研究考察……'],['Data were collected from …','数据来自……'],['The results showed …','结果显示……'],['Future research should …','未来研究应……']],
+ err:[['Data was collected…','Data were collected…','data 作复数'],['This study examine…','This study examines…','主谓一致'],['It effects attention.','It affects attention.','affect 动词 / effect 名词']],
+ task:'为你熟悉的一项小研究写 150–200 词英文摘要（背景/目的/方法/结果/结论）。',
+ chk:['五要素齐全','方法有样本与周期','结果有具体数据','结论不夸大']
+},
+{lvl:'C1',id:'c1-4',title:'评论 / 书评进阶（Critical review）',
+ goal:'能写有批判性的评论：概述、分析论点与证据、评价贡献与局限、给出判断。',
+ steps:['作品与作者定位','核心论点概述','证据与方法评估','贡献与局限','总体评价'],
+ model:[
+  'In The Attention Economy, the author argues that digital platforms are designed to capture, rather than serve, our attention. The book offers a provocative account of how business models shape behaviour.',
+  'The argument is strongest where it combines industry evidence with psychological research. For instance, the discussion of variable rewards is both clear and well supported.',
+  'However, the book is less convincing when it treats users as passive. It pays little attention to how people resist or adapt to these designs, and its policy proposals remain vague.',
+  'Overall, this is a valuable and readable introduction to a pressing issue. Readers looking for a balanced, research-based overview will benefit, although those seeking practical solutions may be disappointed.'
+ ],
+ phr:[['the author argues that …','作者主张……'],['The argument is strongest where …','该论证在……处最有说服力'],['However, the book is less convincing when …','然而，当……时这本书说服力较弱'],['It pays little attention to …','它很少关注……'],['Overall, this is a valuable …','总体而言，这是一本有价值的……']],
+ err:[['The book is very good and interesting and useful.','（堆砌）The book is valuable for its clear argument.','用具体评价代替空泛形容词'],['It doesn’t talk about nothing.','It says little about …','双重否定'],['I am agree with the author.','I agree with the author.','agree 是动词']],
+ task:'评价一本书/一部电影/一篇文章（200–250 词）：概述、评估证据、指出局限、总体判断。',
+ chk:['先说清作品与核心论点','评价有依据（举例）','指出至少一个局限','总体判断明确']
+}
+];
+
+var LV='all', DONE={};
+try{DONE=JSON.parse(localStorage.getItem('wc_done')||'{}')||{};}catch(e){DONE={};}
+function saveDone(){try{localStorage.setItem('wc_done',JSON.stringify(DONE));}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function unitHTML(u){
+ var m=u.model.map(function(p){return '<p class="passage">'+esc(p)+'</p>';}).join('');
+ var ph=u.phr.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td></tr>';}).join('');
+ var er=u.err.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td></tr>';}).join('');
+ var ck=u.chk.map(function(c,i){return '<li><label><input type="checkbox" data-chk="'+u.id+'_'+i+'">'+esc(c)+'</label></li>';}).join('');
+ var st=u.steps.map(function(s){return '<li>'+esc(s)+'</li>';}).join('');
+ var done=!!DONE[u.id];
+ return '<section class="unit'+(done?' done':'')+'" id="u_'+u.id+'" data-lv="'+u.lvl+'">'
+  +'<h3>'+u.lvl+' · '+esc(u.title)+(done?'<span class="tag">已完成</span>':'')+'</h3>'
+  +'<p class="goal">🎯 '+esc(u.goal)+'</p>'
+  +'<h4>① 结构框架</h4><ol>'+st+'</ol>'
+  +'<h4>② 范文</h4><div class="model">'+m+'</div>'
+  +'<h4>③ 常用句型 / 表达</h4><table class="tbl phr"><thead><tr><th>英文</th><th>中文</th></tr></thead><tbody>'+ph+'</tbody></table>'
+  +'<h4>④ 易错点</h4><table class="tbl err"><thead><tr><th>别这样写</th><th>改成</th><th>原因</th></tr></thead><tbody>'+er+'</tbody></table>'
+  +'<h4>⑤ 动手写</h4><div class="task">'+esc(u.task)+'</div>'
+  +'<textarea data-ta="'+u.id+'" placeholder="在这里写你的作文…"></textarea>'
+  +'<div class="tools"><span data-wc="'+u.id+'">0 词</span><button type="button" data-copy="'+u.id+'">复制</button><button type="button" data-clr="'+u.id+'">清空</button></div>'
+  +'<h4>⑥ 自查</h4><ul class="chk">'+ck+'</ul>'
+  +'<label class="donebox"><input type="checkbox" data-done="'+u.id+'"'+(done?' checked':'')+'> 标记本篇完成</label>'
+  +'</section>';
+}
+function render(){
+ var host=document.getElementById('units');
+ var arr=UNITS.filter(function(u){return LV==='all'||u.lvl===LV;});
+ host.innerHTML=arr.map(unitHTML).join('');
+ bindUnit();
+ updateProgress();
+}
+function bindUnit(){
+ var host=document.getElementById('units');
+ host.querySelectorAll('textarea[data-ta]').forEach(function(ta){
+  var id=ta.getAttribute('data-ta');
+  try{ta.value=localStorage.getItem('wc_ta_'+id)||'';}catch(e){}
+  function wc(){var n=(ta.value.trim().match(/[A-Za-z][A-Za-z'\-]*/g)||[]).length;var el=host.querySelector('[data-wc="'+id+'"]');if(el)el.textContent=n+' 词';}
+  wc();
+  ta.addEventListener('input',function(){wc();try{localStorage.setItem('wc_ta_'+id,ta.value);}catch(e){}});
+ });
+ host.querySelectorAll('[data-copy]').forEach(function(b){b.onclick=function(){var ta=host.querySelector('textarea[data-ta="'+b.getAttribute('data-copy')+'"]');if(!ta)return;ta.select();try{document.execCommand('copy');b.textContent='已复制 ✓';setTimeout(function(){b.textContent='复制';},1200);}catch(e){}};});
+ host.querySelectorAll('[data-clr]').forEach(function(b){b.onclick=function(){var id=b.getAttribute('data-clr');var ta=host.querySelector('textarea[data-ta="'+id+'"]');if(!ta)return;if(confirm('清空这篇的草稿？')){ta.value='';try{localStorage.removeItem('wc_ta_'+id);}catch(e){}var el=host.querySelector('[data-wc="'+id+'"]');if(el)el.textContent='0 词';}};});
+ host.querySelectorAll('[data-done]').forEach(function(c){c.onchange=function(){var id=c.getAttribute('data-done');if(c.checked)DONE[id]=1;else delete DONE[id];saveDone();var sec=c.closest('.unit');if(sec){sec.classList.toggle('done',c.checked);var tag=sec.querySelector('.tag');var h=sec.querySelector('h3');if(c.checked&&!tag&&h){var s=document.createElement('span');s.className='tag';s.textContent='已完成';h.appendChild(s);}if(!c.checked&&tag)tag.remove();}updateProgress();};});
+ host.querySelectorAll('[data-chk]').forEach(function(c){var k='wc_ck_'+c.getAttribute('data-chk');try{c.checked=localStorage.getItem(k)==='1';}catch(e){}c.onchange=function(){try{localStorage.setItem(k,c.checked?'1':'0');}catch(e){}};});
+}
+function updateProgress(){
+ var tot=UNITS.length,dn=UNITS.filter(function(u){return DONE[u.id];}).length;
+ var fill=document.getElementById('pfill');if(fill)fill.style.width=(tot?Math.round(dn/tot*100):0)+'%';
+ var t=document.getElementById('ptext');if(t)t.textContent=dn+'/'+tot+' 篇完成';
+}
+document.getElementById('bar').addEventListener('click',function(e){
+ var b=e.target.closest('.lv');if(!b)return;
+ if(b.id==='preset'){if(!confirm('清除本页完成进度与所有草稿？'))return;UNITS.forEach(function(u){delete DONE[u.id];try{localStorage.removeItem('wc_ta_'+u.id);}catch(e){}});DONE={};saveDone();render();return;}
+ LV=b.getAttribute('data-lv');
+ document.querySelectorAll('.bar .lv[data-lv]').forEach(function(x){x.classList.toggle('on',x===b);});
+ render();
+});
+render();
+</script>
+<script src="cet4-dict.js"></script>
+<script src="ky-dict.js"></script>
+<script src="sentence_pairs.js"></script>
+<script src="study_dict.js"></script>
+<script src="sentence_tr.js"></script>
+<script src="write_check.js"></script>
+<script src="auth.js"></script>
+</body></html>
