@@ -24,6 +24,7 @@ table.tbl th{color:var(--sub);font-weight:600}
 .unit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
 .unit.done{border-color:#bfe3cc;box-shadow:0 0 0 2px #eaf6ee inset}
 .goal{color:#1b7f3b;font-size:13.5px;margin:2px 0 6px}
+.bc{margin:0 0 8px;font-size:13px}.bc a{color:#1b5fa8;text-decoration:none;font-weight:600}.bc a:hover{text-decoration:underline}
 .model{background:#fffdf7;border:1px dashed #d9cfb8;border-radius:10px;padding:8px 12px}
 .model p{text-indent:2em;margin:6px 0}
 .phr td:first-child{color:#123a6b}
@@ -94,7 +95,7 @@ html[data-theme="sepia"] body{background:#f6efe0}
 <p class="lead" style="margin-top:24px">说明：本教程为本站原创，按 CEFR（A1–C1）写作能力描述自编，不复制 British Council 原文；范文与练习均为教学示例。若要更系统，可配合本站「真题精讲」的写作五步法与「错题本/学习统计」一起用。</p>
 </div>
 
-<script src="writing-data.js?v=1"></script>
+<script src="writing-data.js?v=2"></script>
 <script>
 var UNITS=window.UNITS||[];
 
@@ -112,6 +113,7 @@ function unitHTML(u){
  return '<section class="unit'+(done?' done':'')+'" id="u_'+u.id+'" data-lv="'+u.lvl+'">'
   +'<h3>'+u.lvl+' · '+esc(u.title)+(done?'<span class="tag">已完成</span>':'')+'</h3>'
   +'<p class="goal">🎯 '+esc(u.goal)+'</p>'
+  +(u.bc?'<p class="bc">🔗 <a href="https://learnenglish.britishcouncil.org'+u.bc.u+'" target="_blank" rel="noopener">British Council 原教程：'+esc(u.bc.t)+' ↗</a></p>':'')
   +'<h4>① 结构框架</h4><ol>'+st+'</ol>'
   +'<h4>② 范文</h4><div class="model">'+m+'</div>'
   +'<h4>③ 常用句型 / 表达</h4><table class="tbl phr"><thead><tr><th>英文</th><th>中文</th></tr></thead><tbody>'+ph+'</tbody></table>'
